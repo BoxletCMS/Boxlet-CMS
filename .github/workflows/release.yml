@@ -1,0 +1,103 @@
+# A release of Boxlet, built from a version tag in BoxletCMS/boxlet-cms-dev.
+#
+# Run by hand: Actions → Release → Run workflow, with the tag. It
+#   1. refuses a tag whose tests did not all pass in the development repository
+#   2. builds the release there, with that tag's own tools/release/build.php: vendor/ without
+#      the development tools, and nothing of the project's own papers
+#   3. puts the result in this repository, as a commit and the same tag
+#   4. publishes a GitHub Release here with the ZIP a person uploads to their hosting
+#
+# No token and no key: the development repository is public, so it is read without one, and
+# this workflow writes only to its own repository, which its own GITHUB_TOKEN may do.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The tag in BoxletCMS/boxlet-cms-dev, e.g. v0.1.0-preview'
+        required: true
+      prerelease:
+        description: 'Mark the release as a pre-release'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: The tag exists, and its tests passed
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || { echo "::error::Not a version: $VERSION"; exit 1; }
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$VERSION" >/dev/null 2>&1; then
+            echo "::error::$VERSION is released already."; exit 1
+          fi
+          sha=$(gh api "repos/BoxletCMS/boxlet-cms-dev/commits/$VERSION" --jq .sha)
+          runs=$(gh api "repos/BoxletCMS/boxlet-cms-dev/commits/$sha/check-runs" --jq '[.check_runs[] | {name, status, conclusion}]')
+          echo "$runs" | jq -r '.[] | "\(.name): \(.status) \(.conclusion)"'
+          echo "$runs" | jq -e 'length > 0 and all(.status == "completed" and .conclusion == "success")' >/dev/null \
+            || { echo "::error::The tests for $VERSION ($sha) have not all passed."; exit 1; }
+          echo "SHA=$sha" >> "$GITHUB_ENV"
+
+      - name: Check out the development repository at the tag
+        uses: actions/checkout@v4
+        with:
+          repository: BoxletCMS/boxlet-cms-dev
+          ref: ${{ inputs.version }}
+          path: dev
+
+      - name: PHP 8.1, the oldest Boxlet runs on, with Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: zip
+          tools: composer
+          coverage: none
+
+      - name: Build the release
+        run: php dev/tools/release/build.php "$RUNNER_TEMP/out" "$VERSION"
+
+      - name: Check out this repository
+        uses: actions/checkout@v4
+        with:
+          path: install
+          fetch-depth: 0
+
+      - name: Put the release in this repository, as a commit and a tag
+        run: |
+          set -euo pipefail
+          unzip -q "$RUNNER_TEMP/out/boxlet-$VERSION.zip" -d "$RUNNER_TEMP/unpacked"
+          cd install
+          # Everything but the history and this workflow goes; the release takes its place.
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github -exec rm -rf {} +
+          cp -a "$RUNNER_TEMP/unpacked/boxlet/." .
+          git config user.name BoxletCMS
+          git config user.email noreply@boxletcms.org
+          git add -A
+          git commit -q -m "Boxlet $VERSION" -m "Built from BoxletCMS/boxlet-cms-dev@$SHA."
+          git tag -a "$VERSION" -m "Boxlet $VERSION"
+          git push origin HEAD:main "refs/tags/$VERSION"
+
+      - name: Publish the release, with the ZIP to install
+        run: |
+          set -euo pipefail
+          flag=""
+          if [ "${{ inputs.prerelease }}" = "true" ]; then flag="--prerelease"; fi
+          gh release create "$VERSION" "$RUNNER_TEMP/out/boxlet-$VERSION.zip" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Boxlet $VERSION" \
+            --notes "Built from [BoxletCMS/boxlet-cms-dev@${SHA:0:7}](https://github.com/BoxletCMS/boxlet-cms-dev/commit/$SHA).
+
+          **To install:** download \`boxlet-$VERSION.zip\` below, upload its \`boxlet/\` directory to your hosting, point the domain at \`boxlet/public\`, and open \`/install.php\` in a browser. No shell, no Composer." \
+            $flag
