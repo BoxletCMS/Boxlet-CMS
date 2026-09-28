@@ -99,5 +99,5 @@ jobs:
             --title "Boxlet $VERSION" \
             --notes "Built from [BoxletCMS/boxlet-cms-dev@${SHA:0:7}](https://github.com/BoxletCMS/boxlet-cms-dev/commit/$SHA).
 
-          **To install:** download \`boxlet-$VERSION.zip\` below, upload its \`boxlet/\` directory to your hosting, point the domain at \`boxlet/public\`, and open \`/install.php\` in a browser. No shell, no Composer." \
+          **To install:** download \`boxlet-$VERSION.zip\` below and upload what is inside its \`boxlet/\` folder: straight into \`public_html\` on cPanel, or into a folder of your choice with the domain pointed at its \`public/\`. Then open \`/install.php\` in a browser. No shell, no Composer. The README has the details." \
             $flag
