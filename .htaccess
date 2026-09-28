@@ -1,3 +1,7 @@
+# BEGIN Boxlet
+# Everything down to END Boxlet is replaced when Boxlet is updated (PLAN.md D-140).
+# Lines of your own go above BEGIN or below END, and are kept.
+
 # Boxlet in a folder that is itself the web root: cPanel's public_html, or any host where
 # the domain cannot be pointed at public/ (PLAN.md D-138).
 #
@@ -9,7 +13,7 @@
 # Nginx ignores it entirely.
 #
 # If this folder had a .htaccess of its own before Boxlet (cPanel writes the PHP version
-# into one), keep its lines and put these below them.
+# into one), keep its lines above BEGIN Boxlet.
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -30,3 +34,4 @@
 <IfModule !mod_rewrite.c>
     Require all denied
 </IfModule>
+# END Boxlet

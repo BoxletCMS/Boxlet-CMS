@@ -1,0 +1,81 @@
+/* The Backups screen (PLAN.md D-139). Admin tokens only (--ui-*). */
+
+.backups-progress {
+  margin-block-end: var(--ui-5);
+}
+
+.backups-progress h2 {
+  margin: 0;
+}
+
+.backups-version,
+.backups-size {
+  white-space: nowrap;
+}
+
+.backups-size {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Download, Restore and Delete side by side, the form among them standing like a button. */
+.backups-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-1);
+  justify-content: flex-end;
+}
+
+.backups-actions form {
+  margin: 0;
+}
+
+.backups-actions .button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-1);
+}
+
+.backups-damaged {
+  color: var(--ui-danger);
+}
+
+.backups-total {
+  margin-block-start: var(--ui-3);
+}
+
+/* Where they are kept, under the total or under the empty state: a line of its own. */
+.backups-total + .hint,
+.empty-state + .hint {
+  margin-block-start: var(--ui-2);
+}
+
+.backups-confirm {
+  max-inline-size: 44rem;
+}
+
+.backups-confirm ol {
+  margin: 0;
+  padding-inline-start: var(--ui-5);
+}
+
+.backups-confirm li + li {
+  margin-block-start: var(--ui-2);
+}
+
+.backups-confirm .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+}
+
+/* A phone keeps when and what for, and the actions; the version and the size go. */
+@media (max-width: 47.5rem) {
+  .backups-version,
+  .backups-size {
+    display: none;
+  }
+
+  .backups-actions {
+    justify-content: flex-start;
+  }
+}

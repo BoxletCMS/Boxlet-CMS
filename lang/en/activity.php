@@ -22,6 +22,8 @@ return [
     'activity.kind.message' => 'Message',
     'activity.kind.design' => 'Design',
     'activity.kind.settings' => 'Settings',
+    'activity.kind.backup' => 'Backup',
+    'activity.kind.update' => 'Update',
 
     'activity.page.created' => 'Created “:name”',
     'activity.page.saved' => 'Edited “:name”',
@@ -48,6 +50,11 @@ return [
     'activity.menu.renamed' => 'Renamed a menu to “:name”',
     'activity.menu.edited' => 'Changed the items of “:name”',
     'activity.menu.deleted' => 'Deleted the menu “:name”',
+    'activity.update.done' => 'Updated Boxlet to :name',
+    'activity.update.rolled_back' => 'Rolled Boxlet back to :name',
+    'activity.backup.made' => 'Made the backup :name',
+    'activity.backup.restored' => 'Restored the backup :name',
+    'activity.backup.deleted' => 'Deleted the backup :name',
     'activity.redirect.created' => 'Added a redirect for :name',
     'activity.redirect.deleted' => 'Deleted the redirect for :name',
 

@@ -26,16 +26,21 @@ final class Migrator
      * Every pending file is compiled before the first one runs, so a bad token aborts
      * the run with nothing applied.
      *
+     * $only limits the run to those files: a restore rebuilds the tables as the backup's
+     * own migrations left them, loads its rows, and only then runs what this code adds
+     * (PLAN.md D-139), so a migration that moves data finds the data to move.
+     *
+     * @param list<string>|null $only
      * @return list<string> filenames applied by this run, empty when already up to date
      */
-    public function migrate(): array
+    public function migrate(?array $only = null): array
     {
         $applied = $this->appliedFilenames();
         $names = [];
         $compiled = [];
         foreach ($this->files() as $file) {
             $name = basename($file);
-            if (!in_array($name, $applied, true)) {
+            if (!in_array($name, $applied, true) && ($only === null || in_array($name, $only, true))) {
                 $names[] = $name;
                 $compiled[] = self::compile((string) file_get_contents($file), $this->db->driver, $name);
             }
@@ -69,6 +74,16 @@ final class Migrator
         }
 
         return $pending;
+    }
+
+    /**
+     * Every migration file this code carries, applied or not, in filename order.
+     *
+     * @return list<string>
+     */
+    public function available(): array
+    {
+        return array_map('basename', $this->files());
     }
 
     /**

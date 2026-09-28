@@ -18,6 +18,9 @@ use App\Modules\Auth\ForgotController;
 use App\Modules\Auth\TwoFactorController;
 use App\Modules\Appearance\AppearanceController;
 use App\Modules\Appearance\AppearancePreview;
+use App\Modules\Backup\Backup;
+use App\Modules\Backup\BackupsController;
+use App\Modules\Backup\Restore;
 use App\Modules\Design\Design;
 use App\Modules\Forms\FormsController;
 use App\Modules\Forms\FormSubmitController;
@@ -52,8 +55,12 @@ use App\Modules\Stats\StatsSettingsController;
 use App\Modules\Update\Maintenance;
 use App\Modules\Update\MaintenanceController;
 use App\Modules\Update\Update;
+use App\Modules\Update\Releases;
 use App\Modules\Update\UpdateController;
+use App\Modules\Update\UpdatesController;
+use App\Modules\Update\Upgrade;
 use App\Support\Url;
+use App\Support\Version;
 
 /**
  * Builds the container for the current request and registers routes. Expects
@@ -111,6 +118,43 @@ $container->set('mail_transport', fn (Container $c) => MailSettings::transport($
 $container->set('media_encoder', fn () => new MediaEncoder());
 $container->set('media_writer', fn (Container $c) => new MediaWriter($c->get('media_encoder')));
 $container->set('media_upload', fn (Container $c) => new MediaUpload($c->get('db'), $storage, $c->get('media_encoder')));
+// Backups and restoring one (D-139): the site's own folders, and the key that seals its
+// secrets, which a backup records a print of. Read as ['key'] and so on rather than by
+// dotted keys, for the route guard's reason above.
+$app = (array) $config->get('app', []);
+$container->set('backups_path', fn () => $storage . '/backups');
+$container->set('backup', fn (Container $c) => new Backup(
+    $c->get('db'),
+    $root,
+    $storage . '/backups',
+    $storage . '/uploads',
+    (string) ($app['public_path'] ?? '') . '/m',
+    (string) ($app['env_path'] ?? ''),
+    (string) ($app['key'] ?? ''),
+));
+$container->set('restore', fn (Container $c) => new Restore(
+    $c->get('db'),
+    $root,
+    $storage . '/backups',
+    $storage . '/uploads',
+    (string) ($app['public_path'] ?? '') . '/m',
+    (string) ($app['env_path'] ?? ''),
+    (string) ($app['key'] ?? ''),
+    $storage,
+    $cache,
+    (string) ($app['public_path'] ?? ''),
+));
+// Updating to a new version (D-140): which version this is, where releases come from, and
+// the update itself, which puts the new code where the running code is.
+$container->set('version', fn () => Version::current($root));
+$container->set('releases', fn () => new Releases());
+$container->set('upgrade', fn (Container $c) => new Upgrade(
+    $c->get('db'),
+    $root,
+    $storage,
+    $cache,
+    (string) ($app['public_path'] ?? ''),
+));
 // Making every picture's sizes again, step by step (D-048).
 $container->set('media_remake', fn (Container $c) => new MediaRemake(
     $c->get('db'),
@@ -177,6 +221,13 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // lets through while one is pending (D-019).
     $router->get('/admin/update', [UpdateController::class, 'show'], $requireAdmin);
     $router->post('/admin/update', [UpdateController::class, 'run'], $requireAdmin);
+    // A new version of Boxlet (D-140): from GitHub when asked, or from a ZIP, after a backup.
+    $router->get('/admin/updates', [UpdatesController::class, 'index'], $requireAdmin);
+    $router->post('/admin/updates/check', [UpdatesController::class, 'check'], $requireAdmin);
+    $router->post('/admin/updates/github', [UpdatesController::class, 'github'], $requireAdmin);
+    $router->post('/admin/updates/upload', [UpdatesController::class, 'upload'], $requireAdmin);
+    $router->post('/admin/updates/step', [UpdatesController::class, 'step'], $requireAdmin);
+    $router->post('/admin/updates/roll-back', [UpdatesController::class, 'rollBack'], $requireAdmin);
     // Maintenance mode (D-021). The GET is where the bar's link goes; it only brings the
     // owner back to the dashboard, because switching off is a POST with a token.
     $router->get('/admin/maintenance', [MaintenanceController::class, 'show'], $requireAdmin);
@@ -236,6 +287,17 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->get('/admin/redirects', [RedirectsController::class, 'index'], $requireAdmin);
     $router->post('/admin/redirects', [RedirectsController::class, 'store'], $requireAdmin);
     $router->post('/admin/redirects/{id:\d+}/delete', [RedirectsController::class, 'delete'], $requireAdmin);
+
+    // Backups (D-139): made and restored in steps, downloaded, deleted. The name is a
+    // backup's own (Backups::validName), checked again by everything it reaches.
+    $backupName = '{name:\d{4}-\d{2}-\d{2}-\d{6}-(?:manual|update|restore)}';
+    $router->get('/admin/backups', [BackupsController::class, 'index'], $requireAdmin);
+    $router->post('/admin/backups', [BackupsController::class, 'start'], $requireAdmin);
+    $router->post('/admin/backups/step', [BackupsController::class, 'step'], $requireAdmin);
+    $router->get('/admin/backups/' . $backupName . '/download', [BackupsController::class, 'download'], $requireAdmin);
+    $router->get('/admin/backups/' . $backupName . '/restore', [BackupsController::class, 'confirm'], $requireAdmin);
+    $router->post('/admin/backups/' . $backupName . '/restore', [BackupsController::class, 'restore'], $requireAdmin);
+    $router->post('/admin/backups/' . $backupName . '/delete', [BackupsController::class, 'delete'], $requireAdmin);
 
     // Forms (D-046): the list, a new one, and its edit screen, where every button saves.
     $router->get('/admin/forms', [FormsController::class, 'index'], $requireAdmin);

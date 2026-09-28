@@ -175,6 +175,8 @@ It gets there by leaving things out:
 - **Protected login.** Repeated wrong passwords get locked out. A forgotten password can be
   reset by email, or with a file uploaded over FTP when the site can't send mail.
 - **Maintenance mode** for working in peace while visitors see a short message.
+- **Backups and updates** from the admin, in steps that suit a slow shared host, with a
+  backup made before every update and a way back from each.
 
 ## Requirements
 
@@ -199,7 +201,9 @@ inside it**. Where it goes depends on your host.
    never `/public/about`.
 
 If `public_html` already has a `.htaccess` file (cPanel sometimes writes your PHP version
-into one), don't overwrite it. Add Boxlet's lines below the ones already there.
+into one), don't overwrite it. Put Boxlet's lines below the ones already there. Boxlet's
+rules sit between `# BEGIN Boxlet` and `# END Boxlet`, and an update replaces only those,
+so your own lines stay.
 
 **If your host lets you choose the folder a domain points at:** upload everything inside
 `boxlet/` to a folder of your choice, and point the domain at the `public/` folder inside
@@ -227,6 +231,32 @@ straight away.
 
 When it's done, the installer deletes itself. If it can't, it tells you, and you delete
 `public/install.php` by hand. Then log in at `/admin`.
+
+## Updating
+
+Open **Updates** in the admin.
+
+- **Look for a newer version.** Boxlet asks GitHub for its releases, and only when you
+  press the button. It downloads the one you pick and checks the file against the
+  checksum GitHub publishes.
+- **Or upload the release ZIP yourself**, on a server that cannot reach GitHub.
+
+Before anything changes, Boxlet makes a backup of the whole site. Visitors see a short
+"being updated" page while it runs. Your pictures, settings and uploads
+stay where they are, and so do your own lines in `.htaccess`.
+
+If something is wrong afterwards, **Roll back** puts the previous version back, together
+with the site as it was before the update.
+
+## Backups
+
+**Backups** in the admin makes a backup of the whole site in one ZIP: pages, settings,
+messages, every uploaded file and every picture size. From the same screen you can download
+a backup, or restore one with a single button. A backup of the site as it is is made before
+any restore, so a restore can be undone too.
+
+Backups are kept in `storage/backups`, on the same server. Download one now and then, and
+keep it somewhere else.
 
 ## Locked out?
 
