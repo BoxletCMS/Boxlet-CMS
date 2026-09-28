@@ -1,258 +1,227 @@
 # Boxlet
 
-A small self-hosted PHP CMS for people who build many small sites.
+**A small, self-hosted CMS for people who build lots of small websites.**
+
+Upload a ZIP, open a page in your browser, answer four questions. Fifteen minutes later you
+have a multilingual site that looks designed, not like a template with the logo swapped. No
+shell, no Composer, no Node, no build step. An FTP client and a browser are enough.
+
+> **This is a preview.** Boxlet works and installs cleanly, but it hasn't reached v0.1 yet.
+> Until then, things may still change between versions in ways that need a fresh install.
+> Try it, poke at it, tell us what breaks. Don't bet a client's site on it just yet.
+
+![The Boxlet admin: the overview screen](https://raw.githubusercontent.com/BoxletCMS/boxlet-cms-dev/main/tools/release/readme/overview.png)
+
+## Why another CMS?
+
+You know the drill. A client needs a five-page site. You install WordPress, then spend the
+afternoon *removing* things: the comments, the widgets, the emoji script. Then you add
+things back as plugins: one for SEO, one for forms, one for image optimisation, one for
+security, and one for the cookie banner that all the others made necessary. A year later
+half of them want a paid upgrade.
+
+Boxlet does the handful of things a small site needs, does them properly, and does them out
+of the box. It doesn't try to do anything else.
+
+What it will never be, on purpose: a blogging platform, a shop, a page builder with
+free-form dragging, or a plugin marketplace. There is one administrator and no user
+accounts. It is small, it is boring where boring is good, and it spends its effort on the
+part that decides whether a site looks good.
+
+## No cookies. No cookie banner.
+
+**Boxlet doesn't set a single cookie for your visitors.** Not on pages, not on the 404, not
+when someone sends a form. We checked every one of those in a real browser, and the
+visitor's cookie jar stayed empty.
+
+- **Statistics without cookies**, and without a tracking script, as the next section explains.
+- **Forms** store a salted hash of the sender's IP address, used for spam limits, and never
+  the address itself.
+- **Fonts are served from your own server.** No Google Fonts, no CDN, so a visit doesn't
+  report anything to anyone.
+- **YouTube videos** are embedded through `youtube-nocookie.com`, and a map can be
+  OpenStreetMap instead of Google.
+- **Almost no JavaScript** on the public site. The only script is a small one that folds the
+  menu on a phone, and it loads only when the header has a menu to fold.
+- **A suggested privacy-policy paragraph** for the statistics, written from your own
+  settings, in every language the site speaks.
+
+So in the usual case you don't need a consent banner at all. The fine print is that Boxlet
+takes care of what *Boxlet* does. If you embed a Google Map or a Vimeo video, that provider
+sets its own cookies and its rules apply. And we're a CMS, not your lawyer: Boxlet is built
+not to collect personal data about visitors, but whether a site complies with GDPR depends
+on the whole site, not just its software.
+
+## Statistics on your own server
+
+![Statistics in Boxlet](https://raw.githubusercontent.com/BoxletCMS/boxlet-cms-dev/main/tools/release/readme/statistics.png)
+
+Visits are counted by the site itself, on your server. Nothing is sent anywhere and nothing
+is added to the page.
+
+- Visitors and page views by day, with the previous period to compare against, or any range
+  you choose.
+- **Traffic data:** the pages people read, where they came from, and their devices, browsers
+  and operating systems.
+- **Location:** countries on a world map, and optionally regions and cities, from a location
+  database kept on your server (by DB-IP).
+- **How a visitor is counted:** an anonymous key that changes every day, so nobody can be
+  followed from one day to the next. The IP address is used for that key and never stored.
+- **Left out of the counts:** you, while logged in, and well-known bots.
+- **Your data:** you choose how long counts are kept, and Do Not Track can be honoured.
+  Everything can be exported as CSV.
+
+Already using another analytics tool? Switch Boxlet's statistics off in Settings.
+
+## Design, without writing CSS
+
+This is the part Boxlet is really about.
+
+- **Five characters.** Editorial, Minimal, Bold, Soft and Brutalist. Each one changes how a
+  page is *composed*, not just its colours: reading width, vertical rhythm, section edges,
+  and how a hero is arranged.
+- **Eight decisions.** Main colour and an optional second one, typeface pairing, type scale,
+  spacing, corners, shadows, content width and surface contrast. The whole palette is worked
+  out from those.
+- **Contrast is enforced.** A colour combination that would make any text hard to read is
+  refused, and Boxlet tells you which pair failed.
+- **Bounded on purpose.** Sections choose from a few surfaces built from your palette, so
+  there's no way to end up with red text on orange. Every combination looks acceptable.
+- **Header and footer.** Several arrangements for each, a logo for light and dark
+  backgrounds, a real mobile menu, and a boxed or full-width page.
+- **Live preview**, with the real header and footer, while you change things.
+
+## Writing pages
+
+- **A visual editor.** You edit the page on a canvas that shows it as visitors will see it,
+  add blocks from a library that shows each block as it looks, and drag them to reorder.
+- **Fifteen blocks:** hero, text, image and text, picture, gallery, columns, quote, numbers,
+  call to action, accordion, logo strip, downloads, form, video or map embed, and divider.
+- **Rich text that stays clean.** Pasting from Word leaves no inline styles, font tags or
+  leftover classes, and what's saved is checked and cleaned on the server.
+- **The page tree.** Drag a page right to put it under another, left to take it out, up or
+  down to reorder, and Undo if you change your mind. Its translations follow.
+- **No JavaScript? Still works.** Every page can also be edited in a plain form.
+- **Nothing is saved until you save.** If you try to leave with unsaved changes, Boxlet asks
+  first.
+
+## Pictures and files
+
+- **Upload once.** Boxlet makes every size a page needs, in **AVIF** and **WebP** when your
+  server can produce them, with the original format as a fallback for older browsers.
+- **Served straight from disk** by the web server, without PHP.
+- **Modern markup.** Pictures go out as `<picture>` with `srcset`, width and height always
+  set so the page doesn't jump, and lazy loading below the fold.
+- **Done for you:** a phone photo's EXIF orientation is corrected, and you can set a focal
+  point and a crop.
+- **A media library** with search, "used on" for every picture, alt text and captions in
+  each language, and replace: every page showing a picture shows the new one, with no page
+  edited. A picture that is still in use can't be deleted by mistake.
+- **Files as well.** PDFs, documents, spreadsheets and ZIPs sit in the same library,
+  each with its own icon. The Downloads block offers them to visitors and counts the
+  downloads.
+
+## Fast without trying
+
+On 28 September 2026, Google PageSpeed Insights gave the demo site **100 for performance on
+a computer and 98 on a phone**. SEO and best practices scored 100 on both. And that is
+before Boxlet has a page cache.
+
+It gets there by leaving things out:
+- **Next to no JavaScript,** so nothing blocks the page (0 ms of blocking time).
+- **Pictures in AVIF and WebP** at the size the screen needs.
+- **Width and height on every picture,** so nothing jumps while the page loads.
+- **Fonts from your own server,** with no third-party requests.
+
+## SEO that's just there
+
+- **Clean addresses.** Subpages nest, as in `/services/web-design`.
+- **Address history.** Change a page's address and the old one redirects to the new one
+  with a permanent 301, so search engines update their index and old links keep working.
+- **Your own redirects**, for addresses from an old site, each with a count of how often it
+  was used.
+- **In every page's head:** a canonical link, `hreflang` for each translation, and a title,
+  description and sharing image of its own.
+- **Structured data:** a BreadcrumbList that tells search engines where the page sits.
+- **Written for you:** `sitemap.xml` and `robots.txt` stay up to date as pages change.
+
+## Multilingual from day one
+
+- **Adding a language** takes one screen in the admin. Each language gets its own addresses
+  (`/`, `/hr/`, `/de/`…).
+- **Translations are linked.** Each page knows its translations, so the language switcher and
+  `hreflang` come for free.
+- **Built-in words** such as form labels, buttons and "page not found" are already translated
+  into English, German, Spanish, French, Croatian, Italian and Slovenian.
+
+## Forms and email
+
+- **A form builder** with text, email, phone, long text, choice and checkbox fields.
+- **Messages are kept in the admin**, and emailed to you as they arrive, with an optional
+  automatic reply to the sender.
+- **Spam protection with no CAPTCHA:** a hidden field, a timing check and a per-sender limit.
+- **Email through SMTP or [Resend](https://resend.com)**, whose web API still works on hosts
+  that block SMTP. A test button tells you it works before a client finds out it doesn't.
+
+## An admin that's nice to be in
+
+- **Its own design,** light or dark. It never takes on the site's colours, so a bad colour
+  choice can't lock you out of the screen that fixes it.
+- **The overview** shows what changed lately, what needs attention (such as pictures with no
+  description) and which pages people read most.
+- **⌘K search** across pages, pictures and settings.
+- **Two-step login** with any authenticator app, and ten recovery codes. It's optional and
+  never forced.
+- **Protected login.** Repeated wrong passwords get locked out. A forgotten password can be
+  reset by email, or with a file uploaded over FTP when the site can't send mail.
+- **Maintenance mode** for working in peace while visitors see a short message.
 
 ## Requirements
 
-- PHP 8.1 or newer
-- Extensions: pdo, mbstring, fileinfo, json, session, and pdo_mysql or pdo_sqlite
-- MySQL/MariaDB with a `utf8mb4` database (recommended), or SQLite for small
-  single-site installs
-- URL rewriting: Apache `mod_rewrite` or nginx `try_files` (required, see Deployment)
-- Composer (development only; release ZIPs ship with `vendor/`)
+- PHP 8.1 or newer, with pdo, mbstring, fileinfo, json and session
+- MySQL or MariaDB (recommended), or SQLite for a small single site
+- Apache with `mod_rewrite`, or nginx
+- Imagick for AVIF. Without it Boxlet uses GD and serves WebP.
 
-## Development server
+That's ordinary shared hosting. The installer checks all of it, and names anything that's
+missing in plain words.
 
-```sh
-composer install
-PHP_CLI_SERVER_WORKERS=4 php -S localhost:8000 -t public
-```
+## Installing
 
-Then open <http://localhost:8000/install.php>. `PHP_CLI_SERVER_WORKERS` matters: the
-installer checks URL rewriting by requesting the site itself, which a single-worker dev
-server cannot answer while it is busy with the installer. After installing, add
-`APP_DEBUG="true"` to `.env` for readable error traces.
+1. Unpack the ZIP and upload the `boxlet/` folder to your host.
+2. Point the domain's document root at `boxlet/public`.
+3. For MySQL, create an empty database with the `utf8mb4` character set.
+4. Open `https://your-site/install.php` and follow the four steps.
 
-## Installation
+**Proving you own the server.** The installer writes a token to
+`storage/install-token.txt` and asks you to paste it in. Open the file over FTP or in your
+host's file manager.
 
-1. Upload the files and point the document root at `public/` (see Deployment).
-2. For MySQL, create an empty database with `utf8mb4` as its character set.
-3. Open `https://your-site/install.php` and follow the steps:
-   - **Requirements.** Anything required blocks installation. The page asks for the
-     install token, which the installer has just written to
-     `storage/install-token.txt`; open that file via FTP or your host's file manager
-     and paste its contents. This proves you control the server.
-   - **Database.** MySQL (preselected) or SQLite. Connection problems are named.
-   - **Admin account.** Email and a password of at least 12 characters.
-   - **Site.** Name, time zone and the primary language. **The primary language
-     cannot be changed later.**
-4. The installer writes `.env` and `storage/install.lock`, then deletes itself. If it
-   cannot, delete `public/install.php` by hand. Log in at `/admin`.
+**The primary language can't be changed later**, so choose it with care.
 
-To reinstall, delete `storage/install.lock` and `.env`, and start from an empty
-database.
+If you like, the installer adds a demo site, so you can try the design on real pages
+straight away.
 
-## Locked out
+When it's done, the installer deletes itself. If it can't, it tells you, and you delete
+`public/install.php` by hand. Then log in at `/admin`.
 
-Both ways back in work with FTP or your host's file manager alone, no shell needed.
+## Locked out?
 
-- **A forgotten password.** "Forgot your password?" on the login page emails a link that
-  works once, for an hour, when the site can send mail (Settings → Email). Without mail,
-  put a file named `storage/reset-password` on the server holding the new password as its
-  only line, at least 12 characters. The next visit to the login page sets it and deletes
-  the file. If Boxlet cannot delete the file it does not use it.
-- **A lost phone, with two-step login on.** Put an empty file named `storage/disable-2fa`
-  on the server. The next login switches two-step login off and deletes the file.
+Both ways back in need only FTP or your host's file manager.
 
-## Pages
+- **Forgot your password?** Use the link on the login page, which emails you a one-hour link
+  when the site can send mail. If it can't, upload a file named `storage/reset-password`
+  whose only line is the new password (12 characters or more). The next visit to the login
+  page sets it and deletes the file.
+- **Lost the phone with your two-step login?** Upload an empty file named
+  `storage/disable-2fa`. Your next login switches two-step login off and deletes the file.
 
-Log in at `/admin` and open **Pages**. A new page can start from a template, which
-pre-fills its blocks. Edit the blocks, reorder them (drag, or Move up / Move down),
-and press **Save page**; nothing is saved until you do, and leaving with unsaved
-changes asks first. Editing and saving also work with JavaScript turned off.
+## For developers
 
-A page is a draft until published; visitors get a 404 for drafts. The page with an
-empty address is the home page of its language: `/` for the primary language, `/hr/`
-for Croatian. Addresses cannot be language codes such as `de`, even for languages
-that are not enabled, nor paths Boxlet uses itself such as `admin`.
-
-### Design
-
-**Design** in the admin sets how the whole site looks, without writing CSS:
-
-- **Characters.** Editorial, Minimal, Bold, Soft and Brutalist each set every decision
-  at once, and each composes a page differently: reading measure, vertical rhythm,
-  alignment, section edges and how a hero is arranged. Using one fills in the form; the
-  site changes when you press Save design. On a site that already has pages you choose
-  explicitly between saving the design alone and also resetting every section's style.
-- **Eight decisions.** Main colour (and an optional second), typeface pairing, type
-  scale, spacing, corners, shadows, content width and surface contrast. Everything else
-  (the palette, sizes, spacing scale) is derived and shown, not edited.
-- **Contrast is enforced.** A colour that would make any text unreadable (below WCAG AA)
-  is refused, with the failing pair named next to the decision that caused it.
-- **Live preview** while you change values, when JavaScript is on. Saving works without.
-
-Each block in the page editor also has a **Section style** (surface, rhythm, width,
-alignment, top edge) and, where the block offers several, a **Layout**.
-
-The compiled stylesheet is `public/cache/tokens.{hash}.css`; the name changes on every
-save, so visitors never see a stale design. Fonts are served from the site itself
-(`public/assets/fonts`, SIL Open Font License), never from Google Fonts.
-
-The admin has a fixed design system of its own and never renders with the site's tokens,
-so the tool you judge a design with does not change as you change the design. The only
-place the site's own design appears in the admin is the preview pane.
-
-### Vendored front-end assets
-
-Boxlet has no build step, so the few front-end libraries it uses are committed to the
-repository and loaded with a plain script tag. Each must be permissively licensed,
-dependency-free and a single file.
-
-They live in `public/assets/vendor/`, and each file records its version and source URL in
-its own header. A vendored asset is added only when it earns its place, one at a time.
-To update one, download the new pinned release over it and change both.
-
-One of them, the TipTap editor bundle, is not published as a single file, so it is built
-once by a maintainer from the recipe in `tools/tiptap/` and committed like the rest. That
-build happens outside the project and never on your server: installing Boxlet still builds
-nothing, and needs no Node and no npm.
-
-### Demo site
-
-The installer can add a demo site: four pages that use every block and section style.
-On an installed site without pages, add it from the command line:
-
-```sh
-php migrations/seed.php
-```
-
-### max_input_vars
-
-The editor sends a whole page as one form, and PHP silently drops fields beyond its
-`max_input_vars` setting (default 1000, roughly a hundred blocks). Boxlet detects
-this and refuses the save with a message rather than saving a page with content
-missing. The installer shows the current value. To raise it, set in `php.ini`,
-`.user.ini` or your hosting panel:
-
-```ini
-max_input_vars = 3000
-```
-
-On Apache with mod_php, `php_value max_input_vars 3000` in `.htaccess` also works.
-
-### Upload size
-
-Pictures arrive as one request, and PHP discards anything larger than its limits
-without reporting an error — the same silent failure as `max_input_vars`. A photograph
-from a modern phone is easily 8–12 MB, so the defaults on shared hosting (often 2M)
-drop ordinary files.
-
-Two settings, and both matter:
-
-- `upload_max_filesize` — the largest single file.
-- `post_max_size` — the largest request. It has to be **at least as large** as
-  `upload_max_filesize`, because the file arrives inside the request. Raising only
-  the first achieves nothing.
-
-The installer reports both, on the requirements step, as
-`Uploads: … per file, … per request` filled in with what your server is set to. It
-does not block on them. Set them in `php.ini`, `.user.ini` or your hosting panel:
-
-```ini
-upload_max_filesize = 16M
-post_max_size = 16M
-```
-
-On Apache with mod_php, `php_value upload_max_filesize 16M` in `.htaccess` also works.
-On PHP-FPM, `.user.ini` is read per directory; a pool configuration uses
-`php_admin_value[upload_max_filesize] = 16M`, which `.user.ini` cannot override.
-
-**Nginx has its own limit.** `client_max_body_size` defaults to 1M and rejects the
-request with a 413 before PHP ever sees it, so the browser shows nginx's error page
-rather than anything from Boxlet. Raise it alongside the PHP settings, in the `http`,
-`server` or `location` block (see Deployment):
-
-```nginx
-client_max_body_size 16M;
-```
-
-## Tests
-
-Run `php tests/run.php`. It needs no web server; exits non-zero on failure.
-
-Tests run against SQLite always, and against MySQL when a database that exists only
-for tests is configured: copy `.env.test.example` to `.env.test` and fill it in, or
-set the same variables in the environment. Every table in that database is dropped
-on each run, so never point it at a real site. Without it, MySQL tests are skipped.
-
-Static analysis: `composer install` (includes dev tools), then `vendor/bin/phpstan analyse`.
-
-## Deployment
-
-In every case the document root must point at `public/`. `app/`, `config/`,
-`storage/` and `vendor/` must not be reachable from the web.
-
-**URL rewriting is required, not optional.** Every request that is not a real file
-must reach `public/index.php`. There is no fallback URL mode. The installer checks
-this and refuses to continue without it.
-
-### Apache (shared hosting)
-
-Set the document root to `public/`, enable `mod_rewrite` and allow `.htaccess`
-overrides. `public/.htaccess` already contains the rules:
-
-```apache
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [QSA,L]
-</IfModule>
-```
-
-If `mod_rewrite` is missing, the site shows a page explaining how to enable it
-instead of a bare 404.
-
-The `.htaccess` files containing `Require all denied` in `app/`, `config/` and
-`storage/` are a safety net for hosts that cannot move the document root. They are
-not a substitute for it.
-
-### Nginx
-
-Set the document root to `public/` and route unknown paths to the front controller:
-
-```nginx
-location / {
-    try_files $uri $uri/ /index.php?$query_string;
-}
-```
-
-Nginx ignores `.htaccess` files entirely, so the document root is the only
-protection for `app/`, `config/` and `storage/`. On a managed host without access to
-the server block, ask the provider to add the `try_files` line.
-
-**Pass PHP only for the two entry points.** A configuration that hands every `.php` path
-to PHP-FPM will execute any `.php` file that ever reaches a public directory. Boxlet has
-exactly two: `index.php` and `install.php`. Name them rather than matching `\.php$`:
-
-```nginx
-location = /index.php {
-    include fastcgi_params;
-    fastcgi_pass unix:/run/php/php8.1-fpm.sock;
-    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-}
-
-location = /install.php {
-    include fastcgi_params;
-    fastcgi_pass unix:/run/php/php8.1-fpm.sock;
-    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-}
-
-# Everything else that is not a real file goes to the front controller.
-location / {
-    try_files $uri $uri/ /index.php?$query_string;
-}
-```
-
-This is belt and braces rather than the main protection: original uploads are stored
-outside the web root in `storage/uploads/`, and only generated image variants are public,
-so there is nothing under `public/` for a stray handler to execute. The two rules together
-mean a file that should not run cannot run, whichever one you forget.
-
-Uploads also need `client_max_body_size` raised — see **Upload size** above, where the PHP
-settings that go with it are covered.
+The source, the tests and the issue tracker live in
+[BoxletCMS/boxlet-cms-dev](https://github.com/BoxletCMS/boxlet-cms-dev). This repository
+holds only the finished install code, written by each release.
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
