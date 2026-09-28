@@ -11,6 +11,14 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Asked for as /public/… where Boxlet sits in the web root itself, behind the .htaccess
+    # beside public/ (D-138). The same page without public/ is the real address, so this
+    # one is sent there for good rather than answering the page at two addresses. The first
+    # line is what tells that layout apart: only there is public/ inside the document root.
+    RewriteCond %{DOCUMENT_ROOT}/public/index.php -f
+    RewriteCond %{THE_REQUEST} ^\S+\s/public(?:/([^\s?]*))?[\s?]
+    RewriteRule ^ /%1 [R=301,L]
+
     # Real files and directories (assets, cache, uploads) are served directly.
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

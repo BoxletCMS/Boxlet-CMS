@@ -4,6 +4,7 @@ namespace App\Modules\Media;
 
 use Imagick;
 use RuntimeException;
+use Throwable;
 
 /**
  * The pixel work: orient, crop, resize, strip, encode (SPEC §5.5).
@@ -56,13 +57,46 @@ final class MediaWriter
             ? $this->encodeImagick($source, $target, $crop, $format, $orientation, $quality)
             : $this->encodeGd($source, $target, $crop, $format, $orientation, $quality);
 
-        $size = @getimagesize($target);
+        [$width, $height] = $this->dimensions($target) ?? [$crop['targetWidth'], $crop['targetHeight']];
 
         return [
-            'width' => (int) ($size[0] ?? $crop['targetWidth']),
-            'height' => (int) ($size[1] ?? $crop['targetHeight']),
+            'width' => $width,
+            'height' => $height,
             'bytes' => (int) @filesize($target),
         ];
+    }
+
+    /**
+     * A written file's size in pixels, read back from the file, or null when nothing can.
+     *
+     * getimagesize() first. PHP 8.1 recognises an AVIF but reports it as 0×0, which 8.2
+     * fixed, and 8.1 is Boxlet's oldest PHP and a common one on shared hosting. It surfaced as
+     * a red CI run on 8.1, where a 0×0 AVIF also made the `full` preset's retry budget the
+     * flat one rather than the one scaled by pixels (D-130). So a 0 is no answer, and
+     * Imagick, which wrote the file, reads it instead.
+     *
+     * @return array{int, int}|null
+     */
+    private function dimensions(string $target): ?array
+    {
+        $size = @getimagesize($target);
+        if (is_array($size) && $size[0] > 0 && $size[1] > 0) {
+            return [$size[0], $size[1]];
+        }
+        if ($this->encoder->driver() !== 'imagick') {
+            return null;
+        }
+        try {
+            $class = 'Imagick';
+            $image = new $class();
+            $image->pingImage($target);
+            $found = [(int) $image->getImageWidth(), (int) $image->getImageHeight()];
+            $image->clear();
+
+            return $found[0] > 0 && $found[1] > 0 ? $found : null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**

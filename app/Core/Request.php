@@ -30,11 +30,9 @@ final class Request
 
     public static function fromGlobals(): self
     {
-        $scriptDir = str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? '/index.php')));
-        $basePath = rtrim($scriptDir, '/');
-
         // URL rewriting is required, so the path always comes from the request URI.
         $path = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+        $basePath = self::basePath((string) ($_SERVER['SCRIPT_NAME'] ?? '/index.php'), $path);
         if ($basePath !== '' && str_starts_with($path, $basePath . '/')) {
             $path = substr($path, strlen($basePath));
         }
@@ -66,6 +64,34 @@ final class Request
             $https,
             $_FILES,
         );
+    }
+
+    /**
+     * The part of the address in front of every Boxlet path: normally the directory the
+     * front controller is in, as SCRIPT_NAME gives it.
+     *
+     * NOT WHEN BOXLET SITS IN THE WEB ROOT ITSELF (cPanel's public_html, PLAN.md D-138).
+     * There the .htaccess beside public/ hands every request to public/ without it being in
+     * the address, so SCRIPT_NAME says /public/index.php for an address of /about, and every
+     * link would have come out as /public/about. The base is therefore the longest part of
+     * the script's directory that the address really starts with.
+     */
+    public static function basePath(string $scriptName, string $path): string
+    {
+        $base = self::directory($scriptName);
+        while ($base !== '' && $path !== $base && !str_starts_with($path, $base . '/')) {
+            $base = self::directory($base);
+        }
+
+        return $base;
+    }
+
+    /** The directory of an address path, '' for the top: never '/' or '.'. */
+    private static function directory(string $path): string
+    {
+        $directory = rtrim(str_replace('\\', '/', dirname($path)), '/');
+
+        return $directory === '.' ? '' : $directory;
     }
 
     public function header(string $name, ?string $default = null): ?string

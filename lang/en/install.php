@@ -35,6 +35,8 @@ return [
     'install.req.env' => 'The settings file can be written: :path',
     'install.req.env_detail' => 'The installer saves your database settings to this file at the end. Make the directory writable by the web server.',
     'install.req.rewrite' => 'URL rewriting sends requests to index.php',
+    'install.req.private' => 'Nothing beside public/ can be opened in a browser',
+    'install.req.private_detail' => 'A file put beside public/ could be downloaded, and the settings file with your database password will be written there. Point the domain at public/, or, if Boxlet is in the domain\'s own folder (public_html), keep the .htaccess file that comes with it in that folder and make sure your host reads .htaccess files.',
     'install.req.rewrite_detail' => 'Boxlet needs every request that is not a real file to reach public/index.php. Add the configuration below for your web server, or ask your host to.',
     'install.req.intl_detail' => 'Without intl, dates and numbers use basic formatting.',
     'install.req.images_detail' => 'Without GD or Imagick, uploaded images cannot be resized.',

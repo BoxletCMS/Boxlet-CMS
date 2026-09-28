@@ -25,6 +25,7 @@ final class InstallController
 
     /**
      * @param Closure(): bool $rewriteWorks
+     * @param Closure(): bool $privateHidden
      */
     public function __construct(
         private readonly string $root,
@@ -33,6 +34,7 @@ final class InstallController
         private readonly string $script,
         private readonly Session $session,
         private readonly Closure $rewriteWorks,
+        private readonly Closure $privateHidden,
         private readonly ?string $cacheDirectory = null,
     ) {
     }
@@ -215,7 +217,7 @@ final class InstallController
      */
     private function checks(): array
     {
-        return Requirements::check($this->root, $this->storage, $this->envPath, $this->rewriteWorks);
+        return Requirements::check($this->root, $this->storage, $this->envPath, $this->rewriteWorks, $this->privateHidden);
     }
 
     /**

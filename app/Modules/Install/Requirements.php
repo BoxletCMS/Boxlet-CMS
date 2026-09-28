@@ -13,9 +13,10 @@ final class Requirements
 {
     /**
      * @param Closure(): bool $rewriteWorks
+     * @param Closure(): bool $privateHidden nothing beside public/ can be downloaded (D-138)
      * @return list<array{id: string, label: string, ok: bool, required: bool, detail: string}>
      */
-    public static function check(string $root, string $storage, string $envPath, Closure $rewriteWorks): array
+    public static function check(string $root, string $storage, string $envPath, Closure $rewriteWorks, Closure $privateHidden): array
     {
         $checks = [
             self::item('php', t('install.req.php', ['version' => PHP_VERSION]), version_compare(PHP_VERSION, '8.1.0', '>='), true),
@@ -31,6 +32,7 @@ final class Requirements
         $envWritable = is_file($envPath) ? is_writable($envPath) : is_writable(dirname($envPath));
         $checks[] = self::item('env', t('install.req.env', ['path' => $envPath]), $envWritable, true);
         $checks[] = self::item('rewrite', t('install.req.rewrite'), $rewriteWorks(), true);
+        $checks[] = self::item('private', t('install.req.private'), $privateHidden(), true);
 
         // The page editor sends a whole page as one form; PHP silently drops fields past
         // this limit. Reported, not blocking: the editor refuses truncated saves.

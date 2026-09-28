@@ -242,6 +242,7 @@ class ComposerStaticInitc15ec43cbb87e55668616d4e2f0b9067
         'App\\Modules\\Install\\DatabaseSetup' => __DIR__ . '/../..' . '/app/Modules/Install/DatabaseSetup.php',
         'App\\Modules\\Install\\InstallController' => __DIR__ . '/../..' . '/app/Modules/Install/InstallController.php',
         'App\\Modules\\Install\\Installer' => __DIR__ . '/../..' . '/app/Modules/Install/Installer.php',
+        'App\\Modules\\Install\\PrivateCheck' => __DIR__ . '/../..' . '/app/Modules/Install/PrivateCheck.php',
         'App\\Modules\\Install\\Requirements' => __DIR__ . '/../..' . '/app/Modules/Install/Requirements.php',
         'App\\Modules\\Languages\\LanguagesController' => __DIR__ . '/../..' . '/app/Modules/Languages/LanguagesController.php',
         'App\\Modules\\Languages\\Locales' => __DIR__ . '/../..' . '/app/Modules/Languages/Locales.php',

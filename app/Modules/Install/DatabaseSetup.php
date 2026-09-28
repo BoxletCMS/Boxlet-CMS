@@ -36,8 +36,21 @@ final class DatabaseSetup
             throw new RuntimeException(self::mysqlMessage($e, $mysql), 0, $e);
         }
 
-        $row = $db->one('SELECT @@character_set_database AS charset');
-        $charset = (string) ($row['charset'] ?? '');
+        $charset = self::charset($db);
+        if ($charset !== 'utf8mb4' && self::empty($db)) {
+            // cPanel makes every new database in the server's default, often latin1, and its
+            // screen offers no choice, so the one database a cPanel user can make would always
+            // be refused (D-138). An empty one is changed here instead: the installer's user
+            // owns it, and all that changes is the character set of tables not yet made. One
+            // that holds tables is only reported, since those belong to something else. If the
+            // host does not allow it either, the message below says what to do.
+            try {
+                $db->query('ALTER DATABASE `' . $mysql['database'] . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+                $charset = self::charset($db);
+            } catch (PDOException) {
+                // Not allowed here: reported below as it was before.
+            }
+        }
         if ($charset !== 'utf8mb4') {
             throw new RuntimeException(t('install.db.charset', ['database' => $mysql['database'], 'charset' => $charset]));
         }
@@ -95,6 +108,17 @@ final class DatabaseSetup
             'username' => (string) ($env['DB_USERNAME'] ?? ''),
             'password' => (string) ($env['DB_PASSWORD'] ?? ''),
         ]);
+    }
+
+    private static function charset(Db $db): string
+    {
+        return (string) ($db->one('SELECT @@character_set_database AS charset')['charset'] ?? '');
+    }
+
+    /** True when the database holds no table at all, Boxlet's or anything else's. */
+    private static function empty(Db $db): bool
+    {
+        return (int) ($db->one('SELECT COUNT(*) AS n FROM information_schema.tables WHERE table_schema = DATABASE()')['n'] ?? 1) === 0;
     }
 
     /**

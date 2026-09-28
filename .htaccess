@@ -1,0 +1,32 @@
+# Boxlet in a folder that is itself the web root: cPanel's public_html, or any host where
+# the domain cannot be pointed at public/ (PLAN.md D-138).
+#
+# Every request is answered from public/, so nothing beside it (.env, app/, storage/,
+# vendor/, or anything else left in this folder) can be reached from the web. It is a
+# rewrite, not a redirect: the address stays /about, and a visitor never sees public/.
+#
+# Where the domain already points at public/, this file is not in the way and does nothing.
+# Nginx ignores it entirely.
+#
+# If this folder had a .htaccess of its own before Boxlet (cPanel writes the PHP version
+# into one), keep its lines and put these below them.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Certificate checks (AutoSSL, Let's Encrypt) read files the host puts here.
+    RewriteRule ^\.well-known/ - [L]
+
+    # A file missing there is the only 404 Apache itself answers here. Left to the host's
+    # own error page, that page's address was sent into public/ like any other, where
+    # index.php took the 404 for a server with no rewriting and answered 500.
+    ErrorDocument 404 default
+
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Without mod_rewrite, nothing here is served at all rather than everything.
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>

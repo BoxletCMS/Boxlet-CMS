@@ -180,7 +180,7 @@ It gets there by leaving things out:
 
 - PHP 8.1 or newer, with pdo, mbstring, fileinfo, json and session
 - MySQL or MariaDB (recommended), or SQLite for a small single site
-- Apache with `mod_rewrite`, or nginx
+- Apache with `mod_rewrite` (which is what cPanel runs), or nginx
 - Imagick for AVIF. Without it Boxlet uses GD and serves WebP.
 
 That's ordinary shared hosting. The installer checks all of it, and names anything that's
@@ -188,10 +188,33 @@ missing in plain words.
 
 ## Installing
 
-1. Unpack the ZIP and upload the `boxlet/` folder to your host.
-2. Point the domain's document root at `boxlet/public`.
-3. For MySQL, create an empty database with the `utf8mb4` character set.
-4. Open `https://your-site/install.php` and follow the four steps.
+Unpack the ZIP. Inside is a `boxlet/` folder, and what goes on your server is **what's
+inside it**. Where it goes depends on your host.
+
+**On cPanel, or any host where your domain always serves from `public_html`:**
+
+1. Upload everything inside `boxlet/` straight into `public_html`.
+2. There's no step two. The `.htaccess` file that comes with Boxlet serves the site from its
+   `public/` folder and keeps everything else out of reach. Addresses stay clean: `/about`,
+   never `/public/about`.
+
+If `public_html` already has a `.htaccess` file (cPanel sometimes writes your PHP version
+into one), don't overwrite it. Add Boxlet's lines below the ones already there.
+
+**If your host lets you choose the folder a domain points at:** upload everything inside
+`boxlet/` to a folder of your choice, and point the domain at the `public/` folder inside
+it. This is the tidiest setup: the rest of Boxlet then sits outside the web entirely.
+
+**Then, in both cases:**
+
+1. For MySQL, create an empty database. cPanel often creates them in `latin1`, and that's fine:
+   the installer switches an empty database to `utf8mb4` by itself.
+2. Open `https://your-site/install.php` and follow the four steps.
+
+**Checked, not assumed.** Before it asks you for anything, the installer checks that
+nothing beside `public/` can be opened in a browser. That includes the settings file with
+your database password. If the server ignores the `.htaccess` file, the installer says so
+and stops.
 
 **Proving you own the server.** The installer writes a token to
 `storage/install-token.txt` and asks you to paste it in. Open the file over FTP or in your

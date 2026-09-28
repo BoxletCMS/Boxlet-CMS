@@ -64,6 +64,7 @@ return array(
     'App\\Modules\\Install\\DatabaseSetup' => $baseDir . '/app/Modules/Install/DatabaseSetup.php',
     'App\\Modules\\Install\\InstallController' => $baseDir . '/app/Modules/Install/InstallController.php',
     'App\\Modules\\Install\\Installer' => $baseDir . '/app/Modules/Install/Installer.php',
+    'App\\Modules\\Install\\PrivateCheck' => $baseDir . '/app/Modules/Install/PrivateCheck.php',
     'App\\Modules\\Install\\Requirements' => $baseDir . '/app/Modules/Install/Requirements.php',
     'App\\Modules\\Languages\\LanguagesController' => $baseDir . '/app/Modules/Languages/LanguagesController.php',
     'App\\Modules\\Languages\\Locales' => $baseDir . '/app/Modules/Languages/Locales.php',

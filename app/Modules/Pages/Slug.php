@@ -18,8 +18,9 @@ final class Slug
     // disk. Reserving a name costs nothing; un-reserving one breaks those sites quietly.
     // 'sitemap' is the route a host without a writable public/ serves the sitemap from, which
     // a page there would never be reached past; 'download' leads nested addresses (D-129)
-    // into /download/{id}/{name}, a file's.
-    public const SYSTEM = ['admin', 'assets', 'cache', 'uploads', 'm', 'install', '_boxlet', 'download', 'sitemap'];
+    // into /download/{id}/{name}, a file's. 'public' because where Boxlet sits in the web
+    // root itself (D-138), /public/… is sent to the same address without it.
+    public const SYSTEM = ['admin', 'assets', 'cache', 'uploads', 'm', 'install', '_boxlet', 'download', 'sitemap', 'public'];
 
     public const MAX_LENGTH = 100;
 

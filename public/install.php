@@ -9,6 +9,7 @@ use App\Modules\Design\Presets;
 use App\Modules\Design\TokenCompiler;
 use App\Modules\Design\Typography;
 use App\Modules\Install\InstallController;
+use App\Modules\Install\PrivateCheck;
 use App\Support\Url;
 
 // Boxlet installer. Refuses to run once storage/install.lock exists, and tries to
@@ -57,6 +58,7 @@ $installer = new InstallController(
     __FILE__,
     $session,
     static fn (): bool => RewriteCheck::works($baseUrl),
+    static fn (): bool => PrivateCheck::hidden($root, $baseUrl, $request->basePath),
 );
 
 $installer->handle($request)->send();
