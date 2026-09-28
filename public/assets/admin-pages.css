@@ -1,0 +1,315 @@
+/* The page list and the page editor. Admin tokens only (--ui-*). */
+
+.address {
+  color: var(--ui-accent-dark);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+/* The page list's columns (D-052). Fixed layout, so a long title is cut rather than pushing
+   the table past its column; the title takes what the others leave. */
+.page-tree {
+  table-layout: fixed;
+}
+
+.page-tree .col-order { inline-size: 12.5rem; }
+.page-tree .col-address { inline-size: 11rem; }
+.page-tree .col-lang { inline-size: 3.5rem; }
+.page-tree .col-status { inline-size: 7rem; }
+.page-tree .col-date { inline-size: 10rem; }
+.page-tree .col-menu { inline-size: 2.5rem; }
+
+.page-tree .page-name,
+.page-tree .address {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-tree .lang abbr {
+  color: var(--ui-ink-muted);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+  text-decoration: none;
+}
+
+/* On a phone the list keeps what a page is and whether it is live; the language and when it
+   was edited go, rather than making the table scroll. */
+@media (max-width: 47.5rem) {
+  .page-tree .col-lang,
+  .page-tree .lang,
+  .page-tree .col-date,
+  .page-tree .date,
+  .page-tree .col-address,
+  .page-tree .address,
+  .page-tree .col-status,
+  .page-tree td:nth-child(5) {
+    display: none;
+  }
+
+  /* Four arrows and a handle since D-133: tighter, so the title — the one thing a row
+     cannot lose — keeps its room. The status is changed in the page's own settings here. */
+  .page-tree .col-order { inline-size: 8.75rem; }
+
+  .page-tree .move-button {
+    padding-inline: var(--ui-1);
+  }
+}
+
+/* Editor */
+
+.editor-form {
+  display: grid;
+  gap: var(--ui-5);
+}
+
+.editor-meta {
+  display: grid;
+  gap: var(--ui-4);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+/* The two search-result fields (D-004) get a row of their own.
+   Dropped straight into the panel's grid they took columns one and two and left a hole
+   under the third, and the description — the one field meant to hold a sentence — came out
+   the narrowest control on the screen, under a hint longer than itself. A row of its own,
+   with a wider minimum, gives both of them room and still collapses to one column when the
+   panel is narrow. `1 / -1` rather than a span: the columns here are auto-fit, so a span
+   would force an implicit column and cramp the whole panel at small widths. */
+.editor-meta-seo {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: var(--ui-4);
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+}
+
+.editor-section-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ui-3);
+  margin: var(--ui-2) 0 0;
+}
+
+.editor-section-title h2 {
+  margin: 0;
+}
+
+.block-list {
+  display: grid;
+  gap: var(--ui-4);
+}
+
+/* One block: a panel with a header strip, so a long page reads as a stack of cards. */
+
+.block-editor {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-s);
+  min-width: 0;
+  min-inline-size: 0;
+}
+
+.block-editor-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  float: left;
+  inline-size: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--ui-3) var(--ui-4);
+  background: var(--ui-panel-sunken);
+  border-bottom: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l) var(--ui-radius-l) 0 0;
+  font-size: var(--ui-text-sm);
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ui-ink-muted);
+}
+
+/* A floated legend leaves the fields to clear it; this is the body they sit in. */
+.block-body {
+  clear: both;
+  display: grid;
+  gap: var(--ui-4);
+  padding: var(--ui-5) var(--ui-4);
+}
+
+.block-editor-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-1);
+  padding: var(--ui-2) var(--ui-4);
+  border-top: var(--ui-border) solid var(--ui-line);
+  background: var(--ui-panel-sunken);
+  border-radius: 0 0 var(--ui-radius-l) var(--ui-radius-l);
+}
+
+.block-editor-controls .checkbox {
+  font-size: var(--ui-text-sm);
+}
+
+.drag-handle {
+  margin-inline-end: var(--ui-1);
+  color: var(--ui-ink-faint);
+  cursor: grab;
+  user-select: none;
+}
+
+/* The page tree. A child is indented by its depth, which the row carries as --depth, so
+   the nesting is read from the data rather than from a class per level. */
+
+/* A table cell, not a flex box: as flex it dropped out of the table and its row line sat a
+   few pixels off the rest of the row. The handle and arrows line up inline instead. */
+.page-tree .page-order {
+  white-space: nowrap;
+}
+
+.page-tree .page-order > * {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* One step per level, added to the cell's own padding rather than replacing it: .table td
+   already sets --ui-4 on the inline start, so `padding-inline-start: var(--ui-5)` made the
+   first level a 8px step and the second a 24px one. Measured in a browser at 16 / 24 / 48,
+   which read as a rendering accident rather than a hierarchy.
+
+   Written out rather than calculated from a custom property, because the admin's CSP has
+   no 'unsafe-inline' and a style attribute carrying the depth would be dropped. Six levels
+   is past anything a site should have; deeper pages stop indenting. */
+.page-tree .depth-1 { padding-inline-start: calc(var(--ui-4) + var(--ui-5)); }
+.page-tree .depth-2 { padding-inline-start: calc(var(--ui-4) + var(--ui-5) * 2); }
+.page-tree .depth-3 { padding-inline-start: calc(var(--ui-4) + var(--ui-5) * 3); }
+.page-tree .depth-4 { padding-inline-start: calc(var(--ui-4) + var(--ui-5) * 4); }
+.page-tree .depth-5 { padding-inline-start: calc(var(--ui-4) + var(--ui-5) * 5); }
+.page-tree .depth-6 { padding-inline-start: calc(var(--ui-4) + var(--ui-5) * 6); }
+
+.move-button {
+  padding-inline: var(--ui-2);
+  line-height: 1;
+}
+
+.is-dragging {
+  opacity: 0.5;
+  outline: 2px dashed var(--ui-accent);
+}
+
+/* Where a dragged page will land (D-133): its row takes the level it will have, and says
+   under which page. Shown only while it is dragged. */
+.page-landing {
+  display: none;
+  margin-inline-start: var(--ui-2);
+  color: var(--ui-accent-dark);
+  font-size: var(--ui-text-sm);
+}
+
+.is-placing .page-landing {
+  display: inline;
+}
+
+/* The copy SortableJS moves with the pointer: a <tr> outside its table, cells folded. The
+   row standing in its place says everything, so this one is not drawn. */
+.page-drag-follower {
+  visibility: hidden;
+}
+
+.page-tree tr.is-placing {
+  opacity: 1;
+  background: var(--ui-accent-soft);
+}
+
+/* Section style, folded away until wanted */
+
+.block-style {
+  border-top: var(--ui-border) dashed var(--ui-line);
+  padding-top: var(--ui-3);
+}
+
+.block-style > summary {
+  cursor: pointer;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  font-weight: 550;
+}
+
+.block-style-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--ui-3);
+  margin-top: var(--ui-4);
+}
+
+.block-style-grid .field select {
+  max-inline-size: none;
+}
+
+.block-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--ui-3);
+  padding: var(--ui-4);
+  background: var(--ui-panel);
+  border: var(--ui-border) dashed var(--ui-line-strong);
+  border-radius: var(--ui-radius-l);
+}
+
+.block-add .field {
+  flex: 1;
+  min-width: 12rem;
+  max-width: 20rem;
+}
+
+.block-add .field select {
+  max-inline-size: none;
+}
+
+/* Save bar: the primary action stays reachable at the bottom of a long page. */
+
+.editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-3);
+  margin-top: var(--ui-2);
+  padding: var(--ui-3) var(--ui-4);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-m);
+}
+
+.editor-actions .hint {
+  flex: 1;
+}
+
+.editor-secondary {
+  margin-top: var(--ui-6);
+  padding-top: var(--ui-4);
+  border-top: var(--ui-border) solid var(--ui-line);
+}
+
+@media (max-width: 40rem) {
+  .block-body {
+    padding-inline: var(--ui-3);
+  }
+}
+
+/* Undo for the move just made (D-133), above the list it changed. */
+.page-undo {
+  margin-block-end: var(--ui-4);
+}
+
+.page-undo .button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-2);
+}

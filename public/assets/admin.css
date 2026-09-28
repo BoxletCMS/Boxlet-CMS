@@ -1,0 +1,356 @@
+/* The admin's own design system: the measurements, the type and the base shell.
+ *
+ * Fixed and independent by design. Nothing here is a token from the site's compiled
+ * tokens.css, so the tool a design is judged with never changes underneath it (SPEC §5.4).
+ * Site tokens are named --color-*, --space-*, --text-* and so on; nothing here may use one.
+ * The admin's own properties are all --ui-*.
+ *
+ * THE COLOURS LIVE IN admin-tokens.css, in two palettes (D-054). This file reads them and
+ * writes none of its own.
+ *
+ * Loaded with admin-tokens.css, admin-ui.css and admin-forms.css by the admin, the login
+ * screen and the installer. */
+
+/* The hidden attribute wins over anything that lays an element out.
+ *
+ * Measured: the link panel carried hidden and still reported display:flex at 59px on
+ * screen, because .richtext-link { display: flex } is an author rule and the browser's own
+ * [hidden] { display: none } is not. Every author rule that gives an element a display
+ * beats it, so this is a rule rather than a patch on one panel — the next thing hidden
+ * this way is protected too. Specificity, not !important: .admin [hidden] is (0,1,1) and
+ * outranks a single class. */
+.admin [hidden] {
+  display: none;
+}
+
+/* The admin's own face: Inter, for reading and for titles (D-052). It already ships in
+   public/assets/fonts for the site's pairings, so the admin adds no file and sends nothing
+   anywhere; it only declares it under a name of its own, so a site pairing can never change
+   the admin's type (SPEC §5.4). Latin and latin-ext, as the site declares them. */
+@font-face {
+  font-family: "Boxlet UI";
+  src: url("fonts/inter/inter-latin-wght.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Boxlet UI";
+  src: url("fonts/inter/inter-latin-ext-wght.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+.admin {
+  /* THE COLOURS ARE NOT HERE. Every --ui-* colour, in both palettes, lives in
+     admin-tokens.css; this file and the rest of the admin only ever read them. What is
+     below is the shape of the admin rather than its colour: spacing, type, radii, the
+     width of the reading column. */
+
+  /* The spacing scale. One rhythm for the whole admin: 4 between a label and its input,
+     5 between fields, 6 inside a panel and between panels, 7 under a page title. */
+  --ui-1: 0.25rem;
+  --ui-2: 0.5rem;
+  --ui-3: 0.75rem;
+  --ui-4: 1rem;
+  --ui-5: 1.5rem;
+  --ui-6: 2rem;
+  --ui-7: 3rem;
+  --ui-8: 4rem;
+
+  /* One face for reading and for titles (D-052): Inter, where titles were Space Grotesk.
+     Hierarchy is size and space, never a heavier weight — headings stop at 500. */
+  --ui-font: "Boxlet UI", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ui-font-display: var(--ui-font);
+  /* Every number, address, size, time and shortcut is set in this; prose never is. */
+  --ui-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  /* A dense tool: 13px to read, 21px for a page's title. */
+  --ui-text-xs: 0.6875rem;
+  --ui-text-sm: 0.75rem;
+  --ui-text-base: 0.8125rem;
+  --ui-text-lg: 0.9375rem;
+  --ui-text-xl: 1.3125rem;
+  --ui-text-2xl: 1.375rem;
+  --ui-leading: 1.5;
+  --ui-leading-tight: 1.25;
+
+  --ui-radius-s: 0.25rem;
+  --ui-radius-m: 0.375rem;
+  --ui-radius-l: 0.5rem;
+  --ui-border: 1px;
+
+  /* The content column, left-aligned beside the rail with the spare width on the right
+     (D-052); the Design screen opts into the wide one. */
+  --ui-content: 77.5rem;
+  --ui-content-wide: 106rem;
+  /* The strip across the top of the content (admin-shell.css): the builder fills the
+     window below it. */
+  --ui-bar-height: 2.875rem;
+
+  margin: 0;
+  background: var(--ui-bg);
+  color: var(--ui-ink);
+  font-family: var(--ui-font);
+  font-size: var(--ui-text-base);
+  line-height: var(--ui-leading);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01";
+}
+
+.admin h1,
+.admin h2,
+.admin h3 {
+  font-family: var(--ui-font-display);
+  font-weight: 500;
+  line-height: var(--ui-leading-tight);
+  letter-spacing: -0.01em;
+}
+
+.admin h1 {
+  margin: 0;
+  font-size: var(--ui-text-xl);
+  letter-spacing: -0.015em;
+}
+
+.admin h2 {
+  margin: 0 0 var(--ui-4);
+  font-size: var(--ui-text-lg);
+}
+
+.admin h3 {
+  margin: 0 0 var(--ui-2);
+  font-size: var(--ui-text-lg);
+}
+
+.admin a {
+  color: var(--ui-accent);
+  text-underline-offset: 0.15em;
+}
+
+/* HINTS ON DEMAND (D-078, D-087). Here rather than on one screen's stylesheet because two
+   screens carry the toggle now, and scoped by the attribute rather than by the screen:
+   every other screen in the admin keeps its hints, because it is these narrow columns that
+   are short of room. Legible at rest, like every control — a border and muted ink on the
+   panel, not something that appears when the pointer is near it. */
+.hints-toggle {
+  justify-self: end;
+  padding: var(--ui-1) var(--ui-2);
+  background: transparent;
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink-muted);
+  font: inherit;
+  font-size: var(--ui-text-xs);
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+}
+
+.hints-toggle:hover {
+  border-color: var(--ui-accent);
+  color: var(--ui-ink);
+}
+
+[data-hints-root][data-hints="off"] .hint {
+  display: none;
+}
+
+.admin :focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+  border-radius: var(--ui-radius-s);
+}
+
+/* A fieldset carries a border of the browser's own, drawn in a light system colour that on
+   this dark ground reads as a white box around the controls — measured on the crop shapes
+   and in the installer's database step. Cleared for every fieldset; .fieldset draws its own
+   (admin-forms.css), and so do .block-editor and .repeater — which is why this is the bare
+   element and not .admin fieldset, which would outrank all three. */
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+/* An icon from the sprite (icon() in helpers.php, D-037): the size of the text beside it,
+   in the text's own colour, so it can never have a contrast of its own to get wrong. */
+.admin .icon {
+  flex: none;
+  inline-size: 1.125em;
+  block-size: 1.125em;
+  vertical-align: -0.2em;
+}
+
+.admin pre {
+  margin: var(--ui-2) 0;
+  padding: var(--ui-3);
+  overflow-x: auto;
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-sm);
+}
+
+.admin code {
+  font-family: var(--ui-mono);
+  font-size: 0.9em;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--ui-2);
+  top: var(--ui-2);
+  z-index: 2;
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-panel);
+  border-radius: var(--ui-radius-m);
+  box-shadow: var(--ui-shadow-m);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.admin-main {
+  max-width: var(--ui-content);
+  padding: var(--ui-5) var(--ui-5) var(--ui-7);
+}
+
+.admin-main-wide {
+  max-width: var(--ui-content-wide);
+}
+
+/* The login screen and the installer: one centred card, no shell. */
+
+.admin-centered {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: var(--ui-5);
+  box-sizing: border-box;
+}
+
+.card {
+  width: 100%;
+  max-width: 30rem;
+  box-sizing: border-box;
+  padding: var(--ui-7) var(--ui-6);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-m);
+}
+
+.card h1 {
+  margin-bottom: var(--ui-6);
+}
+
+/* What follows a paragraph or a form on the card stands apart from it: a hint under a
+   button read as the button's own caption, and an introduction as the first field's label
+   (the forgotten-password screen, D-132; the two-step code screen had the same). */
+.card > :is(p, form) + * {
+  margin-top: var(--ui-4);
+}
+
+/* The mark above the login and installer card, so the first screen says whose tool it is. */
+.card::before {
+  content: "";
+  display: block;
+  inline-size: 2rem;
+  block-size: 2rem;
+  margin-bottom: var(--ui-5);
+  box-sizing: border-box;
+  border: 0.5rem solid var(--ui-mark);
+  border-radius: var(--ui-radius-m);
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ui-4);
+  margin-bottom: var(--ui-6);
+}
+
+.page-header h1 {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.panel {
+  box-sizing: border-box;
+  padding: var(--ui-6);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-s);
+}
+
+/* VERTICAL RHYTHM. Panels, fieldsets, tables and a form's closing actions never touch:
+   whatever follows one of them sits a panel's gap below it. Only in the reading column and
+   a form directly inside it: a panel inside a grid or a .stack already has the grid's gap,
+   and a margin there doubled it (measured on the Design screen). Adjacency rather than a
+   margin on every panel, so the first thing on a screen keeps the title's spacing. */
+:is(.admin-main, .admin-main > form:not(.stack, .editor-form)) > :is(.panel, .fieldset, .table-wrap, form, .metrics)
+  + :is(.panel, .fieldset, .table-wrap, form, .button, .form-actions) {
+  margin-top: var(--ui-5);
+}
+
+/* A heading that opens a stack already has the stack's gap below it; its own margin on
+   top of that doubled the space between a panel's title and its first field. */
+.stack > h2,
+.stack > h3 {
+  margin-bottom: 0;
+}
+
+/* A form's closing row: the primary action first, anything else after it. */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-3);
+}
+
+/* A sentence introducing a table or a list sits just above it, not against its edge, and
+   a panel's gap below whatever came before it. */
+.hint + .table-wrap,
+.hint + form + .table-wrap {
+  margin-top: var(--ui-3);
+}
+
+.admin-main > .panel + .hint {
+  margin-top: var(--ui-5);
+}
+
+.hint {
+  margin: 0;
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-sm);
+}
+
+.choice {
+  font-weight: 600;
+}
+
+/* The closed sets drawn as rows of buttons, and the column arrangements drawn as shapes,
+   are admin-choices.css, linked straight after this file (PLAN.md D-117). */
+
+@media (max-width: 40rem) {
+  .admin-main {
+    padding-inline: var(--ui-4);
+  }
+
+  .panel {
+    padding: var(--ui-5);
+  }
+
+  .admin h1 {
+    font-size: var(--ui-text-lg);
+  }
+}

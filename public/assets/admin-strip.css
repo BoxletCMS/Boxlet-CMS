@@ -1,0 +1,175 @@
+/* The strip across the top of the content (PLAN.md D-052): where you are — the site's host,
+ * then the screen — and the site's time, View site and Log out. Split from admin-shell.css,
+ * which keeps the rail, when that passed the size limit. Admin tokens only (--ui-*), defined
+ * in admin-tokens.css. */
+
+.admin-column {
+  min-inline-size: 0;
+}
+
+.admin-strip {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--ui-3);
+  block-size: 2.875rem;
+  box-sizing: border-box;
+  padding-inline: var(--ui-5) var(--ui-4);
+  background: var(--ui-bg);
+  box-shadow: inset 0 -1px 0 var(--ui-line);
+}
+
+.admin-where {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--ui-2);
+  min-inline-size: 0;
+  margin: 0;
+  font-size: var(--ui-text-base);
+  white-space: nowrap;
+}
+
+.admin .admin-host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-2);
+  min-inline-size: 0;
+  margin-inline-start: calc(-1 * var(--ui-2));
+  padding: 0.3125rem var(--ui-2);
+  overflow: hidden;
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font-weight: 500;
+  text-decoration: none;
+  text-overflow: ellipsis;
+}
+
+.admin .admin-host:hover {
+  background: var(--ui-panel);
+}
+
+/* The site is live: a small green dot, the one place success colour sits at rest. */
+.admin-live {
+  flex: none;
+  inline-size: 0.3125rem;
+  block-size: 0.3125rem;
+  background: var(--ui-success);
+  border-radius: 50%;
+}
+
+.admin-where-slash {
+  color: var(--ui-line-strong);
+}
+
+.admin-where-screen {
+  overflow: hidden;
+  color: var(--ui-ink-faint);
+  text-overflow: ellipsis;
+}
+
+.admin-strip-end {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-1);
+}
+
+.admin-clock {
+  margin-inline-end: var(--ui-2);
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+  white-space: nowrap;
+}
+
+.admin-logout {
+  margin: 0;
+}
+
+/* LIGHT, DARK OR THE MACHINE'S OWN (D-054). Three buttons inside one bordered group, so it
+   reads as a single switch rather than three loose icons; the chosen one carries the accent
+   tint and the accent ink, which is a shape and a colour rather than colour alone. */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin: 0 var(--ui-2) 0 0;
+  padding: 1px;
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.admin .theme-choice {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink-muted);
+  cursor: pointer;
+}
+
+.admin .theme-choice .icon {
+  inline-size: 0.9375rem;
+  block-size: 0.9375rem;
+}
+
+.admin .theme-choice:hover {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+}
+
+.admin .theme-choice[aria-pressed="true"] {
+  background: var(--ui-accent-soft);
+  color: var(--ui-accent);
+}
+
+/* View site, Log out and the phone's menu button: icons alone, each named for a screen
+   reader and on hover. Legible at rest in the muted ink, raised on hover. */
+.admin .admin-strip-icon {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink-muted);
+  cursor: pointer;
+}
+
+.admin .admin-strip-icon .icon {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+.admin .admin-strip-icon:hover {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+}
+
+/* The menu button exists only on a phone, and only once admin-nav.js has shown it. */
+.admin .admin-nav-toggle {
+  display: none;
+}
+
+@media (max-width: 47.5rem) {
+  .admin-strip {
+    padding-inline: var(--ui-2) var(--ui-3);
+  }
+
+  .admin-clock {
+    display: none;
+  }
+
+  /* The phone's menu button, once admin-nav.js has made the rail a drawer. */
+  .admin .nav-ready .admin-nav-toggle {
+    display: inline-grid;
+  }
+}

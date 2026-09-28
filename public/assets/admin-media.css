@@ -1,0 +1,300 @@
+/* The picture library and one picture. Admin tokens only (--ui-*). */
+
+/* Adding pictures, then finding one: the drop zone and, under it, the search, each the
+   full width of the column (D-039). */
+.media-tools {
+  display: grid;
+  gap: var(--ui-4);
+  margin-bottom: var(--ui-6);
+}
+
+.media-upload,
+.media-search {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-3);
+  padding: var(--ui-5);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-s);
+}
+
+.media-search {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.media-search input {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 2.5rem;
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+}
+
+.media-search input:focus {
+  border-color: var(--ui-accent);
+  box-shadow: var(--ui-ring);
+  outline: none;
+}
+
+/* The drop zone: a sunken, rounded ground that says what to do, the whole of it a click
+   target. Visible at rest by its ground and its words, raised when a file is over it or
+   when the file input inside has the keyboard's focus. */
+.dropzone {
+  display: grid;
+  justify-items: center;
+  gap: var(--ui-2);
+  padding: var(--ui-6) var(--ui-5);
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) dashed var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink-muted);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.dropzone .icon {
+  inline-size: 2rem;
+  block-size: 2rem;
+  color: var(--ui-ink-faint);
+}
+
+.dropzone-text {
+  color: var(--ui-ink);
+  font-size: var(--ui-text-lg);
+}
+
+.dropzone-browse {
+  color: var(--ui-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.dropzone-limits {
+  font-size: var(--ui-text-sm);
+}
+
+.dropzone:hover,
+.media-upload:focus-within .dropzone {
+  border-color: var(--ui-accent);
+}
+
+/* While a file is dragged over it, and while the upload is on its way. */
+.media-upload.is-dropping .dropzone,
+.media-upload.is-uploading .dropzone {
+  background: var(--ui-accent-soft);
+  border-color: var(--ui-accent);
+}
+
+/* The grid. auto-fill rather than auto-fit: with two pictures in the library, auto-fit
+   would stretch each card across half the screen and a 200px thumbnail would sit in a
+   600px box. */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--ui-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.media-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-2);
+  padding: var(--ui-3);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-s);
+}
+
+.media-card-link {
+  display: grid;
+  gap: var(--ui-2);
+  text-decoration: none;
+  color: inherit;
+}
+
+.media-card-link:hover .media-name {
+  text-decoration: underline;
+}
+
+/* A fixed square whatever the picture's proportions, so the grid does not jump as
+   pictures load and a portrait sits beside a landscape without either being cut. */
+.media-thumb {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+/* No thumbnail yet: says so in words rather than showing a broken image. */
+.media-thumb-none {
+  display: grid;
+  place-items: center;
+  padding: var(--ui-3);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  text-align: center;
+}
+
+.media-name {
+  overflow-wrap: anywhere;
+  font-weight: 550;
+  font-size: var(--ui-text-sm);
+}
+
+.media-facts {
+  margin: 0;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+.media-pending {
+  display: grid;
+  gap: var(--ui-2);
+  margin-top: auto;
+  padding-top: var(--ui-2);
+  border-top: var(--ui-border) dashed var(--ui-line);
+}
+
+.media-pending .hint {
+  margin: 0;
+}
+
+
+/* One picture */
+
+.media-detail {
+  display: grid;
+  gap: var(--ui-5);
+  grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+  align-items: start;
+}
+
+.media-preview,
+.media-side {
+  padding: var(--ui-4);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+}
+
+.media-side h2 {
+  margin: 0 0 var(--ui-3);
+  font-size: var(--ui-text-lg);
+}
+
+.media-side h2 + * {
+  margin-bottom: var(--ui-5);
+}
+
+/* The picture itself, whole: the uncropped `full` variant. */
+.media-preview-image {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  border-radius: var(--ui-radius-m);
+}
+
+/* Crop, Replace and Delete: one row of word-and-icon buttons (D-038). Replace's form
+   opens under the row, across its whole width, when its button is pressed. */
+.media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--ui-2);
+  margin-top: var(--ui-5);
+  padding-top: var(--ui-5);
+  border-top: var(--ui-border) solid var(--ui-line);
+}
+
+.media-actions form {
+  margin: 0;
+}
+
+/* The small size: three buttons share the narrow side column on one line. */
+.media-actions .button {
+  min-block-size: 2.25rem;
+  padding: var(--ui-1) var(--ui-3);
+  font-size: var(--ui-text-sm);
+}
+
+.media-replace {
+  margin-top: var(--ui-3);
+}
+
+/* The replacement's drop zone sits in the side column: no card of its own around it. */
+.media-replace-form {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.media-replace-form .dropzone {
+  padding: var(--ui-5) var(--ui-4);
+}
+
+.media-facts-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--ui-1) var(--ui-3);
+  margin: 0;
+  font-size: var(--ui-text-sm);
+}
+
+.media-facts-list dt {
+  color: var(--ui-ink-muted);
+}
+
+.media-facts-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.media-used {
+  margin: 0;
+  padding-inline-start: var(--ui-5);
+  font-size: var(--ui-text-sm);
+}
+
+
+.media-meta {
+  display: grid;
+  gap: var(--ui-4);
+  justify-items: start;
+  margin-top: var(--ui-5);
+}
+
+.media-meta h2 {
+  margin: 0;
+  font-size: var(--ui-text-lg);
+}
+
+.media-meta .fieldset {
+  inline-size: 100%;
+}
+
+/* The picker that appears inside the page editors is admin-picker.css, and the crop dialog
+   is admin-crop.css: this file dresses the library screen, those dress a control and a
+   dialog. */
+
+@media (max-width: 60rem) {
+  .media-detail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

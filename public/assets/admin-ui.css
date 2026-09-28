@@ -1,0 +1,298 @@
+/* Admin buttons, feedback and the installer's progress parts. Admin tokens only
+ * (--ui-*), defined in admin-tokens.css: no value from the site's tokens.css reaches the
+ * admin. Loaded by the admin, the login screen and the installer. */
+
+/* Feedback. A save confirmation has to be visible without hunting for it, so it sits at
+   the top of the content column in its own colour. */
+
+.notice {
+  display: block;
+  margin: 0 0 var(--ui-6);
+  padding: var(--ui-3) var(--ui-4) var(--ui-3) var(--ui-5);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-left: var(--ui-1) solid var(--ui-ink-faint);
+  border-radius: var(--ui-radius-m);
+}
+
+.notice-success {
+  background: var(--ui-success-soft);
+  border-color: var(--ui-success);
+  color: var(--ui-success);
+  font-weight: 550;
+}
+
+.notice-error {
+  background: var(--ui-danger-soft);
+  border-color: var(--ui-danger);
+  color: var(--ui-danger);
+  font-weight: 550;
+}
+
+.notice-warning {
+  background: var(--ui-warning-soft);
+  border-color: var(--ui-warning);
+  color: var(--ui-warning);
+}
+
+/* A screen's one sentence of explanation, under its title. Shared by every screen, so it
+   lives with the shell rather than with the page list that used it first. */
+.page-subtitle {
+  max-inline-size: 44rem;
+  margin: calc(var(--ui-4) * -1) 0 var(--ui-6);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-base);
+}
+
+/* A dialog over the screen (editing a menu item, D-039). Opened by a script as a modal, or
+   drawn open by the server when there is no script — so it places itself either way, and
+   the page behind is dimmed by its backdrop or, without one, by a wide shadow. */
+.dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  box-sizing: border-box;
+  inline-size: min(34rem, calc(100vw - 2 * var(--ui-4)));
+  max-block-size: calc(100dvh - 2 * var(--ui-4));
+  margin: auto;
+  padding: var(--ui-6);
+  overflow: auto;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-m), 0 0 0 100vmax var(--ui-scrim);
+  color: var(--ui-ink);
+}
+
+.dialog::backdrop {
+  background: var(--ui-scrim);
+}
+
+.dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-4);
+  margin-bottom: var(--ui-5);
+}
+
+.dialog-head h2 {
+  margin: 0;
+}
+
+.dialog-head form {
+  margin: 0;
+}
+
+/* Buttons */
+
+/* One height for every button, so a row of them lines up whatever each one says, and a
+   primary action that reads as the one to press: filled, with a hairline of depth. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  gap: var(--ui-2);
+  box-sizing: border-box;
+  min-block-size: 2.5rem;
+  padding: var(--ui-2) var(--ui-5);
+  border: var(--ui-border) solid transparent;
+  border-radius: var(--ui-radius-m);
+  background: var(--ui-accent);
+  box-shadow: var(--ui-shadow-s);
+  color: var(--ui-on-accent);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.admin a.button {
+  color: var(--ui-on-accent);
+}
+
+.button:hover {
+  background: var(--ui-accent-dark);
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button-secondary,
+.admin a.button-secondary {
+  background: var(--ui-panel);
+  border-color: var(--ui-control-line);
+  color: var(--ui-ink);
+}
+
+.button-secondary:hover {
+  background: var(--ui-panel-sunken);
+}
+
+/* Every variant repeats the anchor selector, because `.admin a.button` sets the filled
+   button's white text and outranks a bare `.button-ghost`. Without this an <a> ghost
+   button is white text on a white bar: invisible at rest, appearing only on hover. No
+   control in this admin is ever invisible or outline-only at rest (see CLAUDE.md). */
+.button-quiet,
+.button-ghost,
+.admin a.button-quiet,
+.admin a.button-ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--ui-accent);
+}
+
+.button-quiet:hover,
+.button-ghost:hover {
+  background: var(--ui-accent-soft);
+}
+
+/* A SELF-CONTAINED PAIR, not an ink borrowed onto whatever ground it lands on.
+   This set only a colour, so `.button.button-danger` put red on the filled accent: 1.15:1
+   against the 4.5:1 text rule. The matrix test never saw it, because that one pairs inks
+   with PALE surfaces and `accent` sits in its ink list rather than its surface list.
+   transparent lets the page through, where danger reads at 6.13:1 on --ui-bg and 6.57:1 on
+   --ui-panel. The buttons that already combined this with ghost look exactly as before,
+   ghost having been transparent too. */
+.button-danger,
+.admin a.button-danger {
+  background: transparent;
+  box-shadow: none;
+  color: var(--ui-danger);
+}
+
+/* A button showing its icon alone: square, the icon a size up from the text. It always
+   carries a visually-hidden label and a title, so it is named for everyone (D-039). */
+.button-icon {
+  inline-size: 2.5rem;
+  padding: 0;
+}
+
+.button-icon .icon {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+}
+
+/* A small button, for rows of a table and the controls inside a block: same shape, less
+   height, so a row of actions does not outgrow the row it sits in. */
+.button-small {
+  min-block-size: 2rem;
+  padding: var(--ui-1) var(--ui-3);
+  font-size: var(--ui-text-sm);
+}
+
+.button-danger:hover {
+  background: var(--ui-danger-soft);
+}
+
+.restart {
+  margin-top: var(--ui-6);
+}
+
+/* Installer steps and requirement checks */
+
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-3);
+  margin: 0 0 var(--ui-5);
+  padding: 0;
+  list-style: none;
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-sm);
+}
+
+.steps [aria-current] {
+  color: var(--ui-ink);
+  font-weight: 600;
+}
+
+.checks {
+  display: grid;
+  gap: var(--ui-2);
+  margin: 0 0 var(--ui-5);
+  padding: 0;
+  list-style: none;
+}
+
+/* ONE ROW, TWO COLUMNS: the verdict in its own, the words in theirs. Reported by the owner
+   from a real install, and it is the rows that print a path that show it — the label wraps,
+   and without a column of its own the second line goes back under the word "OK". Measured
+   on the installer's own screen: three of eighteen rows at 1200px, eight of eighteen on a
+   phone. "Missing" and "Optional" are wider than "OK", so the column is sized to its
+   content rather than to a guess. */
+.check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--ui-1) var(--ui-3);
+  align-items: baseline;
+}
+
+/* A hint, or the rewrite rules under a failed check, line up with the words rather than
+   with the verdict. */
+.check > :not(.check-status) {
+  grid-column: 2;
+  /* A path is one long word with no spaces. Where it cannot fit, it breaks inside itself
+     rather than pushing the card wider than the window. */
+  overflow-wrap: anywhere;
+}
+
+.check-status {
+  font-weight: 700;
+}
+
+.check-fail .check-status {
+  color: var(--ui-danger);
+}
+
+.check-warn .check-status {
+  color: var(--ui-warning);
+}
+
+.check-ok .check-status {
+  color: var(--ui-success);
+}
+
+/* A script-only button keeps the button's own layout: .js-only would otherwise make it
+   inline-block and drop its icon out of line. */
+.js .button.js-only {
+  display: inline-flex;
+}
+
+/* Two fields that belong together side by side, such as a server and its port; one above
+   the other on a phone. */
+.field-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-4);
+}
+
+@media (max-width: 40rem) {
+  .field-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mail-test {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-3);
+}
+
+/* A ghost button that is unavailable, such as Move up on the first of a list: fainter, and
+   still legible — a control nobody can read is not explained by being unavailable, and the
+   3:1 rule covers disabled controls too (PLAN.md D-012). Here rather than on the pages
+   list alone, where it began, so every list of movable things says the same. */
+.button-ghost[disabled],
+.button-ghost[disabled]:hover {
+  background: transparent;
+  color: var(--ui-ink-faint);
+  cursor: default;
+}

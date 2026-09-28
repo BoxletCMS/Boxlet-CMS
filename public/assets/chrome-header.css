@@ -1,0 +1,358 @@
+/* THE HEADER'S ARRANGEMENT, ITS BEHAVIOUR AND ITS MENU (PLAN.md D-032, D-036, D-112).
+   Split out of chrome.css when D-112's five arrangements and three behaviours took it past
+   the size where a file is read rather than searched. The seam is the one the header
+   already had: chrome.css says what the header and footer LOOK like — surfaces, colours of
+   their own, density, edges, the menu's words, the button — and this file says where the
+   header's parts STAND, what the bar does as the page scrolls, and how its menu folds on a
+   phone. Linked right after chrome.css; the same rule as everywhere on the front end: only
+   custom properties, no literal colours, pixel values, fonts or shadows. */
+
+/* THE ARRANGEMENTS (D-112): where the name, the menu and the button stand. `left` is the
+   flex row above — name left, menu and button right. */
+
+/* Inline: the menu beside the name, and the button at the far end. */
+.layout-inline .site-header {
+  justify-content: flex-start;
+}
+
+.layout-inline .site-header-action {
+  margin-inline-start: auto;
+}
+
+/* Centred: the name above, the navigation on one axis under it. */
+.layout-centred .site-header {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.layout-centred .site-nav ul {
+  justify-content: center;
+}
+
+/* Masthead: the name in a row of its own, the menu in a row under it, everything ranged
+   left — a newspaper's front. */
+.layout-masthead .site-header {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.layout-masthead .site-header-action {
+  margin-inline-start: 0;
+}
+
+/* Split: the name in the middle of its menu. The template draws the menu as two lists
+   around the name, and the nav lends them to the grid (display: contents) so each list
+   can take a side. The button, when there is one, sits on a row of its own underneath. */
+.layout-split .site-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas: "before brand after" "action action action";
+  align-items: center;
+  justify-items: center;
+}
+
+.layout-split .site-nav {
+  display: contents;
+}
+
+.layout-split .site-logo {
+  grid-area: brand;
+}
+
+.layout-split .site-nav > ul:first-child {
+  grid-area: before;
+  justify-content: flex-end;
+  justify-self: end;
+}
+
+.layout-split .site-nav > ul:last-child {
+  grid-area: after;
+  justify-content: flex-start;
+  justify-self: start;
+}
+
+.layout-split .site-header-action {
+  grid-area: action;
+}
+
+/* THE BEHAVIOURS (D-112): what the bar does as the page scrolls. On the HEADER element,
+   because that is what sticks or floats; the class is on the bar inside, which is what
+   the template owns, and :has() reads it from there. */
+
+/* Sticky: always within reach, over whatever scrolls beneath on its own surface. */
+.block-header:has(> .container > .behaviour-sticky) {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Over the top: laid over the first section, taking that section's colours rather than
+   painting its own — which is what makes it readable over any surface a hero can have.
+   The first section gains the header's room above its own rhythm, so nothing sits under
+   the bar.
+
+   THE SHEET IS WHAT IT IS LAID OVER (D-067). A header that BREAKS OUT of the sheet has
+   nothing to overlay — it sits above it, on the colour around the page — so none of these
+   rules match it and it draws as an ordinary header. That is the honest reading of the two
+   decisions together, and it needs no code to say so. */
+.page-sheet {
+  position: relative;
+}
+
+.block-header:has(> .container > .behaviour-over) {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 10;
+  background: transparent;
+}
+
+.page-sheet:has(> .block-header .behaviour-over) > main > .block:first-child {
+  padding-block-start: calc(var(--section-rhythm) + var(--space-3xl));
+}
+
+.page-sheet:has(> main > .block:first-child:is(.surface-contrast, .surface-image)) > .block-header:has(.behaviour-over) {
+  --section-bg: var(--color-contrast);
+  --section-text: var(--color-on-contrast);
+  --section-muted: var(--color-muted-on-contrast);
+  --section-link: var(--color-on-contrast);
+  --section-border: var(--color-muted-on-contrast);
+  --section-button-bg: var(--color-on-contrast);
+  --section-button-text: var(--color-contrast);
+}
+
+.page-sheet:has(> main > .block:first-child.surface-gradient) > .block-header:has(.behaviour-over) {
+  --section-bg: var(--color-gradient-start);
+  --section-text: var(--color-on-gradient);
+  --section-muted: var(--color-on-gradient);
+  --section-link: var(--color-on-gradient);
+  --section-border: var(--color-on-gradient);
+  --section-button-bg: var(--color-on-gradient);
+  --section-button-text: var(--color-gradient-start);
+}
+
+.page-sheet:has(> main > .block:first-child.surface-tinted) > .block-header:has(.behaviour-over) {
+  --section-bg: var(--color-surface);
+  --section-card: var(--color-background);
+}
+
+/* A first band that is a cover hero standing alone (D-118) is a picture under a veil of the
+   contrast colour, whatever the band's own surface, so a header laid over it takes the
+   contrast colours — after the gradient and tinted rules above, which a band of either surface
+   under a cover hero would otherwise win. Both of the band's shapes, as in blocks-hero.css. */
+.page-sheet:has(> main > .block-hero:first-child > .container > .hero.is-cover) > .block-header:has(.behaviour-over),
+.page-sheet:has(> main > .block:first-child > .container > .section-cols > .section-column:only-child > :only-child > .hero.is-cover) > .block-header:has(.behaviour-over) {
+  --section-bg: var(--color-contrast);
+  --section-card: var(--color-contrast-raised);
+  --section-text: var(--color-on-contrast);
+  --section-muted: var(--color-muted-on-contrast);
+  --section-link: var(--color-on-contrast);
+  --section-border: var(--color-muted-on-contrast);
+  --section-button-bg: var(--color-on-contrast);
+  --section-button-text: var(--color-contrast);
+}
+
+
+/* Submenus. Without a script they are listed under their parent, smaller and indented, so
+   nothing is out of reach. With one (site-nav.js), each opens from its own button and
+   drops below its parent on its own surface. */
+.site-nav li {
+  position: relative;
+}
+
+.site-nav-children {
+  display: block;
+  padding-inline-start: var(--space-m);
+  font-size: var(--text-sm);
+}
+
+.site-nav-children li + li {
+  margin-block-start: var(--space-xs);
+}
+
+.nav-ready .site-nav-children {
+  display: none;
+}
+
+/* An open submenu drops below its parent on the bar's own surface, with a lift and no
+   border (D-114): a bordered box under a bar of plain words read as a form control, and the
+   words inside it follow the menu's own style — capitals, pills, chips — because the rules
+   above match them too. Opened by its button, and by a mouse resting on its parent
+   (site-nav.js, which is where the pointer's kind can be asked); the button stays for the
+   keyboard and for a finger. */
+.nav-ready .site-nav li.is-open > .site-nav-children {
+  display: grid;
+  gap: var(--space-xs);
+  position: absolute;
+  top: 100%;
+  inset-inline-start: 0;
+  z-index: 11;
+  min-inline-size: 12em;
+  margin-block-start: 0;
+  padding: var(--space-s) var(--space-m);
+  background: var(--section-bg);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-m);
+  font-size: inherit;
+}
+
+/* Room under the parent for the pointer to travel into the panel without it closing:
+   the panel begins at the parent's bottom edge, so the parent carries the gap. */
+.nav-ready .site-nav > ul > li {
+  padding-block-end: var(--space-xs);
+  margin-block-end: calc(var(--space-xs) * -1);
+}
+
+.nav-ready .site-nav-children li + li {
+  margin-block-start: 0;
+}
+
+/* The controls a script adds: legible at rest, in the section's own ink (CLAUDE.md). */
+.site-nav-more,
+.site-nav-toggle {
+  padding: var(--space-xs) var(--space-s);
+  background: transparent;
+  border: var(--border-width) solid var(--section-border);
+  border-radius: var(--radius-s);
+  color: var(--section-text);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.site-nav-more {
+  margin-inline-start: 0.2em;
+  padding: 0.1em 0.2em;
+  border-color: transparent;
+  font-size: var(--text-sm);
+}
+
+/* The chevron turns when its submenu is open, so the state is visible, not only spoken. */
+.site-nav-more[aria-expanded="true"] span {
+  display: inline-block;
+  transform: rotate(180deg);
+}
+
+.site-header-action .button {
+  white-space: nowrap;
+}
+
+.site-nav > ul > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.site-nav-toggle {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  /* On a narrow screen the bar becomes a stack: a logo, its navigation and a button do
+     not share a line at this width without one of them being squeezed to nothing. */
+  .site-header {
+    justify-content: flex-start;
+  }
+
+  /* The real mobile menu (D-032): one button, and the navigation folded under it until it
+     is opened. Only once site-nav.js has run — without it, the navigation wraps openly. */
+  .nav-ready .site-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    margin-inline-start: auto;
+    padding: var(--space-xs);
+    border-radius: var(--radius-button);
+  }
+
+  .nav-ready .site-nav-toggle svg {
+    display: block;
+  }
+
+  /* The logo keeps to its line beside the button: it may shrink, the button may not. */
+  .nav-ready .site-logo {
+    flex: 0 1 auto;
+    min-inline-size: 0;
+  }
+
+  /* One shape on a phone, whatever the arrangement on a wide screen: the name and the
+     Menu button on one line, and the navigation and the call to action folded under it.
+     A centred column there scattered three controls down the screen. */
+  .layout-centred .nav-ready.site-header,
+  .layout-masthead .nav-ready.site-header,
+  .layout-split .nav-ready.site-header,
+  .nav-ready.site-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    text-align: start;
+  }
+
+  /* The split header's two lists are one folded list on a phone. Measured, not assumed:
+     a block-level list keeps the `justify-self: end` it had as a grid item, and Chrome
+     honours justify-self on block-level boxes — the first list shrank to its words and
+     stood at the right edge while the second stood at the left. */
+  .layout-split .nav-ready .site-nav {
+    display: none;
+  }
+
+  .layout-split .nav-ready.nav-open .site-nav {
+    display: block;
+  }
+
+  .layout-split .nav-ready .site-nav > ul {
+    inline-size: 100%;
+    justify-self: auto;
+  }
+
+  .nav-ready .site-nav,
+  .nav-ready .site-header-action {
+    display: none;
+    flex-basis: 100%;
+  }
+
+  .nav-ready.nav-open .site-nav,
+  .nav-ready.nav-open .site-header-action {
+    display: block;
+  }
+
+  /* A header laid over the first section paints nothing — until its menu is open. Open, it
+     grows downward over the hero, and the first section does not move out of its way, so
+     the items landed on the picture and the headline with nothing behind them (D-110). While
+     the menu is open the bar paints the first section's own colour, which the rules above
+     already hand it as --section-bg, so the words stand on the surface they were measured
+     against and nothing under them shows through. */
+  .block-header:has(.behaviour-over.nav-open) {
+    background-color: var(--section-bg);
+  }
+
+  .layout-centred .nav-ready .site-nav ul,
+  .layout-split .nav-ready .site-nav ul {
+    justify-content: flex-start;
+  }
+
+  .nav-ready .site-nav ul {
+    flex-direction: column;
+    gap: var(--space-s);
+  }
+
+  .nav-ready .site-nav li.is-open > .site-nav-children {
+    position: static;
+    margin-block-start: var(--space-xs);
+    padding-block: 0;
+    box-shadow: none;
+  }
+
+  .nav-ready .site-nav > ul > li {
+    padding-block-end: 0;
+    margin-block-end: 0;
+  }
+
+  .layout-columns .site-footer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

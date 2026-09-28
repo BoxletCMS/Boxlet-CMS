@@ -1,0 +1,442 @@
+/* The editor's chrome inside the canvas iframe.
+ *
+ * This file lives in a document full of the SITE's tokens, so it must not read one: a
+ * selection outline that changed colour with the design would be unreadable on the
+ * designs that need it most. Its own values are literals, prefixed --bx-, and every
+ * class is bx- so nothing can collide with a block's own class names. */
+
+.bx-canvas {
+  --bx-select: #2f5fd0;
+  --bx-select-soft: rgb(47 95 208 / 0.08);
+  --bx-hover: rgb(47 95 208 / 0.28);
+  /* The insertion control's disc. Dark enough to read as a shape on any pale design;
+     the white ring around it carries the dark ones. */
+  --bx-ink: #101a33;
+
+  margin: 0;
+  /* The overlay is positioned against the body, in document coordinates. */
+  position: relative;
+  /* Room for the first block's controls above it, for the same reason the line below
+     gives for the last one (D-085): without a gap, the block's own toolbar sat on its
+     first line of text and the first insertion control had to be clamped into the block.
+     Every other block has the boundary above it to sit on; the first had nothing. */
+  padding-top: 1.75rem;
+  /* Room for the last insertion control without the page ending under it. */
+  padding-bottom: 4rem;
+}
+
+/* Insertion controls float over the page rather than sitting between the sections,
+   which would break the sibling rules sections.css depends on. */
+
+.bx-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.bx-insert {
+  position: absolute;
+  /* ABOVE THE COLUMN SLOTS. Both live in the overlay, and a slot is a wide strip drawn
+     under a column's content while this is a small pill on the band's edge — where a band
+     has little padding the two meet, and the last one drawn wins. The smaller target has
+     to be the one that can be hit. */
+  z-index: 1;
+  /* A STRIP ON THE SEAM, THE WIDTH OF THE PAGE — the same shape a column's "+ Block" has,
+     and what the design artifact draws. It was a pill centred on the boundary, so half of
+     it stood in the band above and half in the one below and it cut through the dashed
+     outline of a selected band. The owner reported that on sight. A strip lying along the
+     seam reads AS the seam, and nothing pokes through an edge. */
+  left: 0;
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 2rem;
+  transform: translateY(-50%);
+  /* NO EDGE AND NO FILL OF ITS OWN. It had a dashed box first, and over a band that is
+     itself outlined the two sets of dashes read as one confused thing — "preljevaju te
+     linije preko sekcije". Then it had a grey veil, which the owner asked to see without.
+     What is left is the honest shape: the strip is only the reach of the control, and the
+     control itself is what carries the two tones and is legible at rest. */
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* The control itself, inside the strip: exactly what a column's "+ Block" wears, because
+   it is the same control asking the same question one level up. */
+.bx-insert > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-inline-size: 1.5rem;
+  block-size: 1.5rem;
+  padding: 0 0.5rem;
+  /* Two tones, so one edge always contrasts: the white ring shows on a dark page, the dark
+     fill on a light one. It cannot fade either — a control at 0.35 measured 1.69:1 against
+     white (PLAN.md D-012). Full opacity at rest; hover and focus raise it, never reveal it. */
+  background: var(--bx-ink);
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 999rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* The word beside the +. Not italic, whatever <em> usually means: it is here because the
+   control needs a second piece of text inside it and nothing else in this document does. */
+.bx-insert em,
+.bx-slot em {
+  font-size: 0.8125rem;
+  font-style: normal;
+  letter-spacing: 0.01em;
+}
+
+.bx-insert:hover,
+.bx-insert:focus-visible {
+  background: var(--bx-select-soft);
+}
+
+.bx-insert:hover > span,
+.bx-insert:focus-visible > span {
+  background: var(--bx-select);
+  /* The dark edge the fill stopped providing. Filling with the accent leaves only the
+     white ring, and a sweep over every possible page luminance put the worst case at
+     2.39:1 — hover made the control HARDER to see than at rest, which is the rule this
+     control exists to obey, inverted. The outer ink ring restores the resting guarantee:
+     whatever is behind it, one of white and --bx-ink clears 4.16:1. */
+  box-shadow: 0 0 0 2px var(--bx-ink);
+}
+
+/* A library preview: one block on its own, shown small and never scrolled. */
+.bx-preview {
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Selection is an outline and a class, never a wrapper element: sections.css styles a
+   section by its position among its siblings, so an inserted wrapper would change the
+   page the canvas is meant to be showing. Outline does not affect layout either. */
+
+.bx-canvas [data-bx-index] {
+  cursor: pointer;
+}
+
+.bx-canvas [data-bx-index]:hover {
+  outline: 2px dashed var(--bx-hover);
+  outline-offset: -2px;
+}
+
+.bx-canvas [data-bx-index]:focus-visible {
+  outline: 3px solid var(--bx-select);
+  outline-offset: -3px;
+}
+
+.bx-canvas .bx-selected,
+.bx-canvas .bx-selected:hover {
+  outline: 3px solid var(--bx-select);
+  outline-offset: -3px;
+}
+
+/* A WHOLE BAND SELECTED (PLAN.md D-101), which is a different thing from a block being
+   selected and has to look like one. A dashed edge rather than a solid one: the band is the
+   container, and its selection is about what is INSIDE it, so the edge reads as a boundary
+   rather than as the thing itself. */
+.bx-canvas .bx-band-selected,
+.bx-canvas .bx-band-selected:hover {
+  outline: 3px dashed var(--bx-select);
+  outline-offset: -3px;
+}
+
+/* A block being dragged into a new position. */
+.bx-canvas .bx-dragging {
+  opacity: 0.4;
+}
+
+.bx-canvas .bx-drop-target {
+  outline: 3px dashed var(--bx-select);
+  outline-offset: -3px;
+}
+
+/* Links must not navigate away from the editor; canvas.js stops the click, and this
+   removes the affordance that says otherwise. */
+.bx-canvas [data-bx-index] a {
+  cursor: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bx-canvas [data-bx-index] {
+    transition: outline-color 120ms ease-out;
+  }
+}
+
+/* The selected block's own controls (D-040): up, down, duplicate, remove, on its top right
+   corner. The insertion control's two tones for the same reason — this floats over the
+   site's design, which can be any colour: a dark bar with a white ring reads on a pale page
+   and on a dark one. Full opacity at rest; a disabled control is dimmed in its icon only,
+   never below a legible shape (PLAN.md D-012). */
+.bx-tools {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  transform: translateX(-100%);
+  background: var(--bx-ink);
+  border: 2px solid #ffffff;
+  border-radius: 0.625rem;
+  box-shadow: 0 2px 10px rgb(16 26 51 / 0.3);
+  pointer-events: auto;
+}
+
+.bx-tool {
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  padding: 0;
+  background: transparent;
+  color: #ffffff;
+  border: 0;
+  border-radius: 0.4375rem;
+  cursor: pointer;
+}
+
+.bx-tool svg {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+}
+
+.bx-tool:hover,
+.bx-tool:focus-visible {
+  background: #2c3654;
+  outline: none;
+}
+
+.bx-tool-danger:hover,
+.bx-tool-danger:focus-visible {
+  background: #b3261e;
+}
+
+.bx-tool[disabled] {
+  color: #8f98ad;
+  cursor: default;
+}
+
+.bx-tool[disabled]:hover {
+  background: transparent;
+}
+
+/* A COLUMN WITH NOTHING STANDING IN IT (PLAN.md D-101).
+
+   On the page it has no height, and should not: an empty column is nothing. In the EDITOR it
+   is the place a block goes, and at nought pixels tall everything belonging to it has to be
+   drawn somewhere else — the "+ Block" area and the "+ Section" pills then poked out through
+   the band's own edge. That is what the owner saw first on a band he had just added:
+   "dodavanje sekcije i blok prostor prelaze izvan granice sekcije".
+
+   Given a height the band is tall enough to hold its own controls, and nothing crosses its
+   outline. :not(:has(*)) rather than :empty, because the renderer leaves whitespace inside an
+   empty column and :empty would never match it. */
+.bx-canvas .section-column:not(:has(*)) {
+  min-block-size: 6rem;
+}
+
+/* AND EVERY COLUMN KEEPS ROOM UNDER ITS CONTENT, in the editor only (PLAN.md D-106).
+
+   "+ Block" is a line under what a column holds, and "+ Section" lies across the band's
+   bottom edge. A band whose content reaches that edge — which the design layer decides, not
+   this file — left the first nowhere to go: it collided with the second, and raising it
+   covered the words, and shrinking it clipped its own label. Three wrong answers to one
+   question, each reported on sight.
+
+   The owner asked the right one: "zašto u prevju ne bi mogli imati dole mjesta kao u
+   artifaktu?" — the artifact's sections have that room, and a preview may keep room for the
+   editor's own controls. Enough for the strip, the gap and the seam's upper half, so the
+   control that adds the next block always has somewhere to stand.
+
+   This is the second place the canvas is deliberately not pixel-identical to the page, after
+   the empty column above, and for the same reason: an editor has to show the places things
+   go, and a place with no size is not one. */
+.bx-canvas .section-column {
+  padding-block-end: 3.5rem;
+}
+
+/* A BLOCK THAT DRAWS NOTHING YET (PLAN.md D-117), in the editor only.
+
+   A new Text, Call to action, Quote or Form arrives empty, and empty they draw nothing:
+   measured, all four were 0px tall on the canvas the moment they were added. The block
+   existed, was selected, and could not be seen or pressed — the owner's "neki blokovi kad
+   se ubace ne vide se u previewu". The rule D-106 wrote for an empty column holds for an
+   empty block: an editor has to show the places things are, and a place with no size is
+   not one. canvas.js marks a block that measures no height; on the page it stays nothing.
+
+   The words are ink on white, the two tones every control in here wears, because they sit
+   on whatever surface the site's design gave the band. */
+.bx-canvas [data-bx-empty] {
+  display: grid;
+  /* One cell, which the words and the block's own empty markup share: in rows of their
+     own, the words stood at the top of the place and not in it. */
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  min-block-size: 5rem;
+  background: var(--bx-select-soft);
+  outline: 2px dashed var(--bx-hover);
+  outline-offset: -2px;
+  border-radius: 0.5rem;
+}
+
+.bx-canvas [data-bx-empty]::before,
+.bx-canvas [data-bx-empty] > * {
+  grid-area: 1 / 1;
+}
+
+.bx-canvas [data-bx-empty]::before {
+  content: attr(data-bx-empty);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--bx-ink);
+  font: 500 0.8125rem/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.bx-canvas .bx-selected[data-bx-empty] {
+  outline: 3px solid var(--bx-select);
+  outline-offset: -3px;
+}
+
+/* A column with nothing in it yet (the Columns block marks it is-empty). On the page it is
+   a blank cell; here it is outlined and given height, so a new block shows its grid rather
+   than an empty band, and a forgotten column is seen before it is published. */
+.bx-canvas [data-bx-index] .is-empty {
+  min-block-size: 8rem;
+  background: var(--bx-select-soft);
+  outline: 2px dashed var(--bx-hover);
+  outline-offset: -2px;
+  border-radius: 0.5rem;
+}
+
+/* An Embed block whose address nothing recognises. blocks.css hides it on the page — a
+   visitor is not the person who can fix it — and here it says what is wrong, in the place
+   the owner is looking at the moment they paste one. The note itself never needs an
+   outline: it IS legible text on the surface it sits on, which is the resting state every
+   control in this editor owes the reader. */
+.bx-canvas [data-bx-index] .embed.is-empty {
+  display: block;
+  min-block-size: 0;
+  background: none;
+  outline: 0;
+}
+
+.bx-canvas [data-bx-index] .embed-unknown {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  background: var(--bx-select-soft);
+  border: 1px dashed var(--bx-hover);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* A translation's block whose source changed after it was translated (D-043, step 3): an
+   amber edge down its left side, at rest, so a stale block is found by looking at the
+   page. Two tones like the insertion control — amber inside a dark line — so it reads
+   against a pale section and a dark one alike. The inspector says what it means. */
+.bx-canvas [data-bx-stale] {
+  box-shadow: inset 6px 0 0 #f0a020, inset 8px 0 0 #101a33;
+}
+
+/* AN EMPTY COLUMN, which has to be visible or the arrangement is a lie (PLAN.md D-099).
+
+   Choosing "two columns" and seeing one block and a stretch of nothing tells the author
+   neither that a column is there nor that anything can be put in it. CLAUDE.md's rule is
+   that no control is ever invisible at rest, and an empty column IS a control: it is the
+   place a block goes.
+
+   Drawn in the overlay like every other editor mark, never in the page: the canvas is the
+   visitor's markup and the editor does not write into it. So this is positioned over the
+   column's own box, which is why it needs a size rather than only a place. */
+.bx-slot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* The same two tones as .bx-insert above, and for the same reason: this floats over the
+     SITE's design, which can be any colour, so it cannot be legible by assuming a surface.
+     The dashed edge is drawn twice — ink inside, white outside — so one of the two always
+     clears against whatever is behind it. */
+  border: 2px dashed var(--bx-ink);
+  outline: 2px dashed #ffffff;
+  outline-offset: -4px;
+  border-radius: 0.5rem;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* The + inside it is the insert control itself, so it wears exactly what one wears. */
+.bx-slot > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  background: var(--bx-ink);
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 999rem;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.bx-slot:hover,
+.bx-slot:focus-visible {
+  border-color: var(--bx-select);
+}
+
+.bx-slot:hover > span,
+.bx-slot:focus-visible > span {
+  background: var(--bx-select);
+  box-shadow: 0 0 0 2px var(--bx-ink);
+}
+
+/* A COLUMN THAT ALREADY HOLDS SOMETHING gets a line under it rather than a box over it
+   (D-101, the artifact's "+ Block"). A box would cover the words; the line shows where the
+   next block lands. */
+.bx-slot-after {
+  gap: 0.5rem;
+  border-width: 1px;
+  outline-width: 1px;
+  border-radius: 0.375rem;
+}
+
+.bx-slot-after > span {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border-width: 1px;
+  font-size: 0.875rem;
+}
+
+.bx-slot em {
+  color: var(--bx-ink);
+  /* On the site's own surface, which can be any colour. The ink tone is the one the rest of
+     these controls are drawn in, and it is paired with the white ring above for contrast. */
+  text-shadow: 0 0 2px #ffffff, 0 0 2px #ffffff;
+}
+
+/* A Downloads item with no file chosen (PLAN.md D-127). blocks-downloads.css hides it on
+   the page, where it would be a download of nothing; here it is the place to choose one,
+   drawn in the editor's own dashed edge like an empty column, never in a site colour. */
+.bx-canvas .downloads-item.is-empty {
+  display: grid;
+  outline: 2px dashed var(--bx-hover);
+  outline-offset: -2px;
+}
+
+.bx-canvas .downloads-item.is-empty .downloads-type {
+  min-block-size: 2rem;
+}

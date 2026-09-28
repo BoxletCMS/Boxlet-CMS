@@ -1,0 +1,142 @@
+/* The characters, down the left of the Appearance screen (PLAN.md D-059, D-061): Boxlet's
+ * five, then the designs the owner keeps, as the same kind of card — a whole look you can
+ * put on.
+ *
+ * Where this column SITS, and what happens to it when there is no room for it, is in
+ * admin-appearance.css and admin-appearance-widths.css. Admin tokens only (--ui-*). */
+
+.rail-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ui-2);
+  margin: var(--ui-3) 0 var(--ui-1);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rail-heading:first-child {
+  margin-block-start: 0;
+}
+
+.rail-heading span {
+  color: var(--ui-ink-faint);
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* A card is a button you can read: the whole thing is the target, and the tools on it sit
+   above that target rather than inside it. */
+.rail-card {
+  position: relative;
+  display: grid;
+  gap: var(--ui-1);
+  padding: var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.rail-card-current {
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 1px var(--ui-accent);
+}
+
+.rail-card-top {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+}
+
+.rail-card-name {
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail-chips {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 2px;
+}
+
+.rail-chips svg {
+  inline-size: 0.85rem;
+  block-size: 0.85rem;
+  border-radius: 2px;
+  border: var(--ui-border) solid var(--ui-line);
+}
+
+.rail-live {
+  margin-inline-start: auto;
+  padding: 0 var(--ui-1);
+  background: var(--ui-accent-soft);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink);
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.rail-card-shape {
+  margin: 0;
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+  overflow-wrap: anywhere;
+}
+
+/* The card's own button covers it, under the tools rather than over them, so "use this"
+   is the whole card and the two icons still get their own clicks. */
+.rail-use {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  /* Its only content is the name for a screen reader, which is an absolutely positioned
+     1em box: left alone it stuck 16px out of the rail and put a horizontal scrollbar under
+     the whole column. */
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ui-radius-m);
+  cursor: pointer;
+}
+
+/* The CARD lights up, not the button over it. Fading a translucent sheet over the card
+   would be opacity doing the work, which is the one thing the admin's contrast rule
+   forbids (D-012) — and tests/contrast_test.php said so within a minute of it being
+   written. */
+.rail-card:hover {
+  border-color: var(--ui-accent);
+}
+
+.rail-card-tools {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  margin-inline-start: auto;
+  gap: var(--ui-1);
+}
+
+.rail-keep {
+  display: grid;
+  gap: var(--ui-2);
+  margin-block-start: var(--ui-3);
+}
+
+/* A text input carries an intrinsic width of about twenty characters, which is wider than
+   this column and was the last eight pixels of horizontal scrollbar under the rail. The
+   rest — the ground, the border, the corners, the box-sizing — is .field's, since D-078
+   put the input in one; a second copy here would be a second answer waiting to differ. */
+.rail-keep input {
+  min-inline-size: 0;
+}
+

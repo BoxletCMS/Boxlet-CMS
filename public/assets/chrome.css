@@ -1,0 +1,437 @@
+/* The site's header and footer (PLAN.md D-028, D-030, D-032, D-036). Split out of
+   site.css, which holds the page and its blocks, when the two together passed the size
+   limit. The same rule: only custom properties, no literal colours, pixel values, fonts or
+   shadows. Linked after site.css and before sections.css, the order these rules had when
+   they were one file. */
+
+/* Site chrome (PLAN.md D-028, D-030)
+
+   What the chrome LOOKS like lives here; what it measures lives in sections.css, next to
+   the .block rule that sets those properties. Two rules of mine sat here setting
+   --section-rhythm and --section-width and neither ever applied: .block sets both, the
+   selectors weigh the same, and sections.css is linked second. The header's height did
+   fall when I wrote the first one, so I believed it — but it fell because a bar holds less
+   than a band of content. Measured afterwards: the header was still taking --space-xl. */
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m) var(--space-l);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-logo {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+/* Held by its height so a wide logo and a square one sit on the same line, and sized in
+   ems so the character's own scale carries it. */
+.site-logo img {
+  display: block;
+  block-size: 2.5em;
+  inline-size: auto;
+  border-radius: 0;
+}
+
+/* The site's name where there is no logo (D-110): set in the heading face and its weight,
+   so it takes the character with it, and sized by the same three classes the logo answers
+   to, so "logo size" still means what it says. */
+.site-name {
+  color: var(--section-text);
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
+  font-size: var(--text-lg);
+  line-height: 1;
+}
+
+.logo-small .site-name { font-size: var(--text-base); }
+.logo-large .site-name { font-size: var(--text-xl); }
+
+.site-nav ul,
+.site-footer-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A navigation link keeps its colour at rest and gains the underline on hover and focus.
+   The reverse — grey until touched — is the "no control is ever invisible at rest" rule
+   broken in the quietest possible way (CLAUDE.md). */
+.site-nav a,
+.site-footer-nav a {
+  text-decoration: none;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.site-footer-nav a:hover,
+.site-footer-nav a:focus-visible {
+  text-decoration: underline;
+}
+
+.site-nav-children {
+  display: none;
+}
+
+.site-header-action {
+  margin: 0;
+}
+
+.site-footer {
+  display: grid;
+  gap: var(--space-s);
+}
+
+.site-footer-text {
+  color: var(--section-muted);
+}
+
+/* The switcher sits in the footer now, so it no longer carries the standalone padding it
+   had when the layout drew it on its own. */
+.site-footer .locale-switcher {
+  padding-block: 0;
+}
+
+.site-small-print {
+  margin: 0;
+  color: var(--section-muted);
+  font-size: var(--text-sm);
+}
+
+/* A COLOUR OF ITS OWN (PLAN.md D-076, corrected by D-110).
+
+   The header and the footer take one of the three palette surfaces, and may instead take a
+   colour the owner picked. The element's own background and colour fall back to WHAT THE
+   SURFACE CLASS GAVE, and the --chrome-* tokens exist only when a colour was set — so with
+   no colour set those two declarations compute to exactly what sections.css put there.
+
+   THE --section-* TOKENS ARE NOT REDEFINED WITH THEMSELVES IN THE FALLBACK. That is what
+   D-076 did, on the container, on the belief that var(--section-link) inside the fallback
+   of --section-link would be the value inherited from the parent. It is not: a custom
+   property whose declaration names itself is a cycle whatever element it sits on, and a
+   cycle makes the property invalid, silently. Measured (2026-09-24): every --section-*
+   token on the footer's container computed to "", so every link inside a contrast footer
+   fell back to the ACCENT of the page — 2.43:1 under Bold. (With a colour of the owner's
+   own set, the primary resolved and the fallback was never read, so the fault showed
+   exactly where nobody had set one: every site.)
+
+   So the tokens are set only where the colour IS the owner's, with no fallback: the
+   template emits `own-colour` on the bar when the decision holds a colour, and Derived
+   emits the --chrome-* tokens under the same condition, so one cannot exist without the
+   other. With no colour there is nothing to match and nothing to fall back to.
+
+   A TRANSPARENT HEADER IS EXCLUDED, because the two choices contradict each other: that
+   layout exists to paint NOTHING and take the colours of the section beneath, and a header
+   with a colour of its own that draws none of it would leave its ink standing on a surface
+   it was not measured against. The layout wins: the template does not emit the class. */
+/* background-COLOR, not the shorthand (D-112): the shorthand resets background-image, and a
+   gradient surface IS a background-image (sections.css). With the shorthand a gradient
+   footer painted the page colour under white words — measured by 22-chrome-look at 1:1
+   the first time a character shipped one. */
+header.block:not(:has(> .container > .behaviour-over)) {
+  background-color: var(--chrome-header-bg, var(--section-bg));
+  color: var(--chrome-header-text, var(--section-text));
+}
+
+footer.block {
+  background-color: var(--chrome-footer-bg, var(--section-bg));
+  color: var(--chrome-footer-text, var(--section-text));
+}
+
+.site-header.own-colour {
+  --section-bg: var(--chrome-header-bg);
+  --section-text: var(--chrome-header-text);
+  --section-muted: var(--chrome-header-muted);
+  /* A link takes the ink rather than the accent, as it does on the contrast surface: the
+     accent is chosen against the PAGE, and a colour of its own is not the page. */
+  --section-link: var(--chrome-header-text);
+  --section-button-bg: var(--chrome-header-text);
+  --section-button-text: var(--chrome-header-bg);
+  --section-card: var(--chrome-header-raised);
+  --section-border: var(--chrome-header-muted);
+}
+
+.site-footer.own-colour {
+  --section-bg: var(--chrome-footer-bg);
+  --section-text: var(--chrome-footer-text);
+  --section-muted: var(--chrome-footer-muted);
+  --section-link: var(--chrome-footer-text);
+  --section-button-bg: var(--chrome-footer-text);
+  --section-button-text: var(--chrome-footer-bg);
+  --section-card: var(--chrome-footer-raised);
+  --section-border: var(--chrome-footer-muted);
+}
+
+/* THE CHROME'S LOOK (PLAN.md D-032, D-036). Every value is a closed-set class drawn from
+   the tokens: density, a rule under the header, logo size, and the header's and footer's
+   arrangements. Surfaces are the sections' own (sections.css), so contrast is the
+   palette's guarantee here as everywhere. */
+
+.site-header.density-compact { padding-block: var(--space-s); }
+.site-header.density-normal { padding-block: var(--space-m); }
+.site-header.density-roomy { padding-block: var(--space-l); }
+.site-footer.density-compact { padding-block: var(--space-m); }
+.site-footer.density-normal { padding-block: var(--space-l); }
+.site-footer.density-roomy { padding-block: var(--space-xl); }
+
+/* THE HEADER'S EDGE (D-112): nothing, a hairline, or a shadow. On the HEADER element,
+   because the bar inside it has no edge of its own to draw. */
+.block-header:has(.edge-line) {
+  /* The own colour's muted ink where there is one (D-076). Read here rather than through
+     --section-border, because this rule is on the HEADER and that property is set on the
+     bar inside it. */
+  border-block-end: var(--border-width) solid var(--chrome-header-muted, var(--section-border));
+}
+
+.block-header:has(.edge-shadow) {
+  position: relative;
+  z-index: 2;
+  box-shadow: var(--shadow-m);
+}
+
+.logo-small .site-logo img { block-size: 2em; }
+.logo-medium .site-logo img { block-size: 2.75em; }
+.logo-large .site-logo img { block-size: 3.75em; }
+
+/* On a phone the logo shares its line with the menu button, so it is capped (D-114): a large
+   logo at 3.75em pushed the button onto a second line under it. Its shape stays; only its
+   height is held, and its width is kept off the button. */
+@media (max-width: 40rem) {
+  .site-logo img,
+  .logo-medium .site-logo img,
+  .logo-large .site-logo img {
+    block-size: 2.25em;
+    max-inline-size: 60vw;
+    object-fit: contain;
+  }
+
+  .site-name {
+    font-size: var(--text-lg);
+  }
+
+  .logo-large .site-name {
+    font-size: var(--text-lg);
+  }
+}
+
+/* Logo and name side by side (D-112): one link, the name after the picture. */
+.site-brand {
+  align-items: center;
+  gap: var(--space-s);
+}
+
+/* THE MENU'S WORDS (D-112): as they are, in small capitals with air between the letters,
+   or with the current page on a pill. And in the accent or the ink. */
+.nav-caps .site-nav a {
+  font-size: var(--text-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-ink-ink .site-nav a {
+  color: var(--section-text);
+}
+
+.nav-pills .site-nav > ul > li > a {
+  padding: var(--space-xs) var(--space-s);
+  border-radius: var(--radius-button);
+}
+
+.nav-pills .site-nav a[aria-current="page"],
+.nav-pills .site-nav .is-current-parent > a {
+  background: var(--section-card);
+  text-decoration: none;
+}
+
+/* A bar under the current page, and under whatever the pointer is on (D-114): a rule that
+   is drawn rather than an underline, in the section's link colour, at the width of the
+   words. The bar is a border so it keeps its distance from the words. */
+.nav-bar .site-nav > ul > li > a {
+  padding-block: var(--space-xs);
+  border-block-end: 0.15em solid transparent;
+  text-decoration: none;
+}
+
+.nav-bar .site-nav > ul > li > a[aria-current="page"],
+.nav-bar .site-nav > ul > li.is-current-parent > a,
+.nav-bar .site-nav > ul > li > a:hover,
+.nav-bar .site-nav > ul > li > a:focus-visible {
+  border-block-end-color: currentColor;
+  text-decoration: none;
+}
+
+/* Every entry a chip (D-114): a bordered box in the bar's own ink, the current one filled
+   with the card tone. Legible at rest by construction — the border is the control. */
+.nav-chips .site-nav > ul > li > a {
+  padding: var(--space-xs) var(--space-s);
+  border: var(--border-width) solid var(--section-border);
+  border-radius: var(--radius-button);
+  text-decoration: none;
+}
+
+.nav-chips .site-nav > ul > li > a[aria-current="page"],
+.nav-chips .site-nav > ul > li.is-current-parent > a {
+  background: var(--section-card);
+  border-color: currentColor;
+  text-decoration: none;
+}
+
+.nav-chips .site-nav > ul > li > a:hover,
+.nav-chips .site-nav > ul > li > a:focus-visible {
+  border-color: currentColor;
+  text-decoration: none;
+}
+
+/* THE BUTTON (D-112): filled is the site's button as everywhere; outlined takes the bar's
+   ink for its edge and its words, which is a pair the palette measures; a link is a link. */
+.site-header-action .button-outline {
+  background: transparent;
+  border-color: var(--section-text);
+  color: var(--section-text);
+  box-shadow: none;
+}
+
+.site-header-link {
+  font-weight: var(--heading-weight);
+}
+
+/* The page being drawn, and the parent it sits under: marked by a rule under the words,
+   so it reads the same on every surface without a colour of its own. */
+.site-nav a[aria-current="page"],
+.site-nav .is-current-parent > a,
+.site-footer-nav a[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.35em;
+}
+
+/* THE FOOTER'S ARRANGEMENTS (D-113). `simple` is the grid above: one column, the words,
+   the menu, the last row. */
+
+/* Centred: everything on one axis. */
+.layout-centred .site-footer {
+  justify-items: center;
+  text-align: center;
+}
+
+.layout-centred .site-footer-nav ul {
+  justify-content: center;
+}
+
+/* A COLUMN OF CONTENT (D-115): a title, words and a menu, each drawn only when there is
+   one. The title is the last heading on the page, set a step above the words. */
+.site-footer-col {
+  display: grid;
+  gap: var(--space-s);
+  align-content: start;
+}
+
+.site-footer-title {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
+  text-transform: var(--heading-transform);
+}
+
+/* Two columns side by side; three side by side. Equal columns, because each holds what its
+   owner put in it (D-115) — the old two-thirds-and-a-third was for words beside a menu. */
+.layout-columns .site-footer {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--space-xl);
+  align-items: start;
+}
+
+.layout-three .site-footer {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--space-xl);
+  align-items: start;
+}
+
+/* Fewer columns with something in them than the arrangement allows: they take the room
+   there is rather than leaving a gap where the empty one would stand. */
+.layout-columns .site-footer.drawn-1,
+.layout-three .site-footer.drawn-1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.layout-three .site-footer.drawn-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Menu first: the column's navigation in a row above its words, as a site map's first line. */
+.layout-menu_first .site-footer-nav {
+  order: -1;
+}
+
+/* THE LAST ROW (D-113): the languages and the small print. Side by side with the space
+   between, centred, or one under the other on the left. */
+.site-footer-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s) var(--space-l);
+  align-items: baseline;
+}
+
+.foot-split .site-footer-foot {
+  justify-content: space-between;
+}
+
+.foot-centred .site-footer-foot {
+  justify-content: center;
+  text-align: center;
+}
+
+.foot-left .site-footer-foot {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* The last row spans every column, whatever the arrangement. */
+.site-footer-foot {
+  grid-column: 1 / -1;
+}
+
+/* Centred: each column's words and menu centred too. */
+.layout-centred .site-footer-col {
+  justify-items: center;
+}
+
+/* Words with a link in them (D-113): the link takes the section's link colour like any
+   other, and paragraphs inside keep the footer's rhythm rather than a page's. */
+.site-footer-text p {
+  margin: 0;
+}
+
+.site-footer-text p + p {
+  margin-block-start: var(--space-xs);
+}
+
+/* In columns the menu is a list down the side, and a long one may run in two or three of
+   them — which is the thing more columns actually help with (D-067). */
+.layout-columns .site-footer-nav ul {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: var(--space-xs) var(--space-l);
+}
+
+.layout-columns.footer-cols-3 .site-footer-nav ul {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.layout-columns.footer-cols-4 .site-footer-nav ul {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 40rem) {
+  .layout-columns .site-footer-nav ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+

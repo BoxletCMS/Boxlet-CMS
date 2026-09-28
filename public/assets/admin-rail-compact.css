@@ -1,0 +1,148 @@
+/* The rail with only its icons (PLAN.md D-052), each entry named on hover and for a screen
+ * reader. Three ways in:
+ *
+ *   - under 1000px, by width alone, unless the owner has opened it (.rail-wide);
+ *   - in the page editor, where the canvas needs the room: the server marks the frame
+ *     .rail-compact, so this needs no script;
+ *   - when the owner folds it with the toggle on its edge (admin-nav.js), which is
+ *     remembered in the browser for the other screens.
+ *
+ * The same rules twice, once for each way the state arrives: a media query cannot be put
+ * in a selector list. Admin tokens only (--ui-*), defined in admin-tokens.css. */
+
+/* The toggle: a small round button on the rail's edge, in the strip so that it stays where
+   it is as the page scrolls. Born hidden and shown by the script that makes it work. Not on
+   a phone, where the rail is a drawer. */
+.admin .rail-toggle {
+  position: absolute;
+  top: 0.75rem;
+  left: -0.6875rem;
+  z-index: 2;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+  padding: 0;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-line);
+  border-radius: 50%;
+  color: var(--ui-ink-muted);
+  cursor: pointer;
+}
+
+.admin .rail-toggle:hover {
+  background: var(--ui-accent-soft);
+  border-color: var(--ui-accent);
+  color: var(--ui-ink);
+}
+
+.admin .rail-toggle .icon {
+  inline-size: 0.8125rem;
+  block-size: 0.8125rem;
+}
+
+@media (min-width: 47.5625rem) {
+  .admin-frame.rail-compact {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+  }
+
+  .admin-frame.rail-compact .rail-brand {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .admin-frame.rail-compact .rail-nav {
+    padding-inline: var(--ui-1);
+  }
+
+  .admin .admin-frame.rail-compact .rail-nav a,
+  .admin .admin-frame.rail-compact .rail-user,
+  .admin .admin-frame.rail-compact .rail-search {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .admin .admin-frame.rail-compact .rail-search {
+    margin-inline: var(--ui-1);
+  }
+
+  /* Hidden to the eye, kept for a screen reader: the entry's name is still its name. */
+  .admin-frame.rail-compact :is(.rail-name, .rail-label, .rail-count, .rail-who) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* A group's name becomes the rule between groups. */
+  .admin-frame.rail-compact .rail-group {
+    block-size: 1px;
+    margin: var(--ui-3) var(--ui-2);
+    overflow: hidden;
+    background: var(--ui-line);
+    color: transparent;
+  }
+
+  /* Folded, the toggle points the other way: it now opens the rail. */
+  .admin-frame.rail-compact .rail-toggle .icon {
+    transform: rotate(180deg);
+  }
+}
+
+@media (min-width: 47.5625rem) and (max-width: 62.5rem) {
+  .admin-frame:not(.rail-wide) {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+  }
+
+  .admin-frame:not(.rail-wide) .rail-brand {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .admin-frame:not(.rail-wide) .rail-nav {
+    padding-inline: var(--ui-1);
+  }
+
+  .admin .admin-frame:not(.rail-wide) .rail-nav a,
+  .admin .admin-frame:not(.rail-wide) .rail-user,
+  .admin .admin-frame:not(.rail-wide) .rail-search {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .admin .admin-frame:not(.rail-wide) .rail-search {
+    margin-inline: var(--ui-1);
+  }
+
+  /* Hidden to the eye, kept for a screen reader: the entry's name is still its name. */
+  .admin-frame:not(.rail-wide) :is(.rail-name, .rail-label, .rail-count, .rail-who) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* A group's name becomes the rule between groups. */
+  .admin-frame:not(.rail-wide) .rail-group {
+    block-size: 1px;
+    margin: var(--ui-3) var(--ui-2);
+    overflow: hidden;
+    background: var(--ui-line);
+    color: transparent;
+  }
+
+  /* Folded, the toggle points the other way: it now opens the rail. */
+  .admin-frame:not(.rail-wide) .rail-toggle .icon {
+    transform: rotate(180deg);
+  }
+}
+
+@media (max-width: 47.5rem) {
+  .admin .rail-toggle {
+    display: none;
+  }
+}

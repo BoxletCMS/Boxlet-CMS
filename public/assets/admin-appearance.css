@@ -1,0 +1,275 @@
+/* The Appearance screen (PLAN.md D-064, D-072): a bar, then the three columns that scroll
+ * independently — the characters, the picture, the controls.
+ *
+ * THIS FILE IS THE SCREEN ITSELF: what the bar holds, how the columns are laid out, and the
+ * strip over the picture. What is INSIDE each column has its own file beside this one
+ * (-rail, -picture, -inspector), and every threshold at which this screen rearranges is in
+ * admin-appearance-widths.css, which is loaded LAST so its overrides win. One file of a
+ * thousand lines was past the point where it is read rather than searched, and the
+ * thresholds scattered through it were the fault docs/ispravci.md §A was written about.
+ *
+ * Admin tokens only (--ui-*): the site's own design appears in one place on this screen,
+ * inside the preview frame, which is a separate document. */
+
+.admin-main-bare {
+  max-width: none;
+  padding: 0;
+}
+
+/* A COLUMN, NOT A THREE-ROW GRID. The grid named three rows — bar, message, body — and the
+   screen usually has two, so the body landed in the `auto` row and took the height of its
+   own content: the page grew past the window, the columns stopped scrolling on their own,
+   and below them sat a dead band of the admin's background. Found in the owner's
+   screenshot, reproduced at a short window, measured at 699px of page in a 620px window.
+   A flex column does not care how many children there are. */
+.appearance {
+  /* THE SCREEN MEASURES ITSELF, NOT THE WINDOW. How much room there is depends on the admin
+     rail — 3.25rem folded, 13.5rem open — which a media query cannot see: the same 1100px
+     window gave this screen 1048px once and 884px the next time, and the CSS behaved
+     identically both times. Every threshold this screen has is a @container on this box
+     (admin-appearance-widths.css), so folding the rail moves the breakpoints with it. */
+  container-type: inline-size;
+  container-name: appearance;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* Stacked, this is the ONE scroll on the screen: the columns give theirs up rather than
+     nest a second one inside it. Above that width nothing here overflows, so no bar
+     appears. */
+  overflow-y: auto;
+}
+
+.appearance-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-2) var(--ui-3);
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-panel);
+  border-block-end: var(--ui-border) solid var(--ui-line);
+}
+
+.appearance-title {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  white-space: nowrap;
+}
+
+.appearance-title strong {
+  font-size: var(--ui-text-base);
+}
+
+/* The subhead says what the screen is for, and goes first when there is no room for it. */
+.appearance-subhead {
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+}
+
+/* Opens the characters as a panel once they stop being a column. Shown by the container
+   query in admin-appearance-widths.css, and only when appearance-rail.js is there to open
+   it: without a script the screen stacks instead, and a button that could not do anything
+   would be worse. */
+.appearance-rail-open {
+  display: none;
+}
+
+.appearance-bar .preview-tools {
+  margin-inline-start: auto;
+}
+
+.appearance-bar .preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+}
+
+/* The no-script preview form has no content of its own: it exists to be submitted into the
+   frame. HIDDEN OUTRIGHT, not visually hidden — .visually-hidden is an absolutely positioned
+   1em box, and sitting after a screen that already fills the window it added exactly 13px of
+   page and a scrollbar with it. A form with display:none still submits. */
+#design-preview-form {
+  display: none;
+}
+
+.appearance-notice {
+  margin: 0;
+  border-radius: 0;
+}
+
+/* ---- the three columns --------------------------------------------------------------- */
+
+.appearance-body {
+  position: relative;
+  flex: 1 1 auto;
+  display: grid;
+  /* A FLOOR UNDER THE PICTURE. With minmax(0, 1fr) the stage was free to shrink to nothing
+     long before any threshold fired — the two side columns are fixed, so every pixel the
+     window loses came out of the one thing the screen exists to show. 30rem is a 1280px
+     page at a little over 0.6, still a page rather than a smudge. */
+  grid-template-columns: 12.25rem minmax(30rem, 1fr) 19.5rem;
+  min-height: 0;
+  margin: 0;
+  gap: 0;
+}
+
+/* Each column carries its own scroll: the picture stays where it is while a list of
+   controls is read, which is the whole reason this screen fills the window. */
+/* RELATIVE, so anything absolutely positioned inside — a visually hidden label, the radio
+   a segment is built on — is measured against its own column and not against the page.
+   Left static, those escape the scroll container and make the DOCUMENT taller than the
+   window, which is the dead band under the screen and the page scrollbar with it. One rule
+   here rather than hunting each of them down. */
+.appearance-rail,
+.appearance-inspector {
+  position: relative;
+  min-height: 0;
+  overflow-y: auto;
+  /* NEVER SIDEWAYS. These two columns have a width the layout gives them, so a horizontal
+     scrollbar is not a way to see more — it is a way to be told something is too wide, at
+     the cost of a bar under every one of them. Anything that does not fit is a bug to fix,
+     and two of them were (a hidden label 16px out, an input asking for twenty characters).
+     `clip` rather than `hidden`, so this does not become a scroll container. */
+  overflow-x: clip;
+  padding: var(--ui-3);
+}
+
+.appearance-rail {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-2);
+  background: var(--ui-panel-sunken);
+  border-inline-end: var(--ui-border) solid var(--ui-line);
+}
+
+.appearance-inspector {
+  background: var(--ui-panel);
+  border-inline-start: var(--ui-border) solid var(--ui-line);
+}
+
+/* A MEASURE, NOT A WIDTH. In its column this does nothing — the column is 19.5rem — and
+   stacked it stops a slider and a row of five segments from being drawn across nine hundred
+   pixels. One rule rather than one per stacked state, so there is nothing to keep in sync.
+   (This is more than docs/ispravci.md asked for: it asked only that the columns stack.) */
+.appearance-inspector .tabs,
+.appearance-rail {
+  /* 100% FIRST, and it is not decoration. The rail is a GRID ITEM, and an auto margin on one
+     of those turns off the stretch that would otherwise fill its track: left at `auto` width
+     it shrank to the widest card it happened to hold — 241px in a 390px column, floating in
+     the middle. A definite width takes the question away, the maximum clamps it, and the
+     margins then have something left over to centre. */
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 42rem;
+  margin-inline: auto;
+}
+
+.appearance-stage-column {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  background: var(--ui-bg);
+}
+
+/* ---- the strip over the picture ---------------------------------------------------- */
+
+.stage-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  padding: var(--ui-1) var(--ui-3);
+  background: var(--ui-panel-sunken);
+  border-block-end: var(--ui-border) solid var(--ui-line);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+.stage-where {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-2);
+  min-inline-size: 0;
+}
+
+.stage-where span {
+  color: var(--ui-ink-faint);
+}
+
+/* Which page the picture is of (D-111): a select of this screen's own, not the browser's
+   (D-078), small enough to sit in the strip. */
+.stage-pick select {
+  max-inline-size: 14rem;
+  padding: 0 var(--ui-1);
+  min-block-size: 1.5rem;
+  block-size: 1.5rem;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-line);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-xs);
+}
+
+/* The one thing in this strip that is a warning rather than a fact, so it is the one that
+   is coloured — and it is words, not a colour alone. */
+.stage-tight {
+  margin-inline-start: auto;
+  color: var(--ui-warning);
+  font-weight: 650;
+}
+
+.stage-size {
+  margin-inline-start: auto;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Publish asking how to apply a character (PLAN.md D-068). Under the bar, across the whole
+   screen, because it is a question about the whole screen and the answer is destructive. */
+
+.appearance-confirm {
+  display: grid;
+  gap: var(--ui-2);
+  padding: var(--ui-3);
+  background: var(--ui-warning-soft);
+  border-block-end: var(--ui-border) solid var(--ui-line);
+}
+
+.confirm-question {
+  margin: 0;
+  font-weight: 650;
+}
+
+.confirm-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-4);
+}
+
+.confirm-options > span {
+  display: grid;
+  gap: var(--ui-1);
+  max-inline-size: 28rem;
+}
+
+.confirm-options .hint {
+  font-size: var(--ui-text-xs);
+}
+
+/* ONLY ON A BOXED PAGE (PLAN.md D-122): the sheet's own controls, what is around it, and how
+   far a header or footer background reaches. Read off the form's own radio, so the controls
+   come and go the moment the choice is pressed, with no script and no round trip. */
+.design-form:has(input[name="boxed"][value="no"]:checked) [data-when-boxed] {
+  display: none;
+}
+
+/* AN ANSWER THAT WOULD CHANGE NOTHING IS NOT OFFERED (D-123), and one already chosen never
+   hides — a radio group with nothing visible pressed reads as broken. Content lined up with
+   the BOX means nothing on a page that is not boxed; content across the WINDOW means nothing
+   when the bar itself stays inside the box, since it can be no wider than the bar. */
+.design-form:has(input[name="boxed"][value="no"]:checked) .segment:has(input[name="header_width"][value="full"]:not(:checked)),
+.design-form:has(input[name="boxed"][value="no"]:checked) .segment:has(input[name="footer_width"][value="full"]:not(:checked)),
+.design-form:has(input[name="boxed"][value="yes"]:checked):has(input[name="header_bleed"][value="sheet"]:checked) .segment:has(input[name="header_width"][value="window"]:not(:checked)),
+.design-form:has(input[name="boxed"][value="yes"]:checked):has(input[name="footer_bleed"][value="sheet"]:checked) .segment:has(input[name="footer_width"][value="window"]:not(:checked)) {
+  display: none;
+}

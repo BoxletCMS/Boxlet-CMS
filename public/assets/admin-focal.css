@@ -1,0 +1,90 @@
+/* The focal point on a picture's page (PLAN.md D-121): the picture to click, a marker on it,
+   the same picture cut two ways beside it, and the two numbers the form posts. Its own file
+   rather than more of admin-media.css, which stands at the size guidance. */
+
+.focal-frame {
+  position: relative;
+  line-height: 0;
+  cursor: crosshair;
+}
+
+/* Two rings, light over dark, so the marker is visible on any photograph. A single colour
+   disappears against half the pictures anyone will upload. */
+.focal-marker {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  margin: -0.625rem 0 0 -0.625rem;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.75);
+  pointer-events: none;
+}
+
+.media-focal h2 {
+  margin-block: var(--ui-5) var(--ui-2);
+}
+
+/* Two cuts side by side: a wide one as a hero is on a computer, a tall one as it is on a
+   phone. The tall one is narrow on purpose — it is the one that loses the most. */
+/* `.js .focal-samples.js-only`, and never the bare class: .js-only makes whatever it marks
+   inline-block, and outweighs one class — the two cuts came out one under the other, the
+   wide one the whole picture (measured: display inline-block). The bare class, set later,
+   would beat .js-only's display: none and show the cuts with no script to move them.
+   admin-ui.css does the same for a script-only button. */
+.js .focal-samples.js-only {
+  display: flex;
+  gap: var(--ui-4);
+  align-items: end;
+  margin-block: var(--ui-3);
+}
+
+.focal-sample {
+  margin: 0;
+}
+
+.focal-sample-wide {
+  flex: 3;
+}
+
+.focal-sample-tall {
+  flex: 1;
+}
+
+.focal-sample-frame {
+  overflow: hidden;
+  border-radius: var(--ui-radius-m);
+  line-height: 0;
+}
+
+.focal-sample-wide .focal-sample-frame {
+  aspect-ratio: 16 / 9;
+}
+
+.focal-sample-tall .focal-sample-frame {
+  aspect-ratio: 9 / 16;
+}
+
+.focal-sample img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.focal-sample figcaption {
+  margin-block-start: var(--ui-2);
+}
+
+.focal-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--ui-3);
+}
+
+.focal-fields .field {
+  inline-size: 7rem;
+  margin: 0;
+}

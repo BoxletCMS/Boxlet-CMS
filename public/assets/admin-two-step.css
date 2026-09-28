@@ -1,0 +1,75 @@
+/* Two-step login's setup and recovery codes (PLAN.md D-050). */
+
+.two-step-steps {
+  display: grid;
+  gap: var(--ui-5);
+  margin: 0;
+  padding-inline-start: var(--ui-5);
+}
+
+.two-step-qr {
+  inline-size: 13.75rem;
+  margin-block: var(--ui-3);
+  padding: var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.two-step-qr svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.two-step-secret {
+  word-break: break-all;
+}
+
+.two-step-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+  margin-block-start: var(--ui-2);
+}
+
+.two-step-confirm input {
+  inline-size: 9rem;
+  font-size: 1.25rem;
+  letter-spacing: 0.2em;
+}
+
+.two-step-codes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--ui-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.two-step-codes code {
+  display: block;
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-panel-sunken);
+  border-radius: var(--ui-radius-s);
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+}
+
+/* On the Settings screen: a label above, its field and button side by side. */
+.two-step-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-2);
+}
+
+.two-step-inline label {
+  flex-basis: 100%;
+  font-weight: 600;
+}
+
+.two-step-inline input {
+  inline-size: 12rem;
+}

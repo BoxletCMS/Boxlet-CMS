@@ -1,0 +1,24 @@
+# Apache only. Nginx ignores this file; see README "Deployment" for try_files.
+# URL rewriting is required: there is no fallback URL mode.
+
+<IfModule mod_negotiation.c>
+    Options -MultiViews -Indexes
+</IfModule>
+
+DirectoryIndex index.php
+
+# If you change these rules, update the copy shown by public/index.php.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Real files and directories (assets, cache, uploads) are served directly.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Without mod_rewrite, send 404s to index.php. It sees REDIRECT_STATUS=404 and shows
+# how to enable rewriting instead of a bare server 404.
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 /index.php
+</IfModule>

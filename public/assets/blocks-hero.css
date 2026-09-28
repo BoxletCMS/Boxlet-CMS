@@ -1,0 +1,260 @@
+/* The hero block (PLAN.md D-118). Split from blocks.css when the arrangements with a picture
+   behind the words arrived, and under its rule: only custom properties from tokens.css and
+   the --section-* properties each section sets in sections.css. No literal colours, pixel
+   values, fonts or shadows. Linked straight after site.css and before blocks.css, where
+   these rules stood. */
+
+/* Hero */
+
+.hero {
+  display: grid;
+  gap: var(--space-xl);
+  align-items: center;
+}
+
+/* Column placement and text alignment are two different things. The section's column is
+   centred on the page by .container; a left-ranged hero then fills that column, so its
+   first line sits on the same spine as every other section. Only a centred hero takes a
+   narrower measure of its own, centred within the column (see .layout-center below). */
+.hero-text {
+  display: grid;
+  gap: var(--space-m);
+}
+
+.hero-heading {
+  margin: 0;
+  font-size: var(--text-4xl);
+  /* A word longer than a phone is wide — "Northwind" at Bold's largest size — is broken
+     with a hyphen where the language allows and anywhere at all where it does not, rather
+     than pushing the page sideways. Measured on the demo's About page at 390 across.
+     anywhere, not break-word: only anywhere lets the word stop sizing the grid column the
+     heading sits in, and with break-word the column grew to 448 and took the page along. */
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+
+.hero-subheading {
+  margin: 0;
+  color: var(--section-muted);
+  font-size: var(--text-lg);
+}
+
+.hero-action {
+  margin: var(--space-s) 0 0;
+}
+
+.layout-center .hero,
+.layout-center .hero-text {
+  justify-items: center;
+  text-align: center;
+}
+
+/* A centred hero reads better on a shorter line than the full column gives it. */
+.layout-center .hero-text {
+  max-width: var(--container-narrow);
+  margin-inline: auto;
+}
+
+
+.layout-split .hero {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* A split hero always has a media element now, whether or not a picture has been chosen,
+   so the rules that re-flowed one WITHOUT it have gone rather than staying as selectors
+   that can no longer match. What they did — heading in one column, subheading and button
+   in the other — avoided an empty half but still left the lower part of the section dead. */
+
+/* ---- THE PICTURE BEHIND THE WORDS (D-118) -----------------------------------------------
+
+   Four arrangements — words centred, on the left, on the right, low on the left — a height,
+   and a veil.
+
+   HOW FAR THE PICTURE REACHES. Alone in its band (one column, one block), the hero lets its
+   picture reach the whole band, edge to edge and through the band's own padding, the way a
+   section's background picture does (D-024): the picture is positioned against the band,
+   which is already position: relative. Sharing a band of one column, it reaches the band's
+   edges across and only its own height down (D-124, below). Beside a neighbour, in a band
+   of columns, it stays a panel in its own box, so it never lies under a neighbour whose
+   words are set for another surface. Said in :has()
+   on both of the band's shapes: the page's, where a lone block IS the band, and the
+   editor's, where it stands in a column (D-103). */
+
+.hero.is-cover {
+  position: relative;
+  align-content: center;
+  padding: var(--space-xl);
+  overflow: hidden;
+  border-radius: var(--radius-l);
+
+  /* The words are set for the contrast surface, as on a section's picture: text, links and
+     the button take the colours guaranteed against it, and nothing is muted over a
+     photograph (sections.css says why). Re-applied here because the band's own colour was
+     computed from the band's surface. */
+  --section-bg: var(--color-contrast);
+  --section-text: var(--color-on-contrast);
+  --section-muted: var(--color-on-contrast);
+  --section-link: var(--color-on-contrast);
+  --section-button-bg: var(--color-on-contrast);
+  --section-button-text: var(--color-contrast);
+  --section-border: var(--color-muted-on-contrast);
+
+  color: var(--section-text);
+}
+
+.block-hero:has(> .container > .hero.is-cover) > .container > .hero.is-cover,
+.block:has(> .container > .section-cols > .section-column:only-child > :only-child > .hero.is-cover) .hero.is-cover {
+  position: static;
+  padding: 0;
+  overflow: visible;
+  border-radius: 0;
+}
+
+/* SHARING A BAND OF ONE COLUMN, IT STILL REACHES BOTH EDGES (PLAN.md D-124, the owner:
+   "da, može"). Across, from edge to edge of the band — the box's edges on a boxed page,
+   the window's otherwise — and down, only its own height, so it never lies under the block
+   above or below it, whose words are set for the band's own surface. Its words stay in
+   line with the column's, the page's text.
+
+   The band measures itself for it: a band holding a cover hero is an inline-size container,
+   so 100cqi is the band's width whatever decided it, and the hero steps out of its column by
+   exactly the difference on each side. A band of two columns keeps it a panel in its own
+   box — there the neighbour stands BESIDE it. */
+.block:has(.hero.is-cover) {
+  container-type: inline-size;
+}
+
+/* No width of its own: a block with an automatic width and negative side margins widens by
+   exactly those margins. Given `inline-size: 100cqi` instead, the hero widened its own
+   wrapper, which the column sizes to its content — so the 50% the margins are measured
+   against grew with it and the margins came to nothing (measured: 50% and 50cqi both 640
+   pixels, the hero 1280 wide and starting at the column's edge, 32 pixels past the band's). */
+.block:has(> .container > .section-cols > .section-column:only-child > * + *) .section-column > * > .hero.is-cover {
+  margin-inline: calc(50% - 50cqi);
+  padding-inline: calc(50cqi - 50%);
+  border-radius: 0;
+}
+
+.hero-cover-picture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--color-contrast);
+}
+
+.hero-cover-picture img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.hero.is-cover > .hero-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* THE VEIL, in the contrast colour, at one of three strengths. The weakest is the least
+   that keeps the words at 4.5:1 over a picture of ANY brightness under every character —
+   measured, 0.65 is where Minimal reaches it (4.7:1); tests/hero_cover_test.php keeps it
+   so. Tokens, so a character can ask for more in one place. */
+.hero.is-cover {
+  --hero-veil: 0.65;
+}
+
+.hero.is-cover.veil-medium {
+  --hero-veil: 0.75;
+}
+
+.hero.is-cover.veil-strong {
+  --hero-veil: 0.85;
+}
+
+.hero-cover-picture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-contrast);
+  opacity: var(--hero-veil);
+}
+
+/* ---- where the words stand -------------------------------------------------------------- */
+
+.layout-cover-center .hero.is-cover,
+.layout-cover-center .hero.is-cover > .hero-text {
+  justify-items: center;
+  text-align: center;
+}
+
+.layout-cover-center .hero.is-cover > .hero-text {
+  max-width: var(--container-narrow);
+  margin-inline: auto;
+}
+
+/* Left means left, whatever the band's own alignment says: a band set to centre would
+   otherwise centre the words inside their narrow column, measured on the demo under every
+   character, which is neither of the two arrangements. */
+.layout-cover-left .hero.is-cover,
+.layout-cover-low .hero.is-cover,
+.layout-cover-left .hero.is-cover > .hero-text,
+.layout-cover-low .hero.is-cover > .hero-text,
+.layout-cover-right .hero.is-cover > .hero-text {
+  justify-items: start;
+  text-align: start;
+}
+
+.layout-cover-left .hero.is-cover > .hero-text,
+.layout-cover-right .hero.is-cover > .hero-text,
+.layout-cover-low .hero.is-cover > .hero-text {
+  max-width: var(--container-narrow);
+}
+
+/* ON THE RIGHT (the owner, 2026-09-25: "trebala bi i opcija desno"). The column of words
+   stands against the right edge, and the words in it are still ranged left: a paragraph
+   ranged right is hard to read past its first line, and the edge the arrangement names is
+   the column's, not every line's. */
+.layout-cover-right .hero.is-cover {
+  justify-items: end;
+}
+
+.layout-cover-low .hero.is-cover {
+  align-content: end;
+}
+
+/* A VEIL THAT FOLLOWS THE WORDS, where the words have a side to be on. Left or right: dense
+   across the part of the band the words can reach, clearing towards the other edge. Low: dense
+   over the lower half, clearing upwards — only when the hero is taller than its words,
+   since a hero as tall as its words has words all the way up. The dense part is the full
+   strength, so the guarantee above holds wherever the words are. On a narrow screen the
+   words run the whole width, and the veil is even again. */
+@media (min-width: 40rem) {
+  .layout-cover-left .hero-cover-picture::after {
+    background: none;
+    background-image: linear-gradient(90deg, var(--color-contrast) 0%, var(--color-contrast) 55%, transparent 100%);
+  }
+
+  .layout-cover-right .hero-cover-picture::after {
+    background: none;
+    background-image: linear-gradient(270deg, var(--color-contrast) 0%, var(--color-contrast) 55%, transparent 100%);
+  }
+
+  .layout-cover-low .hero.is-cover:not(.height-content) .hero-cover-picture::after {
+    background: none;
+    background-image: linear-gradient(0deg, var(--color-contrast) 0%, var(--color-contrast) 50%, transparent 100%);
+  }
+}
+
+/* ---- how tall ------------------------------------------------------------------------------ */
+
+/* 56svh: 70 was a fifth too tall, the owner's measure (2026-09-25, "Tall je malo previsok,
+   treba ga smanjiti za 20%"). */
+.hero.is-cover.height-tall {
+  min-block-size: 56svh;
+}
+
+/* The whole window, less the band's own padding above and below, which the picture covers
+   and the words do not. */
+.hero.is-cover.height-screen {
+  min-block-size: calc(100svh - 2 * var(--section-rhythm));
+}

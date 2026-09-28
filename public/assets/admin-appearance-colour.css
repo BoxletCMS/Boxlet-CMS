@@ -1,0 +1,267 @@
+/* The COLOURS on the Appearance screen: the palette as one list of roles, and the three
+ * places that may take a colour of their own (PLAN.md D-063, D-074, D-076).
+ *
+ * Split from admin-appearance-inspector.css when that file passed 500 lines, along the seam
+ * it already had: that one is HOW A DECISION IS MADE — tabs, rows of buttons, sliders, the
+ * specimen — and this one is HOW A COLOUR IS SHOWN AND TAKEN OVER. They share nothing but
+ * the inspector around them.
+ *
+ * Admin tokens only (--ui-*). The colours being shown are the site's and arrive as attribute
+ * values on an SVG or as an input's value, never as a declaration here: a stylesheet of the
+ * admin's that held a site colour is the bug tests/contrast_test.php exists to catch.
+ *
+ * The contrast gauge is here too: it is the palette measured, and it was the last thing
+ * left in the old Design screen's stylesheet (PLAN.md O-24). */
+/* ---- the palette as ONE list of roles (PLAN.md D-074) --------------------------------- */
+
+/* It used to be two lists: fifteen colours that could not be touched, and a folded panel
+   holding the seven that could. The same information twice, and the half that can be
+   CHANGED was the half that was closed. */
+
+.roles {
+  display: grid;
+  gap: var(--ui-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.role {
+  display: grid;
+  /* swatch, name, hex, then what can be said or done about it.
+     THE LAST TWO ARE FIXED, and that is the whole point of the row. Each <li> is its own
+     grid — a list is not one grid unless every row contributes the same cells — so an
+     `auto` column is sized by ITS row alone: the hexes landed at 253px on the seven rows
+     with a picker and at 194px on the nine without, which is a column that is not a column.
+     A hex is always seven characters of mono, and the widest thing the last cell holds is
+     the word for a computed colour. */
+  grid-template-columns: 1.5rem minmax(0, 1fr) 2.9rem 3.75rem;
+  gap: var(--ui-2);
+  align-items: center;
+  font-size: var(--ui-text-sm);
+}
+
+/* The swatch IS the picker for a role that can be the owner's: a colour beside a button
+   that opens a colour picker is two things where there is one. Sized like the read-only
+   swatch beside it, so the list reads as one list.
+   MIN-BLOCK-SIZE AS WELL AS BLOCK-SIZE: every field's input carries a 2.5rem floor so a
+   text box is comfortable to hit (admin-forms.css), and a floor beats a height — the
+   square came out 24 wide and 40 tall until this said otherwise. */
+.role .role-swatch {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  min-block-size: 1.5rem;
+  max-inline-size: none;
+  flex: none;
+  padding: 0;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-line);
+  border-radius: var(--ui-radius-s);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.role svg.role-swatch,
+.role > svg {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-s);
+}
+
+.role-name {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role-value {
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+/* A role the owner has taken over reads at full strength; the hex of one the palette works
+   out is a fact about the palette, not a choice anybody made.
+   DRIVEN BY THE SWITCH, not by a class the server writes: appearance.js flips that checkbox
+   the moment a colour is picked (D-065), so the row has to follow without a round trip. */
+.role:has(input[type="checkbox"]:checked) .role-value {
+  color: var(--ui-ink);
+}
+
+/* Said in a word rather than by being quiet: a row that is only paler than its neighbours
+   does not say WHY it cannot be changed. */
+.role-derived {
+  color: var(--ui-ink-faint);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-align: end;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The switch is the mechanism, not the control (D-065): it carries "is this mine" through
+   the form, and the button beside it is what a person presses. CLIPPED, NEVER FADED —
+   opacity is what the admin's contrast rule forbids for making a control quiet (D-012). */
+.role input[type="checkbox"] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  clip-path: inset(50%);
+}
+
+/* Only a role that HAS been taken over has anything to give back. */
+.role-free {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  padding: 0;
+  background: transparent;
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink-muted);
+  cursor: pointer;
+}
+
+.role:has(input[type="checkbox"]:checked) .role-free {
+  display: inline-flex;
+}
+
+.role-free:hover {
+  border-color: var(--ui-accent);
+  color: var(--ui-ink);
+}
+
+/* Reset all, likewise: it appears with the first colour taken and goes with the last one
+   given back, without the screen being asked for again. */
+.palette-reset {
+  display: none;
+}
+
+.field:has(.roles input[type="checkbox"]:checked) .palette-reset {
+  display: inline-flex;
+}
+
+.role .field-error {
+  grid-column: 1 / -1;
+}
+
+/* ---- or a colour of your own (PLAN.md D-076) ------------------------------------------ */
+
+/* Under the group it answers, indented by the rule beside it rather than by a heading:
+   it is the same question as the segments above, asked once more without a closed set. */
+.own-colour {
+  position: relative;
+  padding-inline-start: var(--ui-3);
+  border-inline-start: var(--ui-border) solid var(--ui-line);
+}
+
+/* The switch is MECHANISM (D-065, D-074): a colour input always carries some colour, so
+   "is this mine" cannot be read off its value. Clipped, never faded — opacity is what the
+   admin's contrast rule forbids for making a control quiet (D-012). */
+.own-colour input[type="checkbox"] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  clip-path: inset(50%);
+}
+
+/* The row is a .role (D-111), but its last two cells are not the palette's: the hex is
+   drawn only once the colour is the owner's, and the word beside it only until then, so
+   each takes the room it needs rather than the palette's fixed columns — which left the
+   name "Or a colour of your own" cut to "Or a colour of…" beside an empty cell. */
+.own-colour .role {
+  grid-template-columns: 1.5rem minmax(0, 1fr) auto auto;
+}
+
+/* Only a place that HAS taken a colour has one to give back. The row is a .role (D-111),
+   so the button follows the palette rows' rule above; what is this row's own is the word
+   where the hex would be: "palette" until the colour is the owner's, then the hex. The
+   hex shown for a colour that is not the owner's is the shade the page was rendered with,
+   which does not follow the palette live, and a number that can go stale is worse than
+   none. */
+.own-colour .role-value {
+  display: none;
+}
+
+.own-colour:has(input[type="checkbox"]:checked) .role-value {
+  display: inline;
+}
+
+.own-colour:has(input[type="checkbox"]:checked) .role-derived {
+  display: none;
+}
+
+/* ---- the contrast gauge (PLAN.md D-058) ---------------------------------------------- */
+
+/* The contrast gauge (PLAN.md D-058): every pair, what it looks like, what it measures.
+   The sample is an SVG whose two fills are the site's colours — the only site colour that
+   ever reaches this screen, and it reaches it as data, never as a stylesheet value. */
+
+.gauge-list {
+  display: grid;
+  gap: var(--ui-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 1.75rem of sample, not 2.5rem (PLAN.md D-078). D-075 shrank the SVG's viewBox from 40×24
+   to 28×18 and said the sample was smaller; it was not, because this rule still gave the box
+   40×24 and an SVG scales its contents to the box it is given. Sixteen rows share a 312px
+   column and the sample only has to show a pair of colours against each other, so the box
+   moves too and the name gets the twelve pixels. */
+.gauge-row {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+  gap: var(--ui-2);
+  align-items: center;
+  font-size: var(--ui-text-sm);
+}
+
+.gauge-sample {
+  inline-size: 1.75rem;
+  block-size: 1.125rem;
+  border-radius: var(--ui-radius-s);
+  border: var(--ui-border) solid var(--ui-line);
+}
+
+.gauge-ratio {
+  font-variant-numeric: tabular-nums;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  white-space: nowrap;
+}
+
+/* The verdict is a word, never a colour alone: a red dot says nothing to a reader who
+   cannot see red, and nothing at all to one reading it aloud. */
+.gauge-verdict {
+  color: var(--ui-success);
+}
+
+.gauge-fails .gauge-verdict {
+  color: var(--ui-danger);
+  font-weight: 600;
+}
+
+.gauge-more {
+  margin-block-start: var(--ui-2);
+  font-size: var(--ui-text-sm);
+}
+
+.gauge-more summary {
+  cursor: pointer;
+  color: var(--ui-ink-muted);
+  padding-block: var(--ui-1);
+}
+
+.gauge-more summary:hover {
+  color: var(--ui-ink);
+}
+
+.gauge-more .gauge-list {
+  margin-block-start: var(--ui-2);
+}

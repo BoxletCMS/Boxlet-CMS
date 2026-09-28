@@ -1,0 +1,84 @@
+/* The bar a logged-in admin sees on the real site while maintenance is on (PLAN.md D-021).
+ *
+ * Its own file, not site.css, for the same reason canvas.css is its own file: it carries
+ * literal values on purpose, and site.css may not. Every colour and size in site.css and
+ * sections.css must come from a custom property, so that the site's design controls how
+ * the site looks — a rule with its own test (tests/blocks_test.php). This bar is the
+ * opposite case. It is the admin's chrome that happens to render inside the site's
+ * document, and it has to look the same and stay legible over every design, including one
+ * whose own accent is this brown. A bar that took the site's tokens would be invisible on
+ * the design that needed it most.
+ *
+ * Linked by the bar fragment itself, so it is fetched only when the bar is shown. An
+ * ordinary visitor to a healthy site never requests it.
+ *
+ * Measured against D-012: #ffffff on #8a2b06 is 8.65:1, past the 4.5:1 asked of text, and
+ * the underlined link inherits it.
+ *
+ * Fixed rather than in the flow, so the page underneath is the page it would be without
+ * the bar: a browser check measuring spacing, or a screenshot judging a design, must not
+ * be reading a layout this pushed up. */
+
+/* ITS HEIGHT IS KNOWN where the admin has a rail beside the page, so the rail can end above
+   it (below): wider than 47.5rem the words take one line, and the bar is at least this
+   tall (0.5rem twice, plus 1.4 × 0.875rem). Narrower, the words wrap to a height nobody
+   should guess — three lines, 87px, measured at 390 wide — and the admin does not ask. */
+:root {
+  --boxlet-bar-height: 2.25rem;
+}
+
+.boxlet-maintenance-bar {
+  box-sizing: border-box;
+  min-block-size: var(--boxlet-bar-height);
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  /* Above anything a design can raise: this says the site is hidden, and a sticky header
+     or a cookie banner must not bury it. */
+  z-index: 2147483647;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0.5rem 1rem;
+  background: #8a2b06;
+  color: #ffffff;
+  font: 500 0.875rem/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  text-align: center;
+}
+
+.boxlet-maintenance-bar a {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* IN THE ADMIN the rail runs the window's height, and its foot — who is logged in — lay
+   under this bar (the owner, 2026-09-27). The rail ends above the bar instead, as a
+   sidebar and as the drawer a phone opens, and the page's own end clears it. The site's
+   pages keep the rule above: the page under the bar is the page it would be without it. */
+.admin-rail {
+  block-size: calc(100vh - var(--boxlet-bar-height));
+}
+
+.admin-main {
+  padding-block-end: calc(3rem + var(--boxlet-bar-height));
+}
+
+/* ON A PHONE the rail is a drawer over the page (admin-shell.css, the same width), opened on
+   purpose to be read: it lies over the bar while it is open, and the bar is back the moment
+   it closes. So the bar steps down under the drawer here, and the page's end clears
+   however many lines the bar took. */
+@media (max-width: 47.5rem) {
+  .admin .boxlet-maintenance-bar {
+    z-index: 2;
+  }
+
+  .admin-rail {
+    block-size: auto;
+  }
+
+  .admin-main {
+    padding-block-end: 8rem;
+  }
+}

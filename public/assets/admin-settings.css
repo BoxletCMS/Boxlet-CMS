@@ -1,0 +1,134 @@
+/* The Settings screen (PLAN.md D-052): its own list of sections down the left, and the
+ * general and branding settings as a ledger — each a row, its name and what it does on
+ * the left, the control on the right. Admin tokens only (--ui-*), defined in
+ * admin-tokens.css. */
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 10.5rem minmax(0, 1fr);
+  align-items: start;
+  gap: var(--ui-6);
+  max-inline-size: 64rem;
+}
+
+.settings-nav {
+  position: sticky;
+  top: calc(var(--ui-bar-height) + var(--ui-4));
+  display: grid;
+  gap: 0.125rem;
+}
+
+/* The same entry as the rail's: legible at rest, raised on hover, the current one marked by
+   a tint and a bar down its left edge. */
+.admin .settings-nav a {
+  padding: 0.375rem var(--ui-2);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink-muted);
+  text-decoration: none;
+}
+
+.admin .settings-nav a:hover {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+}
+
+.admin .settings-nav a[aria-current] {
+  background: var(--ui-current);
+  color: var(--ui-ink);
+  box-shadow: inset 2px 0 0 var(--ui-accent);
+}
+
+.settings-sections,
+.settings-form {
+  display: grid;
+  gap: var(--ui-5);
+  min-inline-size: 0;
+}
+
+/* A section reached by its link stops below the strip, not under it. */
+.settings-sections .panel {
+  scroll-margin-top: calc(var(--ui-bar-height) + var(--ui-4));
+}
+
+/* The ledger. A field is a grid row: its label over its hint on the left, its control
+   beside them on the right, and a rule under it that fades at both ends. */
+.ledger .field {
+  display: grid;
+  /* Wider than the handoff's 176px: this admin's hints are sentences, and at that width
+     one of them stood nine lines tall beside a one-line control. */
+  grid-template-columns: 13rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.125rem var(--ui-5);
+  padding: var(--ui-3) 0;
+  background-image: linear-gradient(to right, transparent, var(--ui-line) 1.875rem, var(--ui-line) calc(100% - 1.875rem), transparent);
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+}
+
+.ledger .field > label {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.ledger .field > .hint {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: var(--ui-text-xs);
+  line-height: 1.4;
+}
+
+.ledger .field > :is(input, select, textarea, .media-picker) {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  max-inline-size: 25rem;
+}
+
+.ledger .field > .field-error {
+  grid-column: 2;
+  grid-row: 4;
+}
+
+.settings-save .hint {
+  font-size: var(--ui-text-xs);
+}
+
+@media (max-width: 47.5rem) {
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* On a phone the sections are a row to scroll along, above the settings. */
+  .settings-nav {
+    position: static;
+    display: flex;
+    gap: var(--ui-1);
+    overflow-x: auto;
+  }
+
+  .admin .settings-nav a {
+    white-space: nowrap;
+  }
+
+  .ledger .field {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ledger .field > :is(label, .hint, input, select, textarea, .media-picker, .field-error) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+/* Your login (PLAN.md D-132): the email, the password and two-step login, one after another
+   in one panel, each opened by a rule so the three read as three. The fields are as wide
+   as an address needs, not as wide as the panel. */
+.account-form .field {
+  max-inline-size: 30rem;
+}
+
+.admin .account h3 {
+  margin: var(--ui-2) 0 0;
+  padding-block-start: var(--ui-5);
+  border-block-start: var(--ui-border) solid var(--ui-line);
+}

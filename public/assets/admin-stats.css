@@ -1,0 +1,317 @@
+/* Visit statistics (PLAN.md D-051): the Statistics screen — the period, the figures and
+ * the tables. The charts and the dashboard card are in admin-stats-chart.css, which the
+ * dashboard loads without this. Admin tokens only (--ui-*), defined in admin-tokens.css. */
+
+/* THE CONTROL ROW: the period, a range of your own, and the days that adds up to. One
+   line wherever the screen is wide enough to hold them, and rows of their own where it is
+   not — on a laptop the three of them were three lines above the figures, which are what
+   the screen is for. flex-wrap does the whole of it: no breakpoint to keep in step with
+   the rail's own. */
+.stats-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-3) var(--ui-4);
+  margin-bottom: var(--ui-5);
+}
+
+/* Inside the row nothing carries a margin of its own: the row's gap is the spacing, and a
+   margin adds to the line's own height — which is how the three of them still took two
+   lines on a wide screen after they were put in one row. */
+.stats-controls > * {
+  margin: 0;
+}
+
+/* The days the figures cover, beside the fields that choose them. */
+.stats-days {
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-sm);
+}
+
+/* The period: four links that read as one control, the current one raised. One row
+   always: wrapping, "12 months" fell alone onto a second line at a phone's width. */
+.stats-periods {
+  display: inline-grid;
+  grid-template-columns: repeat(4, auto);
+  gap: var(--ui-1);
+  padding: var(--ui-1);
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+}
+
+.admin .stats-periods a {
+  padding: var(--ui-2) var(--ui-4);
+  text-align: center;
+  white-space: nowrap;
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 30rem) {
+  .admin .stats-periods a {
+    padding-inline: var(--ui-3);
+  }
+}
+
+.admin .stats-periods a:hover {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+}
+
+.admin .stats-periods a[aria-current="page"] {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+  box-shadow: var(--ui-shadow-s);
+}
+
+/* The four figures: the dashboard's cards, without the link. Two to a row on a phone,
+   where one to a row filled the whole first screen with four numbers. */
+.stats-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--ui-4);
+  margin: 0 0 var(--ui-5);
+  padding: 0;
+  list-style: none;
+}
+
+.stats-figure {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-1);
+  padding: var(--ui-4) var(--ui-5);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-s);
+}
+
+.stats-change {
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-sm);
+}
+
+.stats-up {
+  color: var(--ui-success);
+  font-weight: 600;
+}
+
+.stats-down {
+  color: var(--ui-danger);
+  font-weight: 600;
+}
+
+/* The six tables, two or three to a row as the width allows. */
+.stats-tables {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  gap: var(--ui-4);
+  margin-bottom: var(--ui-5);
+}
+
+.stats-dimension {
+  margin: 0;
+}
+
+.stats-dimension h2 {
+  margin: 0 0 var(--ui-3);
+  font-size: var(--ui-text-lg);
+}
+
+.stats-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--ui-text-sm);
+}
+
+.stats-table th,
+.stats-table td {
+  padding: var(--ui-2) 0;
+  text-align: left;
+  font-weight: 400;
+  border-bottom: var(--ui-border) solid var(--ui-line);
+}
+
+.stats-table thead th {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stats-table tbody tr:last-child th,
+.stats-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.stats-table .stats-num {
+  padding-left: var(--ui-4);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* The name takes every width the counts leave, so the bar behind it has room to be a
+   share of something: sized to its text, a 100% bar measured 76px. */
+.stats-table th:first-child {
+  inline-size: 100%;
+}
+
+/* The share bar sits behind the name, as long as the row's share of the whole. */
+.stats-name {
+  position: relative;
+  overflow-wrap: anywhere;
+}
+
+.stats-bar {
+  position: absolute;
+  inset: var(--ui-1) 0;
+  inline-size: 100%;
+  block-size: calc(100% - var(--ui-2));
+}
+
+.stats-bar rect {
+  fill: var(--ui-accent-soft);
+}
+
+.stats-name > a,
+.stats-name > span {
+  position: relative;
+  padding-left: var(--ui-2);
+}
+
+.admin .stats-name > a {
+  color: var(--ui-ink);
+  text-decoration: none;
+}
+
+.admin .stats-name > a:hover {
+  color: var(--ui-accent);
+  text-decoration: underline;
+}
+
+.stats-more {
+  margin: var(--ui-3) 0 0;
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+}
+
+.stats-note {
+  max-inline-size: 48rem;
+}
+
+/* A range of your own (O-20): two days beside the periods. */
+.stats-range {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-2);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+.admin .stats-range input[type="date"] {
+  min-block-size: 2rem;
+  padding: 0.25rem var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+}
+
+.admin .stats-range .button {
+  min-block-size: 2rem;
+  padding-block: 0.25rem;
+}
+
+/* What the figures are narrowed to, each removable. */
+.stats-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-2);
+  margin-bottom: var(--ui-4);
+}
+
+.stats-chips-label {
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin .stats-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-2);
+  padding: 0.1875rem var(--ui-2);
+  background: var(--ui-accent-soft);
+  border: var(--ui-border) solid var(--ui-accent);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font-size: var(--ui-text-sm);
+  text-decoration: none;
+}
+
+.admin .stats-chip:hover {
+  background: var(--ui-panel);
+}
+
+.stats-chip-kind {
+  color: var(--ui-ink-faint);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stats-chip .icon {
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+}
+
+.admin .stats-chip-clear {
+  font-size: var(--ui-text-sm);
+}
+
+/* A row's value opens the page it names, beside the link that narrows to it. */
+.admin .stats-open {
+  position: relative;
+  margin-inline-start: var(--ui-2);
+  color: var(--ui-ink-faint);
+}
+
+.admin .stats-open:hover {
+  color: var(--ui-accent-dark);
+}
+
+.stats-open .icon {
+  inline-size: 0.8125rem;
+  block-size: 0.8125rem;
+}
+
+/* Taking a table out as a file (O-20): beside "show all", and quieter than it. */
+.stats-more {
+  display: flex;
+  gap: var(--ui-4);
+}
+
+.admin .stats-csv {
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+.admin .stats-csv:hover {
+  color: var(--ui-accent-dark);
+}
+
+.stats-data {
+  margin-bottom: var(--ui-5);
+}

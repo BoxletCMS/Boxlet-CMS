@@ -1,0 +1,78 @@
+/* The world map on the Statistics screen (PLAN.md O-20), drawn by App\Modules\Stats\Map from
+ * public/assets/vendor/world-map.svg. Admin tokens only (--ui-*), defined in
+ * admin-tokens.css: the five steps are the accent mixed into the page, so the busiest
+ * country is the accent itself and the quietest is barely a tint. */
+
+.stats-map {
+  margin-bottom: var(--ui-5);
+}
+
+.stats-map svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  max-block-size: 26rem;
+}
+
+/* Every line on this map is a hairline whatever the map is showing. Without this, the
+   country view multiplies the stroke by the magnification and a border 0.4 wide becomes a
+   black band twenty pixels thick — measured, on Croatia. */
+.stats-map path,
+.stats-map circle {
+  vector-effect: non-scaling-stroke;
+}
+
+/* A country nobody came from: a shape the eye can read as land, quiet enough that the
+   shaded ones are the only thing it looks at. --ui-panel measured almost invisible here. */
+.map-quiet {
+  fill: var(--ui-line);
+  stroke: var(--ui-bg);
+  stroke-width: 0.4;
+}
+
+.stats-map a path {
+  stroke: var(--ui-bg);
+  stroke-width: 0.4;
+}
+
+.map-step-1 { fill: color-mix(in srgb, var(--ui-accent) 22%, var(--ui-panel)); }
+.map-step-2 { fill: color-mix(in srgb, var(--ui-accent) 40%, var(--ui-panel)); }
+.map-step-3 { fill: color-mix(in srgb, var(--ui-accent) 60%, var(--ui-panel)); }
+.map-step-4 { fill: color-mix(in srgb, var(--ui-accent) 80%, var(--ui-panel)); }
+.map-step-5 { fill: var(--ui-accent); }
+
+.stats-map a:hover path {
+  stroke: var(--ui-ink);
+  stroke-width: 0.8;
+}
+
+.stats-map a:focus-visible path {
+  stroke: var(--ui-ink);
+  stroke-width: 1.2;
+}
+
+/* A city with visitors enough to name (D-055): a dot at its own coordinates, the size of it
+   by how many came from there.
+   IN THE INK, not the accent: the busiest country is drawn in the accent itself, so an
+   accent dot on it is a dot you cannot see — which is exactly what the first version was.
+   The ring in the page's own colour keeps two dots that touch as two. */
+.map-city {
+  fill: var(--ui-ink);
+  stroke: var(--ui-bg);
+  stroke-width: 0.8;
+}
+
+/* The legend: the quietest and the busiest shade, so the shading says what it means. */
+.stats-key-few::before {
+  background: color-mix(in srgb, var(--ui-accent) 22%, var(--ui-panel));
+}
+
+.stats-key-many::before {
+  background: var(--ui-accent);
+}
+
+.stats-key-few::before,
+.stats-key-many::before {
+  block-size: 0.625rem;
+  border-radius: var(--ui-radius-s);
+}

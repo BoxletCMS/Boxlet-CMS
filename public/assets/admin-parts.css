@@ -1,0 +1,226 @@
+/* The parts screens are built from beyond buttons and notices (PLAN.md D-052): a list's
+ * filters and its segmented choice, a row's menu, an empty list, and a figure with its note.
+ * Split from admin-ui.css when that passed the size limit; loaded by the admin shell, which
+ * the login screen and the installer do not use. Admin tokens only (--ui-*), defined in
+ * admin-tokens.css. */
+
+/* Nothing here yet: a drawn empty box, one sentence, and the action that fills it. */
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: var(--ui-4);
+  padding: var(--ui-8) var(--ui-6);
+  background: var(--ui-panel);
+  border: var(--ui-border) dashed var(--ui-line-strong);
+  border-radius: var(--ui-radius-l);
+  text-align: center;
+}
+
+.empty-state::before {
+  content: "";
+  inline-size: 3rem;
+  block-size: 3rem;
+  box-sizing: border-box;
+  border: var(--ui-2) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+}
+
+.empty-state p {
+  max-inline-size: 28rem;
+  margin: 0;
+  color: var(--ui-ink-muted);
+}
+
+.empty-state .button {
+  justify-self: center;
+}
+
+/* A figure: small capitals over a number, and a note saying what the number means. The
+   Overview's strip and the Statistics screen's four both use it (D-052). Every number is
+   set in figures of one width, so a column of them lines up. */
+.metric-label {
+  color: var(--ui-ink-faint);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.metric-value {
+  color: var(--ui-ink);
+  font-size: var(--ui-text-2xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.metric-note {
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+}
+
+/* A list's filters: a search, a segmented choice, and how many rows are shown. */
+.list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-3);
+  margin-bottom: var(--ui-4);
+}
+
+.list-search {
+  display: flex;
+  gap: var(--ui-2);
+  margin: 0;
+}
+
+/* Drawn as a field is (admin-forms.css), outside a .field: soft sides, and the bottom edge
+   in the control line that finds an empty control at rest (D-012). */
+.admin .list-search input {
+  box-sizing: border-box;
+  inline-size: 16rem;
+  max-inline-size: 60vw;
+  min-block-size: 2rem;
+  padding: 0.25rem var(--ui-3);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-base);
+}
+
+.admin .list-search input::placeholder {
+  color: var(--ui-ink-faint);
+}
+
+.admin .list-search input:focus {
+  border-color: var(--ui-accent);
+  box-shadow: var(--ui-ring);
+  outline: none;
+}
+
+.admin .list-search .button {
+  min-block-size: 2rem;
+  padding-block: 0.25rem;
+}
+
+.list-count {
+  margin-inline-start: auto;
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+/* A segmented choice: links that read as one control, the current one raised. */
+.segmented {
+  display: inline-flex;
+  padding: 0.125rem;
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+}
+
+.admin .segmented a {
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.admin .segmented a:hover {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+}
+
+.admin .segmented a[aria-current] {
+  background: var(--ui-accent-soft);
+  color: var(--ui-ink);
+  box-shadow: inset 0 0 0 1px var(--ui-accent);
+}
+
+/* A row's menu: a <details> whose summary is a drawn button at rest, opening a small list
+   of what else can be done to the row. admin.js closes it on a click elsewhere. */
+.row-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.row-menu > summary {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink-muted);
+  list-style: none;
+  cursor: pointer;
+}
+
+.row-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.row-menu > summary:hover,
+.row-menu[open] > summary {
+  background: var(--ui-panel);
+  border-color: var(--ui-control-line);
+  color: var(--ui-ink);
+}
+
+.row-menu-list {
+  position: absolute;
+  top: calc(100% + var(--ui-1));
+  right: 0;
+  z-index: 2;
+  display: grid;
+  min-inline-size: 11rem;
+  padding: var(--ui-1);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+  box-shadow: var(--ui-shadow-m);
+}
+
+/* Placed against the window by row-menu.js, so the table's scroll box cannot clip it. */
+.row-menu-list.is-floating {
+  position: fixed;
+  right: auto;
+  z-index: 30;
+}
+
+.row-menu-list form {
+  margin: 0;
+}
+
+.admin .row-menu-list a,
+.admin .row-menu-list button {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  inline-size: 100%;
+  padding: 0.375rem var(--ui-2);
+  background: transparent;
+  border: 0;
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.admin .row-menu-list a:hover,
+.admin .row-menu-list button:hover {
+  background: var(--ui-panel-sunken);
+}
+
+.admin .row-menu-list .row-menu-danger {
+  color: var(--ui-danger);
+}

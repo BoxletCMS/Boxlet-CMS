@@ -1,0 +1,264 @@
+/* The picture blocks PLAN.md D-105 added: picture, gallery, logos, video or map. Split from
+   blocks.css when it passed the hard size limit (D-117), under exactly its rule: only custom properties from
+   tokens.css and the --section-* properties each section sets in sections.css. No literal
+   colours, pixel values, fonts or shadows. Linked after blocks.css and blocks-words.css,
+   the order these rules had. */
+
+/* Picture (PLAN.md D-105)
+
+   One picture, as wide as whatever holds it. The shape crops it so a row of them lines up;
+   "as it is" leaves the photograph's own proportions alone, which is what a portrait or a
+   screenshot wants. */
+
+.picture {
+  margin: 0;
+}
+
+.layout-inset .picture-frame {
+  padding: var(--space-l);
+  background: var(--section-card);
+  border-radius: var(--radius-m);
+}
+
+.picture-frame img,
+.picture-frame .media-placeholder {
+  inline-size: 100%;
+  block-size: auto;
+  border-radius: var(--radius-m);
+}
+
+.shape-wide .picture-frame img,
+.shape-wide .picture-frame .media-placeholder {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.shape-square .picture-frame img,
+.shape-square .picture-frame .media-placeholder {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+/* clip-path and not a radius, the same way the Columns block draws a round picture: a
+   circle is a SHAPE, and border-radius is the character's own corner language — rounding a
+   picture to a circle with it would say the character had chosen that. */
+.shape-round .picture-frame img,
+.shape-round .picture-frame .media-placeholder {
+  aspect-ratio: 1;
+  object-fit: cover;
+  clip-path: circle(50%);
+}
+
+/* A picture with no shape still needs a box when there is no picture yet: a placeholder has
+   no intrinsic size, so without this the empty state is a line rather than an area. */
+.shape-natural .picture-frame .media-placeholder {
+  aspect-ratio: 4 / 3;
+}
+
+.picture-caption {
+  margin-block-start: var(--space-s);
+  color: var(--section-muted);
+  font-size: var(--text-sm);
+}
+
+/* Gallery (PLAN.md D-105)
+
+   The pictures are the content: no heading per picture, no paragraph, no card. One crop for
+   all of them, because a grid of photographs in their own proportions is a ragged edge and
+   that is the thing this block exists to avoid. */
+
+.gallery-heading {
+  margin: 0 0 var(--space-l);
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-l) var(--space-m);
+}
+
+.layout-two .gallery-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.layout-four .gallery-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-m);
+}
+
+.gallery-item {
+  margin: 0;
+}
+
+.gallery-frame img,
+.gallery-frame .media-placeholder {
+  inline-size: 100%;
+  block-size: auto;
+  border-radius: var(--radius-m);
+}
+
+.shape-square .gallery-frame img,
+.shape-square .gallery-frame .media-placeholder {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.shape-wide .gallery-frame img,
+.shape-wide .gallery-frame .media-placeholder {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* clip-path rather than a radius, for the reason the Picture and Columns blocks give: a
+   circle is a shape, and border-radius is the character's own corner language. */
+.shape-round .gallery-frame img,
+.shape-round .gallery-frame .media-placeholder {
+  aspect-ratio: 1;
+  object-fit: cover;
+  clip-path: circle(50%);
+}
+
+/* A placeholder has no size of its own, so an unfilled cell would be a line. */
+.shape-natural .gallery-frame .media-placeholder {
+  aspect-ratio: 4 / 3;
+}
+
+.gallery-caption {
+  margin-block-start: var(--space-xs);
+  color: var(--section-muted);
+  font-size: var(--text-sm);
+}
+
+/* Logos (D-105)
+
+   NEVER CROPPED, which is the whole reason this is not a Gallery: one height, each mark's
+   own width, contained inside its box. A mark with no picture shows its name in the site's
+   own type, which is a legitimate way to run the block and not a fallback. */
+
+.logos-heading {
+  margin: 0 0 var(--space-l);
+}
+
+.logos-row {
+  display: flex;
+  flex-wrap: wrap;
+  /* Rows closer than the marks across (D-125): the spacing scale's largest step between
+     rows left a mark that wrapped standing alone a screen's worth further down. */
+  gap: var(--space-m) var(--space-xl);
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.layout-grid .logos-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-l);
+}
+
+/* ONE HEIGHT FOR EVERY MARK, AND NOT THE SPACING SCALE'S (PLAN.md D-125). It was
+   --space-2xl, so a character with generous air drew its logos 120 pixels tall (Editorial,
+   7.5rem) — a size for space between things, not for a row of marks. A mark carrying only a
+   name is as tall as its words. */
+.logos-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 3.5rem;
+  color: var(--section-muted);
+  text-decoration: none;
+}
+
+/* THE <picture> STEPS ASIDE (PLAN.md D-117). The img's height is a share of the mark's,
+   and a share needs a parent of known height; the picture element between them is an
+   inline box of no height at all, so the share came to nothing and every logo drew at its
+   natural size — measured, 107 and 160 pixels tall in a mark of 84, spilling over the block
+   above and below it. With the picture laid out as its contents, the img's parent IS the
+   mark. */
+.logos-mark:has(> .logos-name) {
+  block-size: auto;
+}
+
+.logos-mark picture {
+  display: contents;
+}
+
+.logos-mark img {
+  inline-size: auto;
+  max-inline-size: 10rem;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.logos-mark .media-placeholder {
+  inline-size: 8rem;
+  block-size: 100%;
+}
+
+.logos-name {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+}
+
+a.logos-mark:hover,
+a.logos-mark:focus-visible {
+  color: var(--section-link);
+}
+
+/* Video or map (D-105)
+
+   The frame keeps its proportion at every width, so nothing below it moves when it loads.
+   An address nothing recognises draws NOTHING here: the note inside it is for the editor,
+   and canvas.css is what shows it. */
+
+.embed {
+  margin: 0;
+}
+
+.embed.is-empty {
+  display: none;
+}
+
+.layout-inset .embed-frame {
+  padding: var(--space-l);
+  background: var(--section-card);
+  border-radius: var(--radius-m);
+}
+
+.embed-frame iframe {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  border-radius: var(--radius-m);
+}
+
+.ratio-wide .embed-frame {
+  aspect-ratio: 16 / 9;
+}
+
+.ratio-square .embed-frame {
+  aspect-ratio: 1;
+}
+
+.ratio-tall .embed-frame {
+  aspect-ratio: 3 / 4;
+}
+
+.embed-caption {
+  margin-block-start: var(--space-s);
+  color: var(--section-muted);
+  font-size: var(--text-sm);
+}
+
+/* On a narrow screen a row of pictures becomes two columns. Four across at phone width is
+   four pictures nobody can see. */
+@media (max-width: 40rem) {
+  .gallery-grid,
+  .layout-two .gallery-grid,
+  .layout-four .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

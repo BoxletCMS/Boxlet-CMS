@@ -1,0 +1,375 @@
+/* The visual editor shell: toolbar, canvas and panel. Admin tokens only (--ui-*), defined
+ * in admin-tokens.css. The canvas is an iframe, so the site's own CSS is sealed inside it
+ * and cannot reach any of this. */
+
+/* The builder fills the window below the strip rather than sitting in the usual reading
+   column: the canvas is the screen. */
+.admin-main-bare {
+  max-width: none;
+  padding: 0;
+}
+
+/* --ui-bar-height is the strip's height (D-052), which never wraps, and below 64rem the
+   breakpoint at the end of this file gives the builder its natural height instead. dvh so
+   mobile browser chrome cannot add a scroll. */
+.builder {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--ui-bar-height));
+  min-height: 34rem;
+}
+
+/* Toolbar */
+
+.builder-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-3);
+  padding: var(--ui-3) var(--ui-4);
+  background: var(--ui-panel);
+  border-bottom: var(--ui-border) solid var(--ui-line);
+}
+
+.builder-title {
+  flex: 1;
+  min-width: 12rem;
+  margin: 0;
+  padding: var(--ui-2) 0;
+  color: var(--ui-ink);
+  font-size: var(--ui-text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.builder-devices {
+  display: flex;
+  gap: var(--ui-1);
+  padding: var(--ui-1);
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.builder-devices .button {
+  inline-size: 2.25rem;
+  min-block-size: 2.25rem;
+}
+
+.builder-devices [aria-pressed="true"] {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+  box-shadow: var(--ui-shadow-s);
+}
+
+/* The language menu (D-043): the page's language as a button, and under it every language
+   with this page's version there — open it, or make it. A <details>, so it needs no script. */
+.builder-locale {
+  position: relative;
+  font-size: var(--ui-text-sm);
+}
+
+span.builder-locale {
+  padding: var(--ui-2) var(--ui-3);
+  color: var(--ui-ink-muted);
+}
+
+.builder-locale > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-2);
+  list-style: none;
+  cursor: pointer;
+}
+
+.builder-locale > summary::-webkit-details-marker {
+  display: none;
+}
+
+.menu-popover-list {
+  position: absolute;
+  top: calc(100% + var(--ui-1));
+  inset-inline-end: 0;
+  z-index: 3;
+  display: grid;
+  gap: var(--ui-1);
+  min-inline-size: 16rem;
+  margin: 0;
+  padding: var(--ui-2);
+  list-style: none;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+  box-shadow: var(--ui-shadow-m);
+}
+
+.menu-popover-item {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ui-3);
+  inline-size: 100%;
+  padding: var(--ui-2) var(--ui-3);
+  border: 0;
+  border-radius: var(--ui-radius-s);
+  background: none;
+  color: var(--ui-ink);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.menu-popover-item:hover,
+button.menu-popover-item:hover,
+a.menu-popover-item:focus-visible,
+button.menu-popover-item:focus-visible {
+  background: var(--ui-panel-sunken);
+}
+
+.menu-popover-item[aria-current] {
+  cursor: default;
+  font-weight: 600;
+}
+
+/* Canvas and panel */
+
+.builder-body {
+  display: grid;
+  /* Wide enough for a rich-text box to be worth typing in. The canvas keeps the rest. */
+  grid-template-columns: minmax(0, 1fr) 28rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.builder-canvas {
+  position: relative;
+  display: grid;
+  /* TWO ROWS, SAID OUT LOUD. The page fills what is left; the trail is one line under it.
+     Left implicit, both rows were `auto` and a grid's align-content: normal behaves as
+     stretch — so the spare height was SHARED between them: measured at 708px of page and
+     242px of breadcrumb, which put the words a screenful below the page they describe and
+     made the canvas short for no reason the owner could see. Reported by him on sight. */
+  grid-template-rows: minmax(0, 1fr) auto;
+  justify-items: center;
+  overflow: auto;
+  padding: var(--ui-4);
+  background: var(--ui-bg);
+}
+
+/* THE WAY BACK AFTER A REMOVAL (PLAN.md D-079), over the canvas rather than in the panel:
+   the block was here, so this is where its absence is noticed. Sticky at the foot of the
+   pane so it is on screen wherever the page is scrolled to, and READABLE AT REST — it is
+   an offer with a few seconds to take it, not a decoration that fades in. */
+.builder-undo {
+  /* The same grid cell as the iframe, not a row of its own: as a row it took all the
+     height the canvas was not using and became a tall empty box with the sentence lost at
+     the bottom of it. Stacked in the one cell and ended, it is the strip it looks like. */
+  grid-area: 1 / 1;
+  align-self: end;
+  position: sticky;
+  z-index: 3;
+  inset-block-end: var(--ui-3);
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: var(--ui-3);
+  padding: var(--ui-2) var(--ui-2) var(--ui-2) var(--ui-4);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-m);
+  color: var(--ui-ink);
+  font-size: var(--ui-text-sm);
+}
+
+/* The button is the point of the strip, so it is not the quietest thing in it. */
+.builder-undo .button {
+  color: var(--ui-accent);
+  font-weight: 650;
+}
+
+/* The canvas carries a frame and a shadow so it reads as the site inside the tool,
+   which matters most at phone width where it no longer fills the pane. */
+.builder-canvas iframe {
+  /* Named as well, because auto-placement steps AROUND an explicitly placed item: with
+     only the strip at 1 / 1 the iframe was pushed into a second row and the strip sat
+     above the page instead of over the foot of it. */
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 30rem;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+  box-shadow: var(--ui-shadow-m);
+}
+@media (max-width: 64rem) {
+  .builder {
+    height: auto;
+  }
+
+  .builder-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .builder-canvas iframe {
+    block-size: 60vh;
+  }
+}
+
+/* THE PAGE OUTLINE (PLAN.md D-100)
+
+   A third column beside the canvas and the panel. It is narrow on purpose: it is for
+   seeing the shape of the page and reaching a block on a long one, not for reading. */
+
+.builder-body:has(.builder-outline:not([hidden])) {
+  grid-template-columns: 13rem minmax(0, 1fr) 28rem;
+}
+
+.builder-outline {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--ui-panel);
+  border-right: var(--ui-border) solid var(--ui-line);
+}
+
+.outline-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ui-2);
+  padding: var(--ui-3) var(--ui-3) var(--ui-2);
+}
+
+.outline-title {
+  flex: 1;
+  margin: 0;
+  font-size: var(--ui-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ui-ink-muted);
+}
+
+/* Sections and blocks. Tabular figures so the number does not shift as the page grows. */
+.outline-count {
+  margin: 0;
+  font-size: var(--ui-text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--ui-ink-muted);
+}
+
+.outline-rows {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--ui-2) var(--ui-3);
+}
+
+.outline-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--ui-1) var(--ui-2);
+  border: 0;
+  border-radius: var(--ui-radius-s);
+  background: none;
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+  text-align: start;
+}
+
+/* No opacity: a control at rest is legible or it is not there (CLAUDE.md, and the guard in
+   contrast_test caught this one). The icon is quiet because it is small and beside a word
+   that carries the meaning, not because it has been faded. */
+.outline-row .icon {
+  flex: none;
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+}
+
+/* One line, ellipsised: a heading's own words are in the canvas, and a row that wraps
+   turns the shape of the page into a paragraph. */
+.outline-label {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.outline-note {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--ui-text-xs);
+  color: var(--ui-ink-muted);
+}
+
+button.outline-row {
+  cursor: pointer;
+}
+
+button.outline-row:hover,
+button.outline-row:focus-visible {
+  background: var(--ui-panel-sunken);
+}
+
+/* Where you are. A tinted row AND a bar down its leading edge: the tint alone is a colour
+   difference, and the bar is a shape — which is what still reads when the tint does not. */
+.outline-row[aria-current="true"] {
+  background: var(--ui-accent-soft);
+  box-shadow: inset 2px 0 0 var(--ui-accent);
+  color: var(--ui-ink);
+}
+
+.outline-row-column {
+  padding-inline-start: var(--ui-4);
+  color: var(--ui-ink-muted);
+}
+
+/* A block under a band of one column sits one level in; under several, two — the column
+   row is the level between them, and a block without one must not pretend to have it. */
+.outline-row-block {
+  padding-inline-start: var(--ui-4);
+}
+
+.outline-row-block.outline-deep {
+  padding-inline-start: calc(var(--ui-4) + var(--ui-3));
+}
+
+.outline-empty {
+  margin: 0;
+  padding: var(--ui-2);
+  font-size: var(--ui-text-sm);
+  color: var(--ui-ink-muted);
+}
+
+@media (max-width: 64rem) {
+  /* The canvas and the panel already stack here; a third rail would leave neither room. */
+  .builder-outline {
+    display: none;
+  }
+}
+
+/* WHERE YOU ARE, over the page (PLAN.md D-102).
+
+   At the top of the canvas column rather than inside the frame: the frame is the visitor's
+   document and the editor writes nothing into it. It sits above the page rather than over
+   it, so it never covers the first band — which is the one thing a person looks at most. */
+.builder-trail {
+  /* Under the page, which is where it already read; the row above is the canvas. */
+  grid-row: 2;
+  margin: var(--ui-2) 0 0;
+  padding: var(--ui-1) var(--ui-2);
+  font-size: var(--ui-text-sm);
+  color: var(--ui-ink-muted);
+}
+
+.builder-trail strong {
+  font-weight: 600;
+  color: var(--ui-ink);
+}

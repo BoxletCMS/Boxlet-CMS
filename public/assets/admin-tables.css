@@ -1,0 +1,238 @@
+/* The admin's tables: lists of pages, menus and items, their row actions, editing a row in
+ * place, and the status pills they carry. Admin tokens only (--ui-*), defined in
+ * admin-tokens.css. Split from admin-forms.css when that passed the size limit; loaded by
+ * the admin shell. */
+
+/* Tables */
+
+/* position: relative makes the wrapper the containing block of what is absolutely placed
+   inside the table — the .visually-hidden column labels — so they scroll with it. Without
+   it they escaped the scroll box and widened the whole page on a phone: measured 704px of
+   document at a 390px viewport on the page list. */
+.table-wrap {
+  position: relative;
+  min-inline-size: 0;
+  overflow-x: auto;
+}
+
+/* No box around a table (D-052): its rows sit on the page, each over a rule that fades out
+   at both ends, painted as a background image so a hover tint can sit under it. */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.5625rem var(--ui-2);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  background-image: linear-gradient(to right, transparent, var(--ui-line) 1.875rem, var(--ui-line) calc(100% - 1.875rem), transparent);
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+}
+
+.table thead th {
+  padding-block: var(--ui-2);
+  border-bottom: var(--ui-border) solid var(--ui-line);
+  color: var(--ui-ink-faint);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The row's own name reads as its title, not as a link in running text. */
+.table .row-title a,
+.table .page-name a {
+  color: var(--ui-ink);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.table .row-title a:hover,
+.table .page-name a:hover {
+  color: var(--ui-accent-dark);
+  text-decoration: underline;
+}
+
+.table tbody tr:hover {
+  background-color: var(--ui-panel);
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-1);
+}
+
+/* In a table the actions stay a table cell — as a flex box the cell dropped out of the
+   table and broke its row lines — and keep to one line: two words stacked in a narrow cell
+   read as two rows. An edit form opened in place still takes the width it needs. */
+.table td.row-actions {
+  display: table-cell;
+  white-space: nowrap;
+}
+
+.table td.row-actions > * {
+  display: inline-block;
+  vertical-align: middle;
+  margin-inline-end: var(--ui-1);
+}
+
+
+.row-actions form {
+  margin: 0;
+}
+
+/* Actions inside a row are the small size, so they do not set the row's height. */
+.table .button {
+  min-block-size: 2rem;
+  padding: var(--ui-1) var(--ui-3);
+  font-size: var(--ui-text-sm);
+}
+
+/* Status pills */
+
+/* A pill with a dot, so the state reads by shape as well as by colour. */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-2);
+  padding: 0.125rem var(--ui-3) 0.125rem var(--ui-2);
+  border: var(--ui-border) solid transparent;
+  border-radius: 999px;
+  /* Published is the normal case and stays quiet (D-052): a neutral pill whose dot alone
+     carries the colour. A draft is where the tint earns its place. */
+  background: transparent;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-published::before {
+  background: var(--ui-success);
+}
+
+.status::before {
+  content: "";
+  inline-size: 0.4375rem;
+  block-size: 0.4375rem;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.status-draft {
+  background: var(--ui-warning-soft);
+  color: var(--ui-warning);
+}
+
+/* A date in a row: set in the monospace every time is, quieter than the row's name, and
+   never broken across two lines. */
+.table .date {
+  color: var(--ui-ink-muted);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+  white-space: nowrap;
+}
+
+/* The status as the switch that changes it (D-039): the same pill, with an edge and a
+   pointer so it reads as something to press at rest, raised on hover. */
+.admin .status-toggle {
+  border-color: var(--ui-line-strong);
+  font: inherit;
+  font-size: var(--ui-text-xs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.admin .status-toggle:hover {
+  border-color: var(--ui-control-line);
+  box-shadow: var(--ui-ring);
+}
+
+.admin .status-draft.status-toggle {
+  border-color: var(--ui-warning);
+}
+
+/* An action shown as its icon alone: square, the height of a small button. */
+.table .button-icon {
+  inline-size: 2rem;
+  padding: 0;
+}
+
+.table .button-icon .icon {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+}
+
+/* A quiet label beside a row's name, such as the site's main language: a fact about the
+   row, not something to press. */
+.badge {
+  display: inline-block;
+  margin-inline-start: var(--ui-2);
+  padding: 0.0625rem var(--ui-2);
+  border-radius: var(--ui-radius-s);
+  background: var(--ui-panel-sunken);
+  color: var(--ui-ink-muted);
+  font-size: 0.8125rem;
+  vertical-align: 0.0625rem;
+}
+
+/* The language list's add row: the choice and its button side by side, wrapping on a phone. */
+.language-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+}
+
+/* A small-capital label with a hairline edge, such as Home on the home page. */
+.badge-edge {
+  padding: 0 var(--ui-1);
+  background: transparent;
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: 0.1875rem;
+  color: var(--ui-ink-muted);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.badge-warning {
+  background: var(--ui-warning-soft);
+  color: var(--ui-warning);
+}
+
+.badge-accent {
+  background: var(--ui-accent-soft);
+  color: var(--ui-accent);
+}
+
+/* A message not yet opened: its line in the list reads bolder until it is. */
+.messages-table .is-unread .row-title a {
+  font-weight: 650;
+}
+
+/* One message's answers: each label above what was written under it. */
+.message-answers {
+  display: grid;
+  gap: var(--ui-1);
+  margin: 0;
+}
+
+.message-answers dt {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+.message-answers dd {
+  margin: 0 0 var(--ui-3);
+  overflow-wrap: anywhere;
+}

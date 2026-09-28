@@ -1,0 +1,314 @@
+/* HOW A DECISION IS MADE on the Appearance screen: five tabs, and inside them the rows of
+ * buttons, the sliders, the typeface cards and the specimen (PLAN.md D-059, D-062, D-065,
+ * D-066, D-075).
+ *
+ * How a COLOUR is shown and taken over is admin-appearance-colour.css, which split off here
+ * when the two together passed 500 lines. The seam is the one they already had: nothing in
+ * that file is a control with a closed set, and nothing in this one carries a site colour.
+ *
+ * Admin tokens only (--ui-*), with ONE exception that is the point of the screen: the
+ * typeface cards and the specimen are set in the faces being chosen, because a list of
+ * names is not a choice anybody can make. */
+
+.tabs {
+  display: grid;
+  gap: var(--ui-4);
+}
+
+/* The strip reads as a row of tabs at rest — each one has its own edge, not only the
+   selected one, because a control that appears on hover is a control nobody knew was
+   there.
+   SIX EQUAL COLUMNS, NOT A WRAPPING ROW. Six tabs in 19.5rem minus padding is about
+   280px, which fits in English and does not in Croatian: "Boja · Tipografija · Oblik ·
+   Stranica · Zaglavlje" broke into two ragged rows, and a strip that wraps unevenly reads
+   as two strips. Equal columns wrap as one block or not at all, and a name too long for
+   its column gives way at the end with the whole of it in the title.
+   THREE COLUMNS, TWO ROWS since D-111, when the header and the footer got a tab each: six
+   names in one row of 280px cut "Colour", "Header" and "Footer" to "Col…", "Hea…" and
+   "Foo…" in English, and a tab whose name cannot be read is not a tab. Two even rows are
+   what D-075 allowed; uneven ones are what it refused. */
+.tab-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ui-1);
+  padding: var(--ui-1);
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+}
+
+/* The strip's own colour wins over the admin's link colour: these are tabs, and a tab that
+   is painted like a link reads as somewhere else to go rather than as this screen's parts. */
+.tab-strip .tab {
+  color: var(--ui-ink-muted);
+}
+
+.tab-strip .tab:hover,
+.tab-strip .tab-current,
+.tab-strip .tab[aria-selected="true"] {
+  color: var(--ui-ink);
+}
+
+.tab {
+  min-inline-size: 0;
+  overflow: hidden;
+  padding: var(--ui-2) var(--ui-1);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+}
+
+.tab-current,
+.tab[aria-selected="true"] {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+  box-shadow: var(--ui-shadow-s);
+}
+
+.tab-panel {
+  display: grid;
+  gap: var(--ui-4);
+}
+
+/* ---- hints on demand (PLAN.md D-078) -------------------------------------------------- */
+
+/* Quiet, at the end of its own line, and READABLE at rest: it says what it does in words,
+   so it is not a control anybody has to discover. */
+/* Focus is the admin's own one rule (admin.css), not a second one here. */
+
+/* Every slider on this screen, wherever it sits: the helper renders one as a child of the
+   field rather than of a wrapper (D-066). */
+.appearance input[type="range"] {
+  inline-size: 100%;
+  min-inline-size: 0;
+  accent-color: var(--ui-accent);
+}
+
+/* The follow segment is the one that says "not mine", so it reads quieter than a choice. */
+.segment-follow {
+  flex-basis: 100%;
+}
+
+/* ---- the typefaces, and the specimen ------------------------------------------------- */
+
+.typefaces {
+  display: grid;
+  gap: var(--ui-1);
+}
+
+.typeface {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--ui-3);
+  padding: var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  cursor: pointer;
+}
+
+.typeface:has(input:checked) {
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 1px var(--ui-accent);
+}
+
+.typeface:has(input:focus-visible) {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+/* The one place the admin shows the SITE's typefaces: they are what is being chosen, and a
+   list of names is not a choice anybody can make. The families are the same files the site
+   serves, named in admin-appearance-fonts.css. */
+.typeface-sample {
+  flex: 0 0 2rem;
+  font-size: 1.35rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.typeface-name {
+  display: grid;
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+}
+
+.typeface-name span {
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+  font-weight: 400;
+}
+
+/* The sizes the two controls above decide, AT those sizes and in the face being chosen
+   (D-075). The panel is the admin's; what is set inside it is the site's, for the same
+   reason the cards above it are. */
+.specimen {
+  display: grid;
+  gap: var(--ui-1);
+  padding: var(--ui-3);
+  background: var(--ui-panel-sunken);
+  border-radius: var(--ui-radius-m);
+}
+
+.specimen-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ui-2);
+  margin: 0;
+  overflow: hidden;
+}
+
+.specimen-line span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.specimen-line em {
+  margin-inline-start: auto;
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+/* WITHOUT A SCRIPT THESE ARE THE SIZES. appearance-readouts.js overrides them with the
+   page's real sizes, shrunk together to fit (D-075) — an inline size beats a stylesheet —
+   and without it the specimen is at least four different sizes rather than four identical
+   lines. */
+.specimen-4xl { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
+.specimen-2xl { font-size: 1.15rem; font-weight: 650; }
+.specimen-base { font-size: var(--ui-text-sm); }
+.specimen-sm { font-size: var(--ui-text-xs); color: var(--ui-ink-muted); }
+
+/* The spacing scale as it runs: seven steps of one decision. */
+.ramp {
+  display: flex;
+  align-items: end;
+  gap: 2px;
+  block-size: 1.25rem;
+}
+
+.ramp-step {
+  background: var(--ui-accent);
+  border-radius: 1px;
+  block-size: 100%;
+}
+
+.ramp-step[data-ramp="0.25"] { inline-size: 2px; }
+.ramp-step[data-ramp="0.5"] { inline-size: 4px; }
+.ramp-step[data-ramp="1"] { inline-size: 8px; }
+.ramp-step[data-ramp="2"] { inline-size: 16px; }
+.ramp-step[data-ramp="4"] { inline-size: 32px; }
+.ramp-step[data-ramp="6"] { inline-size: 48px; }
+.ramp-step[data-ramp="8"] { inline-size: 64px; }
+
+/* ---- density in the inspector -------------------------------------------------------- */
+
+/* THE ROW IS A FLEX ROW HERE, WHATEVER THE FORMS STYLESHEET SAYS (D-111). admin.css draws
+   `.field-row` as a flex row of label and readout (D-065), and admin-forms.css, loaded after
+   it, draws `.field-row` as a grid of one third label and two thirds input for the settings
+   ledger. The grid won on every screen, and on this one it gave every group's name a third
+   of a 260px column: "HEADER ARRANGEMENT" folded into two lines and "FOOTER MENU COLUMNS"
+   into three, whatever admin.css asked for. Measured, not reasoned — the label computed to
+   84px inside a 261px row with `display: grid` on it — after D-110 had tuned the flex rules
+   and seen no change in the labels. */
+.appearance-inspector .field-row {
+  display: flex;
+  max-inline-size: none;
+}
+
+/* A group's name is a LABEL, not a heading: small, quiet and in capitals, as the handoff
+   draws it. The value beside it is the thing worth reading at full strength. */
+.appearance-inspector .field-label,
+.appearance-inspector .field > .field-row > label {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Three hundred pixels of column is not the place for a paragraph at reading size: the
+   hints stay — they are what teaches the screen — but at the size of a footnote. */
+.appearance-inspector .hint {
+  font-size: var(--ui-text-xs);
+  line-height: 1.45;
+}
+
+.appearance-inspector .fieldset {
+  gap: var(--ui-3);
+  padding: var(--ui-3);
+}
+
+.appearance-inspector .field {
+  gap: var(--ui-1);
+}
+
+.appearance-inspector .tab-panel {
+  gap: var(--ui-3);
+}
+
+/* ---- what the form itself is, and the line under a control (PLAN.md O-24) ------------ */
+
+/* Moved from admin-design.css when that file went: the form is this screen's form, and the
+   derived line is one of its readouts. Nothing about them was the old screen's. */
+
+.design-form,
+.design-form .fieldset {
+  min-width: 0;
+  min-inline-size: 0;
+}
+
+.design-form .field input,
+.design-form .field select {
+  max-inline-size: none;
+}
+
+.derived {
+  margin: 0;
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+  overflow-wrap: anywhere;
+}
+
+/* ---- one language's words, folded (PLAN.md D-111) ------------------------------------ */
+
+/* With several languages each one's words are a <details>, and the language the picture is
+   drawn in stands open. The summary is drawn like a group's legend, and it is a control at
+   rest: a chevron the browser gives it, and a name. */
+.words > summary {
+  cursor: pointer;
+  padding-block: var(--ui-1);
+  color: var(--ui-ink);
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+}
+
+.words > summary:hover {
+  color: var(--ui-accent);
+}
+
+.words-previewed {
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+  font-weight: 400;
+}
+
+.words-inside {
+  display: grid;
+  gap: var(--ui-3);
+  padding-block-start: var(--ui-2);
+}

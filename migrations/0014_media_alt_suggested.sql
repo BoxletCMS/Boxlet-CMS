@@ -1,0 +1,19 @@
+-- Whether the alt text in this row was SUGGESTED by Boxlet or written by the owner
+-- (PLAN.md D-025).
+--
+-- The distinction matters because a guess and a description are worth different amounts.
+-- A suggestion read from a file's metadata, or tidied out of its name, is usually right
+-- and sometimes nonsense; an owner who cannot tell the two apart ends up trusting neither.
+-- So a suggested alt is marked, shown as such in the library, and stops being a suggestion
+-- the moment the owner saves that field — even unchanged, because leaving it alone and
+-- pressing save IS the confirmation.
+--
+-- It also decides what a replacement may touch: new bytes behind an existing picture may
+-- refresh an alt that is still only a suggestion, and must never overwrite one the owner
+-- has confirmed.
+--
+-- SMALLINT rather than BOOLEAN: portable between MySQL and SQLite without either one
+-- inventing a type the other spells differently (SPEC §5.0). 0 is confirmed-or-written,
+-- 1 is suggested, and the default is 0 so every row that already exists is treated as the
+-- owner's own words — which is what they are.
+ALTER TABLE media_meta ADD COLUMN alt_suggested SMALLINT NOT NULL DEFAULT 0;

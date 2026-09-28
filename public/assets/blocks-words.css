@@ -1,0 +1,275 @@
+/* The blocks of words and figures PLAN.md D-105 added: quote, space, questions, call to
+   action, numbers. Split from blocks.css when it passed the hard size limit (D-117), under
+   exactly its rule: only custom properties from
+   tokens.css and the --section-* properties each section sets in sections.css. No literal
+   colours, pixel values, fonts or shadows. Linked straight after blocks.css. */
+
+/* Quote (D-105)
+
+   What somebody said, and who said it. The words carry it; the name is support, so it is
+   quieter and smaller — the opposite of what a Text block does with the same three lines. */
+
+.quote {
+  display: grid;
+  gap: var(--space-m);
+  justify-items: start;
+  margin: 0;
+}
+
+.align-center .quote {
+  justify-items: center;
+  text-align: center;
+}
+
+.layout-card .quote {
+  padding: var(--space-l);
+  background: var(--section-card);
+  border-radius: var(--radius-m);
+}
+
+.quote-portrait img {
+  inline-size: var(--space-2xl);
+  block-size: var(--space-2xl);
+  object-fit: cover;
+  clip-path: circle(50%);
+}
+
+/* --text-xl, not --text-lg: the words are the block, and one step above body text is not
+   enough for that to be visible. Measured against the demo's own body copy, where --text-lg
+   came out a fifth larger and read as a slightly emphatic paragraph rather than a quotation. */
+.quote-words {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: var(--text-xl);
+  line-height: var(--leading-heading);
+}
+
+.quote-said {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+  align-items: baseline;
+  font-size: var(--text-sm);
+}
+
+.quote-who {
+  font-style: normal;
+  font-weight: var(--heading-weight);
+}
+
+.quote-role {
+  color: var(--section-muted);
+}
+
+/* Space (D-105)
+
+   The one block with nothing in it. A band's rhythm says how much air the whole band has;
+   this says that two things in one column are separate thoughts. */
+
+.divider {
+  block-size: var(--space-l);
+}
+
+.height-medium.divider {
+  block-size: var(--space-xl);
+}
+
+.height-large.divider {
+  block-size: var(--space-3xl);
+}
+
+.layout-line .divider {
+  block-size: 0;
+  margin-block: var(--space-l);
+  border-top: var(--border-width) solid var(--section-border);
+}
+
+.layout-line.height-medium .divider {
+  margin-block: var(--space-xl);
+}
+
+.layout-line.height-large .divider {
+  margin-block: var(--space-3xl);
+}
+
+/* Questions (D-105)
+
+   <details> and <summary>, styled without taking away what they do. The marker is the
+   browser's own, rotated by the browser when the panel opens: replacing it with a drawn
+   arrow means drawing the open state too, and getting it wrong in one of them. */
+
+.accordion-heading {
+  margin: 0 0 var(--space-l);
+}
+
+/* RANGED TO THE EDGE EVEN IN A CENTRED BAND, which is not the block overruling the design
+   layer but the rule the form block already follows (.align-center .site-form). A summary
+   row is a CONTROL: its marker sits on the leading edge and its hit area is the whole row,
+   so centring makes every question start at a different place and puts the marker in the
+   middle of nothing. The block's own heading still follows the band. */
+.accordion-items {
+  display: grid;
+  gap: var(--space-s);
+}
+
+.align-center .accordion-items {
+  max-inline-size: var(--container-narrow);
+  margin-inline: auto;
+  text-align: start;
+}
+
+.accordion-item {
+  border-block-end: var(--border-width) solid var(--section-border);
+}
+
+.accordion-question {
+  padding-block: var(--space-s);
+  font-weight: var(--heading-weight);
+  cursor: pointer;
+}
+
+/* The words move, not the block: a summary that shifts its own padding on open makes the
+   whole list jump under the pointer. */
+.accordion-question:hover,
+.accordion-question:focus-visible {
+  color: var(--section-link);
+}
+
+.accordion-answer {
+  padding-block-end: var(--space-m);
+}
+
+.layout-cards .accordion-items {
+  gap: var(--space-m);
+}
+
+.layout-cards .accordion-item {
+  padding-inline: var(--space-l);
+  background: var(--section-card);
+  border: var(--border-card) solid var(--section-border);
+  border-radius: var(--radius-m);
+}
+
+/* Call to action (D-105)
+
+   A closing block, not an opening one: the heading is a heading and not a hero line, and the
+   second link is quieter than the first on purpose. Two solid buttons is a question, and
+   this block asks for one thing. */
+
+.cta {
+  display: grid;
+  gap: var(--space-l);
+}
+
+.layout-beside .cta {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-xl);
+  align-items: center;
+}
+
+.cta-heading {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+.cta-body {
+  margin: var(--space-s) 0 0;
+  color: var(--section-muted);
+}
+
+.cta-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  align-items: center;
+  margin: 0;
+}
+
+.align-center .cta-links {
+  justify-content: center;
+}
+
+.layout-beside .cta-links {
+  justify-content: flex-end;
+}
+
+.cta-quiet {
+  color: var(--section-link);
+  font-weight: var(--heading-weight);
+}
+
+/* Numbers (D-105)
+
+   The number is the content, so it is set at display size and the word under it is not.
+   That relationship is the block: three Text blocks in a row cannot have it, because a
+   heading is sized as a heading. */
+
+.stats-heading {
+  margin: 0 0 var(--space-l);
+}
+
+/* THE BLOCK MEASURES ITS OWN ROOM, not the window's (D-125). Three or four numbers side by
+   side need a width a narrow column does not have: measured, three in a column of 211 pixels,
+   "120+" 110 wide in a track of 70, running into its neighbour. The rule for a narrow window
+   below could not see that — the window was wide. */
+.stats {
+  container-type: inline-size;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-l);
+  margin: 0;
+}
+
+.layout-four .stats-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stats-item {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.stats-value {
+  font-family: var(--font-heading);
+  font-size: var(--text-3xl);
+  font-weight: var(--heading-weight);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--heading-tracking);
+}
+
+.stats-label {
+  margin: 0;
+  color: var(--section-muted);
+  font-size: var(--text-sm);
+}
+
+/* Numbers in fewer columns as their own room narrows, whether a phone or a column made it
+   narrow (D-125): two, then one. */
+@container (max-width: 36rem) {
+  .stats-grid,
+  .layout-four .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 18rem) {
+  .stats-grid,
+  .layout-four .stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* On a narrow screen everything else that was a row becomes one column. */
+@media (max-width: 40rem) {
+  .layout-beside .cta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .layout-beside .cta-links {
+    justify-content: flex-start;
+  }
+}

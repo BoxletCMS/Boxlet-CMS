@@ -1,0 +1,102 @@
+/* The Downloads block (PLAN.md D-127): files for visitors to take away. Its own file rather
+   than more of blocks-media.css, which stood near the size guidance, and under the rule every
+   front-end stylesheet keeps: only custom properties from tokens.css and the --section-*
+   properties each section sets in sections.css. No literal colours, pixel values, fonts or
+   shadows. Linked straight after blocks-media.css. */
+
+.downloads-heading {
+  margin: 0 0 var(--space-l);
+}
+
+.downloads-list {
+  display: grid;
+  gap: var(--space-s);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The whole item is the link: the type, the title and the line about it are one target,
+   as wide as the column, and it looks pressable at rest — a hairline edge on the section's
+   own card colour, never only a hover. */
+.downloads-link,
+.downloads-item.is-empty {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-m);
+  align-items: center;
+  padding: var(--space-m);
+  color: var(--section-text);
+  text-decoration: none;
+  background: var(--section-card);
+  /* --border-width and not --border-card: a character may set cards to no edge at all
+     (measured, 0 under the development site's), and then an item on a card the colour of
+     its section would be a control with nothing to see at rest. */
+  border: var(--border-width) solid var(--section-border);
+  border-radius: var(--radius-m);
+}
+
+.downloads-link:hover,
+.downloads-link:focus-visible {
+  border-color: var(--section-link);
+}
+
+/* The file's type as a label of its own, set in the section's accent: PDF, ZIP, DOCX — what
+   the visitor is about to receive, before they read a word. */
+.downloads-type {
+  display: grid;
+  place-items: center;
+  min-inline-size: 3.25rem;
+  padding: var(--space-xs) var(--space-s);
+  color: var(--section-button-text);
+  background: var(--section-button-bg);
+  border-radius: var(--radius-s);
+  font-size: var(--text-sm);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
+}
+
+.downloads-text {
+  display: grid;
+  gap: var(--space-xs);
+  min-inline-size: 0;
+}
+
+.downloads-title {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+  overflow-wrap: anywhere;
+}
+
+.downloads-link:hover .downloads-title,
+.downloads-link:focus-visible .downloads-title {
+  color: var(--section-link);
+}
+
+.downloads-description {
+  color: var(--section-muted);
+}
+
+.downloads-meta {
+  color: var(--section-muted);
+  font-size: var(--text-sm);
+}
+
+/* CARDS: a few files of equal weight side by side, the type above the words. */
+.layout-cards .downloads-list {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-m);
+}
+
+.layout-cards .downloads-link,
+.layout-cards .downloads-item.is-empty {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  justify-items: start;
+}
+
+/* An item with no file is a download of nothing: not on the page. canvas.css shows it in
+   the editor, where it is the place to choose one. */
+.downloads-item.is-empty {
+  display: none;
+}

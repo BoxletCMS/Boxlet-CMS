@@ -1,0 +1,63 @@
+/* The Redirects screen (PLAN.md D-129). Admin tokens only (--ui-*). */
+
+.admin .redirects-heading {
+  margin-block: var(--ui-7) var(--ui-3);
+}
+
+/* What the kept addresses are, under their heading: the page subtitle's own rule pulls it
+   up against an h1, which here would sit it on the h2. */
+.redirects-intro {
+  max-inline-size: 44rem;
+  margin: 0 0 var(--ui-5);
+  color: var(--ui-ink-muted);
+}
+
+/* The form stands apart from the rules above it, whether they are a table or the empty
+   state's box. */
+.redirects-new {
+  margin-block-start: var(--ui-5);
+}
+
+/* An address is read character by character, so it is set in the mono face and wraps
+   anywhere rather than pushing the table wider than its column. */
+.redirects-address {
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+  overflow-wrap: anywhere;
+}
+
+.redirects-table td > .redirects-address + .redirects-address,
+.redirects-table td > a + .redirects-address {
+  display: block;
+  margin-block-start: var(--ui-1);
+}
+
+.redirects-muted {
+  color: var(--ui-ink-muted);
+}
+
+/* A page, or an address: two fields side by side with the word between them, stacked on
+   a narrow screen. */
+.redirects-to {
+  display: grid;
+  gap: var(--ui-3);
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+}
+
+.redirects-or {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  margin: 0;
+  padding-block-start: var(--ui-6);
+}
+
+@media (max-width: 47.5rem) {
+  .redirects-to {
+    grid-template-columns: 1fr;
+  }
+
+  .redirects-or {
+    padding-block-start: 0;
+  }
+}

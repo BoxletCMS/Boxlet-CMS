@@ -1,0 +1,70 @@
+/* The activity log (PLAN.md D-052): the Overview's "Recent activity" and the full log. Admin
+ * tokens only (--ui-*), defined in admin-tokens.css. */
+
+.activity-log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A row: when, what, and what kind of thing, on one line. Rows are separated by a rule that
+   fades out at both ends, painted as a background image so a hover tint can sit under it. */
+.activity-row {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--ui-3);
+  padding: 0.5625rem var(--ui-1);
+  background-image: linear-gradient(to right, transparent, var(--ui-line) 1.875rem, var(--ui-line) calc(100% - 1.875rem), transparent);
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  border-radius: var(--ui-radius-s);
+}
+
+.activity-row:hover {
+  background-color: var(--ui-panel);
+}
+
+.activity-when {
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+  white-space: nowrap;
+}
+
+.activity-what {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin .activity-what a {
+  color: var(--ui-ink);
+  text-decoration: none;
+}
+
+.admin .activity-what a:hover {
+  color: var(--ui-accent-dark);
+  text-decoration: underline;
+}
+
+.activity-kind {
+  color: var(--ui-ink-faint);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.activity-pager {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-3);
+  margin-top: var(--ui-5);
+}
+
+.activity-page {
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}

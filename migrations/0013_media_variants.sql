@@ -1,0 +1,22 @@
+-- Which variants exist for a picture, and whether the set is finished (SPEC §5.5).
+--
+-- Variants are generated during the upload request, but a large photograph through GD on
+-- a shared host can take longer than the request is allowed. So generation is resumable:
+-- it does what it can, records what it made, and marks the row incomplete. The admin
+-- library finishes the rest, a bounded request at a time, and an incomplete item also
+-- offers a plain button that does the same without JavaScript.
+--
+-- variants_json is a JSON object keyed by preset name, each value recording the file's
+-- extension and its true output dimensions. The dimensions are there because <picture>
+-- must state real width and height to avoid layout shift, and because nothing is ever
+-- enlarged: a thumb of a small picture is smaller than the preset says.
+--
+-- It is a column rather than a table. One row per picture is read on every render that
+-- shows it, always in full and never queried across rows, so a join would cost a query to
+-- reassemble what is always wanted together.
+--
+-- status is 'complete' or 'incomplete'. Anything else is treated as incomplete, which is
+-- the safe direction: an unfinished picture is offered for finishing rather than assumed
+-- whole.
+ALTER TABLE media ADD COLUMN variants_json TEXT NULL;
+ALTER TABLE media ADD COLUMN status VARCHAR(16) NOT NULL DEFAULT 'incomplete';

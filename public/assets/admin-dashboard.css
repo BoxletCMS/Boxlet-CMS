@@ -1,0 +1,189 @@
+/* The Overview (PLAN.md D-052). Admin tokens only (--ui-*), defined in admin-tokens.css.
+ * The row styles of its activity log are in admin-activity.css, shared with the full log. */
+
+/* The figures: tiles on a grid whose 1px gaps show the ground beneath as hairlines, so no
+   tile needs a border of its own. */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 1px;
+  margin: 0 0 var(--ui-6);
+  padding: 0;
+  overflow: hidden;
+  background: var(--ui-line);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  list-style: none;
+}
+
+.admin a.metric {
+  display: grid;
+  align-content: start;
+  gap: 0.125rem;
+  block-size: 100%;
+  box-sizing: border-box;
+  padding: var(--ui-3) 0.875rem;
+  background: var(--ui-panel-sunken);
+  color: var(--ui-ink);
+  text-decoration: none;
+}
+
+.admin a.metric:hover {
+  background: var(--ui-panel);
+}
+
+/* A character is a word, not a number: the same place, set in its own face. */
+.metric-word {
+  font-variant-numeric: normal;
+}
+
+/* The two columns: what changed, beside what is waiting and what is read. */
+.overview-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--ui-6);
+}
+
+.overview-side {
+  display: grid;
+  gap: var(--ui-6);
+}
+
+/* A section's name in small capitals, with its way to more on the right. */
+.overview-kicker {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ui-3);
+  margin-bottom: var(--ui-2);
+}
+
+.admin .overview-kicker h2 {
+  margin: 0;
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.admin .overview-kicker a {
+  font-size: var(--ui-text-sm);
+  text-decoration: none;
+}
+
+.admin .overview-kicker a:hover {
+  color: var(--ui-accent-dark);
+  text-decoration: underline;
+}
+
+.overview-calm {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  margin: 0;
+  color: var(--ui-ink-muted);
+}
+
+.overview-calm .icon {
+  color: var(--ui-success);
+}
+
+/* Needs attention: outlined cards, each the way to its fix. */
+.issues {
+  display: grid;
+  gap: var(--ui-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin a.issue {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ui-2);
+  padding: var(--ui-2) 0.625rem;
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  text-decoration: none;
+}
+
+.admin a.issue:hover {
+  background: var(--ui-accent-soft);
+  border-color: var(--ui-accent);
+}
+
+.issue > .icon {
+  margin-top: 0.1875rem;
+  color: var(--ui-accent-dark);
+}
+
+.issue-title,
+.issue-where {
+  display: block;
+}
+
+.issue-where {
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+}
+
+/* Most read: a name and its count, over a track as long as its share of the first. */
+.most-read {
+  display: grid;
+  gap: var(--ui-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.most-read-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ui-3);
+  margin-bottom: 0.3125rem;
+}
+
+.most-read-path {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.most-read-views {
+  color: var(--ui-ink-muted);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+.most-read-track {
+  display: block;
+  inline-size: 100%;
+  block-size: 3px;
+}
+
+.most-read-ground {
+  fill: var(--ui-line);
+}
+
+.most-read-fill {
+  fill: var(--ui-accent);
+}
+
+@media (max-width: 47.5rem) {
+  .overview-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* On a phone the log's kind label goes: the words already say what changed. */
+  .activity-kind {
+    display: none;
+  }
+
+  .activity-row {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+  }
+}

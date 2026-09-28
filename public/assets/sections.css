@@ -1,0 +1,396 @@
+/* Layer 2: section styles (SPEC §5.4), the only place these classes are styled.
+   Written entirely in layer-1 custom properties from tokens.css.
+
+   A section sets the colours that apply inside it as --section-* properties; block CSS
+   in site.css uses only those, so every block works on every surface. */
+
+.block {
+  --section-bg: var(--color-background);
+  --section-text: var(--color-text);
+  --section-muted: var(--color-muted);
+  --section-link: var(--color-link);
+  --section-button-bg: var(--color-accent);
+  --section-button-text: var(--color-on-accent);
+  /* A card on a plain section is the card colour, which sits between the page and the
+     tinted surface (D-067). It used to BE the tinted surface, so a card and a tinted band
+     were the same tone and a card inside one had nothing to be distinct from. */
+  --section-card: var(--color-card);
+  --section-border: var(--color-border);
+
+  /* Derived from the section's own text colour, which every surface guarantees is
+     readable against it, so a placeholder is visible on any surface — including one
+     nobody has tested. A fixed colour cannot promise that. */
+  --section-placeholder: color-mix(in srgb, var(--section-text) 10%, transparent);
+  --section-placeholder-edge: color-mix(in srgb, var(--section-text) 40%, transparent);
+
+  /* The picture glyph the empty media area wears (D-083). It is a MASK, so what the SVG
+     paints is opacity and what the reader sees is --section-placeholder-edge, mixed from
+     the section's own text colour. The shapes are FILLED and name no colour at all —
+     SVG fills black by itself — because a front-end stylesheet with a literal colour in
+     it is a bug even where the colour cannot reach the screen, and a rule nobody has to
+     make an exception to is worth more than four saved characters. Declared here beside
+     the tints it is drawn with, so the whole appearance of an empty picture area is one
+     thing to read. */
+  --placeholder-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5.5 3h13A2.5 2.5 0 0 1 21 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-13A2.5 2.5 0 0 1 5.5 3Zm0 1.6a.9.9 0 0 0-.9.9v13a.9.9 0 0 0 .9.9h13a.9.9 0 0 0 .9-.9v-13a.9.9 0 0 0-.9-.9Z'/%3E%3Ccircle cx='9' cy='9' r='1.9'/%3E%3Cpath d='M5.6 18.4h12.8l-4.6-6-3 3.8-1.8-2.1z'/%3E%3C/svg%3E");
+
+  /* How much of the surface's own colour is washed over a background picture, so the
+     words on top stay readable whatever the photograph is (D-024). A token rather than a
+     number in a rule: a character that needs more of it says so in one place. */
+  --section-picture-veil: 0.55;
+  --section-rhythm: var(--space-xl);
+  --section-width: var(--container-width);
+  --divider-depth: var(--space-xl);
+
+  position: relative;
+  padding-block: var(--section-rhythm);
+  color: var(--section-text);
+  background: var(--section-bg);
+}
+
+.block > .container {
+  max-width: var(--section-width);
+  padding-block: 0;
+}
+
+/* Site chrome is drawn by the same machinery, so it arrives wearing .block and takes the
+   rule above — a band of content's rhythm and the content's measure. Neither suits a bar.
+   These overrides live HERE, beside the rule they answer, and not in site.css: the same
+   two properties set there never applied, because .block weighs exactly as much and this
+   file is linked second. A rule that loses silently is worse than no rule, and it cost two
+   slices — the header's height fell anyway, for an unrelated reason, which made the first
+   one look like it had worked (PLAN.md D-028, D-030, D-031). Zero, because the chrome's
+   height is the owner's density choice (D-032), drawn by site.css on the bar itself. */
+.block-header,
+.block-footer {
+  --section-rhythm: 0;
+}
+
+/* The header runs to the content's measure or edge to edge: its own decision, not the
+   content's (D-031). Through --section-width rather than a max-width override, so the one
+   rule above still decides how a container is measured. */
+.block-header {
+  --section-width: var(--page-header-width, var(--container-width));
+}
+
+/* And the footer's, its own decision since D-116. */
+.block-footer {
+  --section-width: var(--page-footer-width, var(--container-width));
+}
+
+/* Surface */
+
+.surface-tinted {
+  --section-bg: var(--color-surface);
+  --section-card: var(--color-background);
+}
+
+.surface-contrast,
+.surface-image {
+  --section-bg: var(--color-contrast);
+  --section-text: var(--color-on-contrast);
+  --section-muted: var(--color-muted-on-contrast);
+  --section-link: var(--color-on-contrast);
+  --section-button-bg: var(--color-on-contrast);
+  --section-button-text: var(--color-contrast);
+  --section-card: var(--color-contrast-raised);
+  --section-border: var(--color-muted-on-contrast);
+}
+
+/* Over a photograph, nothing is muted. A lowered-contrast secondary colour is right on a
+   flat surface and wrong on a picture: measured on the demo under `soft`, the subheading
+   fell across the busiest part of the photograph and was hard to read while the heading
+   and the button were fine. D-024 puts the legibility treatment in tokens only, so this is
+   a token and not a shadow or an outline behind the words.
+
+   surface-image alone, not surface-contrast: a contrast section is a flat colour, where a
+   muted tone is doing its job. */
+.surface-image {
+  --section-muted: var(--color-on-contrast);
+}
+
+.surface-gradient {
+  --section-text: var(--color-on-gradient);
+  --section-muted: var(--color-on-gradient);
+  --section-link: var(--color-on-gradient);
+  --section-button-bg: var(--color-on-gradient);
+  --section-button-text: var(--color-gradient-start);
+  --section-card: var(--color-gradient-end);
+  --section-border: var(--color-on-gradient);
+
+  background-image: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+}
+
+/* A section's background picture (D-024).
+
+   A real <picture>, laid under the content, not a CSS background-image: a URL is a
+   per-section value and nothing is inlined as a style attribute (SPEC §5.4). As an element
+   it also gets srcset, true width and height, and lazy loading for nothing extra, which a
+   background-image cannot have.
+
+   The contrast tokens above stay exactly as they are. They ARE the legibility treatment —
+   text, links and buttons already switch to colours guaranteed against the contrast
+   surface — and they keep working when no picture resolves, which is what makes
+   surface: image with nothing chosen render as contrast rather than as a hole. */
+
+.section-picture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.section-picture img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* A wash between the picture and the words, in the surface's own background colour. The
+   amount is a token, so a character that needs more of it says so once. */
+.section-picture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--section-bg);
+  opacity: var(--section-picture-veil, 0.55);
+}
+
+/* The content sits above the picture. .block is already position: relative, so this needs
+   nothing else. */
+.surface-image > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Where a crop holds its subject. object-position travels as a CLASS because a focal point
+   is a per-picture value and a style attribute is not allowed (SPEC §5.4). Two axes at 10%
+   steps is 22 rules rather than the 121 a grid of pairs would need, and 10% is finer than
+   anyone can pick out of the thumbnail they set it on. MediaPicture::FOCAL_STEP rounds to
+   these; if that constant changes, these change with it. */
+
+.focal-x-0 { object-position: 0% var(--focal-y, 50%); }
+.focal-x-10 { object-position: 10% var(--focal-y, 50%); }
+.focal-x-20 { object-position: 20% var(--focal-y, 50%); }
+.focal-x-30 { object-position: 30% var(--focal-y, 50%); }
+.focal-x-40 { object-position: 40% var(--focal-y, 50%); }
+.focal-x-50 { object-position: 50% var(--focal-y, 50%); }
+.focal-x-60 { object-position: 60% var(--focal-y, 50%); }
+.focal-x-70 { object-position: 70% var(--focal-y, 50%); }
+.focal-x-80 { object-position: 80% var(--focal-y, 50%); }
+.focal-x-90 { object-position: 90% var(--focal-y, 50%); }
+.focal-x-100 { object-position: 100% var(--focal-y, 50%); }
+
+.focal-y-0 { --focal-y: 0%; }
+.focal-y-10 { --focal-y: 10%; }
+.focal-y-20 { --focal-y: 20%; }
+.focal-y-30 { --focal-y: 30%; }
+.focal-y-40 { --focal-y: 40%; }
+.focal-y-50 { --focal-y: 50%; }
+.focal-y-60 { --focal-y: 60%; }
+.focal-y-70 { --focal-y: 70%; }
+.focal-y-80 { --focal-y: 80%; }
+.focal-y-90 { --focal-y: 90%; }
+.focal-y-100 { --focal-y: 100%; }
+
+/* Rhythm */
+
+.rhythm-tight {
+  --section-rhythm: var(--space-l);
+}
+
+.rhythm-airy {
+  --section-rhythm: var(--space-3xl);
+}
+
+/* Width */
+
+.width-narrow {
+  --section-width: var(--container-narrow);
+}
+
+.width-wide {
+  --section-width: var(--container-wide);
+}
+
+.width-full {
+  --section-width: none;
+}
+
+/* A narrow measure is a reading column: two columns inside it leave neither the picture
+   nor the text enough room, so a picture-and-text block stacks. */
+.width-narrow .image-text {
+  grid-template-columns: 1fr;
+}
+
+/* Align */
+
+.align-center {
+  text-align: center;
+}
+
+/* Centre the section's own children. Deliberately not justify-items: that resolves a
+   nested grid's columns to their content width, which collapses a media placeholder
+   sized as a percentage of the column it sits in. */
+.align-center .container > * {
+  margin-inline: auto;
+}
+
+/* A rule down the left edge of a centred quote reads as detached from it. */
+.align-center .richtext blockquote {
+  padding-inline-start: 0;
+  border-inline-start: 0;
+}
+
+/* Divider: drawn on the top edge of the section it belongs to. */
+
+.divider-line {
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.divider-slant,
+.divider-curve {
+  margin-top: calc(var(--divider-depth) * -1);
+  padding-top: calc(var(--section-rhythm) + var(--divider-depth));
+}
+
+/* The section above a shaped edge keeps extra room at its bottom, so the edge never
+   covers its content, whatever that section's rhythm. */
+.block:has(+ .divider-slant),
+.block:has(+ .divider-curve) {
+  padding-bottom: calc(var(--section-rhythm) + var(--divider-depth));
+}
+
+.divider-slant {
+  clip-path: polygon(0 var(--divider-depth), 100% 0, 100% 100%, 0 100%);
+}
+
+.divider-curve {
+  border-top-left-radius: 50% var(--divider-depth);
+  border-top-right-radius: 50% var(--divider-depth);
+}
+
+/* The footer may carry a shaped edge too (D-113), and its neighbour is <main>, not a
+   section: the last section inside keeps the room the rule above gives a section above a
+   shaped edge, so the footer's slant never cuts into its words. */
+main:has(+ .block-footer:is(.divider-slant, .divider-curve)) > .block:last-child {
+  padding-bottom: calc(var(--section-rhythm) + var(--divider-depth));
+}
+
+/* A divider marks a transition between two sections. The first section has nothing to
+   transition from, and a shaped edge there is simply clipped by the top of the page, so
+   the first section never draws one whatever its stored style says. */
+main > .block:first-child {
+  margin-top: 0;
+  padding-top: var(--section-rhythm);
+  border-top: 0;
+  clip-path: none;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+
+/* Columns (PLAN.md D-093 step 3)
+
+   A section that holds more than one block, or that was given a shape to hold them in,
+   draws this container inside its .container. A section of one column holding one block
+   does NOT: there the section IS the block's element, exactly as it has always been, so
+   every page written before columns existed is drawn by the rules above and nothing here
+   can reach it.
+
+   The proportions are a closed set declared twice — here as grid tracks and in
+   SectionLayout::LAYOUTS as weights — and a test reads this file and refuses a pair that
+   disagree. CSS is not generated from PHP in this project, so the choice is two
+   declarations with a guard over them or a percentage in the database, and D-093 refuses
+   the percentage. */
+
+.section-cols {
+  display: grid;
+  gap: var(--space-xl) var(--space-l);
+  align-items: start;
+}
+
+.cols-one {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cols-halves {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cols-thirds {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cols-quarters {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.cols-wide-left {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+.cols-wide-right {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+}
+
+.cols-sidebar {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+}
+
+/* minmax(0, …) on every track, never a bare fr: a grid track's minimum is auto, so one
+   long word or a wide picture inside a column pushes the track past its share and the
+   whole section stops keeping its proportions. */
+
+/* A column stacks its own blocks with the rhythm of a section's content, not of a page's
+   bands: two blocks in one column are one thought, and the space between them should not
+   read as the space between two sections. */
+.section-column {
+  display: grid;
+  align-content: start;
+  gap: var(--space-l);
+}
+
+/* The section's own centring reaches into the columns. .align-center centres what is
+   directly inside .container, which for a section with columns is the column container
+   itself — centring that does nothing, because a grid track is already as wide as its
+   share. What the author meant is the content of each column. */
+.align-center .section-column > * {
+  margin-inline: auto;
+}
+
+/* Below the width two columns of words can hold, the columns become rows.
+
+   64rem and not 40rem: the question is not whether this is a phone but whether a column
+   still has room for a readable line, and half of a tablet does not. Four columns give up
+   sooner — at that width they are already two rows of two, the same concession
+   .layout-four makes in blocks.css for the same reason. */
+@media (max-width: 64rem) {
+  .cols-quarters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .section-cols:not(.stack-stay) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Bottom to top, for the one arrangement an owner needs and cannot otherwise express: a
+     picture to the left of text reads correctly side by side and wrongly stacked, because
+     the picture then arrives before the words it illustrates.
+
+     column-reverse and not `order` on the children: order would have to be set per column
+     and would be wrong the moment a column is added, and it leaves the reading order of
+     assistive technology following the source while the eye follows the screen. Reversing
+     the flow keeps one rule for any number of columns — and this is the deliberate case
+     where source order and visual order differ, which is why it is a choice the author
+     makes and never a default. */
+  .stack-reverse {
+    display: flex;
+    flex-direction: column-reverse;
+    row-gap: var(--space-xl);
+  }
+
+  /* Four columns staying side by side on a phone is unreadable whatever was asked for, so
+     `stay` keeps its proportions only where there is something left to keep. */
+  .cols-quarters.stack-stay {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

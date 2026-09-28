@@ -1,0 +1,177 @@
+/* Search across the admin (PLAN.md D-052): the rail's Search, the ⌘K palette, and the Search
+ * screen they both lead to. Admin tokens only (--ui-*), defined in admin-tokens.css. */
+
+/* The rail's Search: a field-like button, legible at rest, raised on hover. */
+.admin .rail-search {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.625rem;
+  margin: var(--ui-3) var(--ui-2) 0;
+  padding: 0.375rem var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-bar-ink-muted);
+  font-size: var(--ui-text-sm);
+  text-decoration: none;
+}
+
+.admin .rail-search:hover {
+  border-color: var(--ui-accent);
+  color: var(--ui-bar-ink);
+}
+
+.rail-search .icon {
+  inline-size: 0.9375rem;
+  block-size: 0.9375rem;
+}
+
+.rail-search kbd {
+  font-family: var(--ui-mono);
+}
+
+/* The palette: a dialog over the page, pushed a little down from the top. */
+.palette {
+  inline-size: min(34rem, 92vw);
+  max-block-size: 70vh;
+  margin: 12vh auto auto;
+  padding: 0;
+  overflow: hidden;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-m);
+  color: var(--ui-ink);
+}
+
+.palette[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.palette::backdrop {
+  background: var(--ui-scrim);
+  backdrop-filter: blur(3px);
+}
+
+.palette-search {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  margin: 0;
+  padding: 0.6875rem 0.8125rem;
+  box-shadow: inset 0 -1px 0 var(--ui-line);
+  color: var(--ui-ink-muted);
+}
+
+/* The palette's field is the whole search row: the dialog is its edge, and it has the
+   focus from the moment the palette opens. */
+.admin .palette-search input {
+  flex: 1;
+  min-inline-size: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+/* The browser's own clear button, drawn white on the dark palette; Escape does its work. */
+.admin .palette-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.admin .palette-search input::placeholder {
+  color: var(--ui-ink-faint);
+}
+
+.palette-esc,
+.palette-keys {
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+.palette-esc {
+  padding: 0 var(--ui-1);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-s);
+}
+
+.palette-results {
+  flex: 1;
+  min-block-size: 0;
+  overflow-y: auto;
+  padding: var(--ui-1);
+}
+
+.palette-results:empty {
+  display: none;
+}
+
+.palette-keys {
+  margin: 0;
+  padding: var(--ui-2) 0.8125rem;
+  box-shadow: inset 0 1px 0 var(--ui-line);
+}
+
+/* A result: its kind in small capitals, its name, and a hint in monospace on the right. */
+.search-results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin .search-result {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--ui-2);
+  padding: 0.4375rem 0.5625rem;
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink);
+  text-decoration: none;
+}
+
+.admin .search-result:hover,
+.admin .search-result[aria-selected="true"] {
+  background: var(--ui-accent-soft);
+}
+
+.search-kind {
+  color: var(--ui-ink-faint);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.search-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-hint {
+  max-inline-size: 12rem;
+  overflow: hidden;
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-none {
+  margin: 0;
+  padding: var(--ui-3);
+  color: var(--ui-ink-faint);
+}
+
+/* The Search screen: the same list, under a search field. */
+.search-screen-results {
+  max-inline-size: 40rem;
+  margin-top: var(--ui-4);
+}

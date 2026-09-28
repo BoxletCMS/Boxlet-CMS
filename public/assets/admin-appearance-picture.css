@@ -1,0 +1,153 @@
+/* The picture on the Appearance screen and the toolbar over it (PLAN.md D-060).
+ *
+ * Every control has a resting state: a viewport button is a button whether or not it is the
+ * current one, and the one in use says so with a filled ground rather than by being the only
+ * visible thing.
+ *
+ * The stage's own size at each threshold is in admin-appearance-widths.css. Admin tokens
+ * only (--ui-*): what is inside the frame is a separate document with the site's own. */
+
+.preview-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-2);
+}
+
+.viewports {
+  display: flex;
+  gap: 1px;
+  padding: 1px;
+  background: var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.viewport {
+  padding: var(--ui-1) var(--ui-2);
+  background: var(--ui-panel);
+  border: 0;
+  color: var(--ui-ink-muted);
+  font: inherit;
+  font-size: var(--ui-text-xs);
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+}
+
+.viewport:first-child { border-start-start-radius: var(--ui-radius-s); border-end-start-radius: var(--ui-radius-s); }
+.viewport:last-child { border-start-end-radius: var(--ui-radius-s); border-end-end-radius: var(--ui-radius-s); }
+
+.viewport:hover {
+  color: var(--ui-ink);
+}
+
+.viewport[aria-pressed="true"] {
+  background: var(--ui-accent-soft);
+  color: var(--ui-ink);
+  font-weight: 650;
+}
+
+/* THE ZOOM IS A CONTROL OF THIS SCREEN, NOT THE BROWSER'S (PLAN.md D-078). It carried a
+   padding and a size and nothing else, so what was drawn was the browser's own dark-mode
+   select: measured at rgb(107, 107, 107) on a 1px rgb(133, 133, 133) border with square
+   corners, sitting between three chips and Compare. It reads as something that escaped from
+   another screen.
+   THE ARROW STAYS THE BROWSER'S. appearance: none takes it away, and then nothing on the
+   control says it opens a list — which is the rule about a control that is invisible at
+   rest, applied to the one part of it that says what it is. */
+.zoom select {
+  padding: var(--ui-1) var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-xs);
+  cursor: pointer;
+}
+
+.zoom select:hover {
+  border-color: var(--ui-control-line);
+}
+
+.zoom select:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+/* Compare is a chip like the widths, not a word floating beside them: it is the same kind
+   of control — something you press to change what the frame shows. */
+.viewport-compare {
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.viewport-compare[aria-pressed="true"] {
+  background: var(--ui-accent-soft);
+  color: var(--ui-ink);
+}
+
+/* The state, in words. Never a colour alone: a dot says nothing to a reader who cannot see
+   it and nothing at all to one reading the page aloud. */
+.preview-state {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: nowrap;
+}
+
+.state-unpublished {
+  color: var(--ui-warning);
+}
+
+.state-problem {
+  color: var(--ui-danger);
+}
+
+/* The stage the frame is scaled inside. Its width follows the frame's scaled width so the
+   picture stays where it is put, and anything wider than the column scrolls rather than
+   pushing the screen sideways. */
+.preview-stage {
+  /* SIDEWAYS ONLY. The frame is laid out at full size and scaled down, and the scrollable
+     overflow this box reports is the frame BEFORE the transform — 1280×1176 of it while
+     840×772 is what is drawn. So the stage scrolled 404px down onto nothing, and in the
+     stacked state that was the second scroll inside the first. Measured, not reasoned: the
+     frame's own rectangle is exactly the stage's.
+     THAT WAS TRUE OF ONE AXIS. The height was divided by the factor so it landed back on
+     the stage; the width was not, so the box stayed the width it was given while the
+     picture shrank, and this box reported a scrollable width it could not use — a
+     horizontal scrollbar under a picture that fitted, with a band of nothing to the right
+     of it. draw() now pulls the margin box back to what is drawn on both axes (D-078), so
+     sideways there is something to scroll to only when the chosen width really is wider
+     than the room, which is the case [data-stage-tight] already says in words. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  background: var(--ui-panel-sunken);
+}
+
+/* With no script this is the whole of it: a frame the width of the column, as tall as the
+   stage. The toolbar then sets a width, a height and a scale in pixels, and these are what
+   it starts from. */
+.preview-stage iframe {
+  display: block;
+  border: 0;
+  transform-origin: top left;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+/* ---- the buttons under the picture (PLAN.md O-24) ------------------------------------ */
+
+/* The actions sit at the end of the bar, and wrap under it on a narrow screen rather than
+   squeezing the label that says what the frame is. */
+.preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+  margin-inline-start: auto;
+}

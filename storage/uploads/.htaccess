@@ -1,0 +1,4 @@
+# Safety net for Apache shared hosting where the document root cannot be moved to
+# public/. This file does NOTHING on nginx, which ignores .htaccess entirely: there
+# the document root pointing at public/ is the only real protection.
+Require all denied

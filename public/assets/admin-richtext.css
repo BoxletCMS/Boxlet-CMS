@@ -1,0 +1,213 @@
+/* The rich text field: our toolbar, TipTap's editor (PLAN.md D-017 — spike).
+ *
+ * Admin tokens only (--ui-*), as everywhere else in here. TipTap is built with
+ * injectCSS: false, so it adds no stylesheet of its own — measured as zero <style>
+ * elements — and the admin's security policy needs no exception. Everything the editor
+ * looks like is in this file.
+ *
+ * The buttons carry short text rather than icons, so nothing here needs opacity to draw a
+ * glyph: --ui-ink on --ui-panel measures 16.51:1, and a disabled control is told apart by
+ * colour rather than by fading a picture towards its background (D-012).
+ */
+
+.richtext {
+  display: grid;
+  gap: var(--ui-2);
+}
+
+/* Which half is on screen. Without JavaScript neither class is set and the textarea —
+   the element that carries the name — is simply visible, which is the fallback. */
+.richtext-rich > textarea,
+.richtext-plain > .richtext-toolbar,
+.richtext-plain > .richtext-link,
+.richtext-plain > .richtext-editor {
+  display: none;
+}
+
+/* Toolbar */
+
+.richtext-toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--ui-2);
+  align-items: center;
+}
+
+.rt-group {
+  display: flex;
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  overflow: hidden;
+}
+
+/* Undo and redo sit apart from the writing tools, at the end of the row. */
+.rt-history {
+  margin-inline-start: auto;
+}
+
+.rt-button {
+  display: grid;
+  place-items: center;
+  min-inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding-inline: var(--ui-1);
+  background: var(--ui-panel);
+  border: 0;
+  border-left: var(--ui-border) solid var(--ui-line);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rt-group .rt-button:first-child {
+  border-left: 0;
+}
+
+.rt-button:hover {
+  background: var(--ui-panel-sunken);
+}
+
+.rt-button:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: -2px;
+}
+
+/* The state the cursor is in, not a hover: TipTap reports it from the document. */
+.rt-button[aria-pressed="true"] {
+  background: var(--ui-accent-soft);
+}
+
+.rt-italic {
+  font-style: italic;
+}
+
+/* Drawn at the size of the letters beside it, and in the same ink: the icon takes
+   currentColor, so it carries the button's own colour and contrast rather than a value of
+   its own. */
+.rt-icon {
+  inline-size: 1em;
+  block-size: 1em;
+}
+
+/* The link row, in the flow between the toolbar and the editor so it never covers the
+   text being linked. Hidden with the hidden attribute, so it costs nothing when closed. */
+
+.richtext-link {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+  align-items: center;
+  padding: var(--ui-2);
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+/* A page first, an address second (PLAN.md D-034): each takes a full row in the narrow
+   inspector, and the address is hidden while a page is chosen. */
+.rt-link-page,
+.rt-link-input {
+  flex: 1 1 100%;
+  min-inline-size: 0;
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+}
+
+.richtext-link:has(.rt-link-page option:checked:not([value=""])) .rt-link-input {
+  display: none;
+}
+
+.richtext-link .button {
+  font-size: var(--ui-text-sm);
+}
+
+/* The editor itself, matching every other field on the panel. TipTap renders into a child
+   with the ProseMirror class; the box belongs to us. */
+
+.richtext-editor {
+  box-sizing: border-box;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  line-height: var(--ui-leading);
+}
+
+.richtext-editor .ProseMirror {
+  min-block-size: 12rem;
+  padding: var(--ui-2) var(--ui-3);
+  outline: 0;
+}
+
+.richtext-editor:focus-within {
+  border-color: var(--ui-accent);
+  outline: 2px solid var(--ui-accent);
+  outline-offset: -1px;
+}
+
+.richtext-editor .ProseMirror > :first-child {
+  margin-top: 0;
+}
+
+.richtext-editor .ProseMirror > :last-child {
+  margin-bottom: 0;
+}
+
+.richtext-editor h2 {
+  margin: 0 0 var(--ui-2);
+  font-size: var(--ui-text-lg);
+  font-weight: 650;
+}
+
+.richtext-editor h3 {
+  margin: 0 0 var(--ui-2);
+  font-size: var(--ui-text-base);
+  font-weight: 650;
+}
+
+.richtext-editor h4 {
+  margin: 0 0 var(--ui-2);
+  font-size: var(--ui-text-sm);
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.richtext-editor blockquote {
+  margin: 0 0 var(--ui-2);
+  padding-inline-start: var(--ui-3);
+  border-inline-start: var(--ui-1) solid var(--ui-line-strong);
+  color: var(--ui-ink-muted);
+}
+
+.richtext-editor ul,
+.richtext-editor ol {
+  margin: 0 0 var(--ui-2);
+  padding-inline-start: var(--ui-5);
+}
+
+.richtext-editor li > p {
+  margin: 0;
+}
+
+.richtext-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+  align-items: baseline;
+}
+
+.richtext-actions .button {
+  padding-inline: 0;
+  font-size: var(--ui-text-sm);
+}

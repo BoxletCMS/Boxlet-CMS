@@ -1,0 +1,216 @@
+/* The admin's frame (PLAN.md D-052, "Workbench"): a rail down the left with every screen in
+ * four groups; the strip across the top of the content is admin-strip.css. Admin tokens
+ * only (--ui-*), defined in admin-tokens.css. Loaded by the admin shell alone: the login
+ * screen and the installer have no frame.
+ *
+ * Wide, the rail has its words. On a phone it folds behind a menu button (admin-nav.js),
+ * or, without a script, sits above the content as a plain list. Between the two it can keep
+ * only its icons — under 1000px, in the page editor, or when the owner folds it — and that
+ * is admin-rail-compact.css. */
+
+.admin-frame {
+  display: grid;
+  grid-template-columns: 13.5rem minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* ---- the rail ---------------------------------------------------------------------- */
+
+.admin-rail {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  block-size: 100vh;
+  overflow-y: auto;
+  background: var(--ui-bar);
+  color: var(--ui-bar-ink);
+  /* An edge, not a border: a border would take a pixel from the rail's own width. */
+  box-shadow: inset -1px 0 0 var(--ui-line);
+}
+
+.rail-brand {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--ui-3);
+  block-size: 2.875rem;
+  padding-inline: var(--ui-4);
+  box-shadow: inset -1px -1px 0 var(--ui-line);
+  font-size: var(--ui-text-base);
+  font-weight: 500;
+}
+
+/* A box inside a box: the mark, the one warm pixel in the admin. Drawn by CSS, so there is
+   no image to ship or theme. */
+.rail-mark {
+  flex: none;
+  inline-size: 1rem;
+  block-size: 1rem;
+  box-sizing: border-box;
+  border: 0.25rem solid var(--ui-mark);
+  border-radius: var(--ui-radius-s);
+}
+
+.rail-name {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail-nav {
+  flex: 1;
+  padding: var(--ui-2) var(--ui-2) var(--ui-4);
+}
+
+.rail-nav ul {
+  display: grid;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A group's name: small capitals over its entries. */
+.rail-group {
+  margin: var(--ui-4) var(--ui-2) var(--ui-1);
+  color: var(--ui-ink-faint);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rail-group:first-child {
+  margin-top: var(--ui-2);
+}
+
+/* An entry: legible at rest in the rail's own muted ink, raised on hover. The current one is
+   marked by a lighter ink, a tint and a bar down its left edge — never by colour alone. */
+.admin .rail-nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.375rem var(--ui-2);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-bar-ink-muted);
+  font-size: var(--ui-text-base);
+  text-decoration: none;
+}
+
+.admin .rail-nav a:hover {
+  background: var(--ui-bar-raised);
+  color: var(--ui-bar-ink);
+}
+
+.admin .rail-nav a[aria-current] {
+  background: var(--ui-current);
+  color: var(--ui-bar-ink);
+  box-shadow: inset 2px 0 0 var(--ui-accent);
+}
+
+/* The count in the row you are on is not a quiet aside: it sits on the deepest ground in
+   the rail, where the faint ink measured 4.09:1. */
+.admin .rail-nav a[aria-current] .rail-count {
+  color: var(--ui-bar-ink-muted);
+}
+
+.rail-nav .icon {
+  inline-size: 0.9375rem;
+  block-size: 0.9375rem;
+}
+
+.rail-label {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail-count {
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Who is logged in, at the foot of the rail; it opens their login's settings. */
+.admin .rail-user {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--ui-2);
+  padding: var(--ui-3) var(--ui-4);
+  box-shadow: inset -1px 1px 0 var(--ui-line);
+  color: var(--ui-bar-ink);
+  text-decoration: none;
+}
+
+.admin .rail-user:hover {
+  background: var(--ui-bar-raised);
+}
+
+.rail-avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+  background: var(--ui-bar-raised);
+  border-radius: var(--ui-radius-s);
+  font-size: var(--ui-text-xs);
+  font-weight: 500;
+}
+
+.rail-who {
+  display: grid;
+  min-inline-size: 0;
+  line-height: 1.3;
+}
+
+.rail-email {
+  overflow: hidden;
+  font-size: var(--ui-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail-role {
+  color: var(--ui-ink-faint);
+  font-size: 0.625rem;
+}
+
+/* ---- a phone: the rail folds behind a button ------------------------------------------- */
+
+@media (max-width: 47.5rem) {
+  .admin-frame {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Without a script: the rail is a plain list above the content. */
+  .admin-rail {
+    position: static;
+    block-size: auto;
+    box-shadow: inset 0 -1px 0 var(--ui-line);
+  }
+
+  /* With a script: the rail is a drawer over the page until the strip's button opens it. */
+
+  .nav-ready .admin-rail {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 3;
+    display: none;
+    inline-size: min(17rem, 85vw);
+    block-size: 100vh;
+    box-shadow: var(--ui-shadow-m);
+  }
+
+  .nav-ready.nav-open .admin-rail {
+    display: flex;
+  }
+}

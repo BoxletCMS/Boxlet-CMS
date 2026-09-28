@@ -1,0 +1,209 @@
+/* The admin's colours: every one of them, and nothing else.
+ *
+ * This is the only stylesheet in the admin allowed to write a colour as a literal. Every
+ * other admin stylesheet paints with var(--ui-*) alone — tests/contrast_test.php fails a
+ * literal anywhere else — which is what makes a second palette a block of values here
+ * rather than a second copy of the admin (PLAN.md D-054).
+ *
+ * Split out of admin.css when a second palette took it past the size a file is kept to;
+ * the seam is real, because this file answers one question: what colour is anything.
+ *
+ * TWO PALETTES:
+ *   .admin                              the dark Workbench, the default (D-052)
+ *   .admin[data-ui-theme="light"]       warm paper
+ *   .admin[data-ui-theme="system"]      whichever the reader's own machine is set to
+ *
+ * The attribute is written by the server from the boxlet_theme cookie, so the first paint
+ * is already right and there is no flash of the other theme. No attribute means the dark
+ * set, which is what shipped and what every install without a preference gets.
+ *
+ * Both sets are measured, ink against surface, by tests/contrast_test.php. Loaded before
+ * admin.css by the admin, the login screen and the installer. */
+
+.admin {
+  /* A dark workbench (D-052, the "Workbench" redesign after Nocturne): cool, blue-leaning
+     neutrals, one lavender accent, and nothing pure black or pure white. It replaced the
+     warm paper of D-007's first admin at the owner's choice. The values started from
+     docs/design_handoff_admin_v2/IMPLEMENTATION-boxlet.md §3 and were moved only where the
+     contrast test said so. */
+  --ui-bg: #161826;
+  /* A panel, a card, a control's own ground: one step up from the page. */
+  --ui-panel: #1a1d2b;
+  /* One step DOWN: the rail, a table's head, a well of code. On a dark ground a recess is
+     darker, not lighter. */
+  --ui-panel-sunken: #131522;
+  --ui-ink: #e9e9ed;
+  --ui-ink-muted: #a6aabb;
+  /* The quietest text there is: hints, captions, kickers. 4.5:1 against the lightest
+     surface it can meet, the success tint — anything darker fails there first (D-012). */
+  --ui-ink-faint: #8e93a5;
+  --ui-line: #2a2d3c;
+  --ui-line-strong: #3f424d;
+  /* The edge of a control that is empty at rest — a text field, the colour swatch, the
+     editor box. It has no text of its own to be found by, so its border is the only thing
+     saying it is there: 3:1 against every surface (D-012). Containers and badges keep
+     --ui-line-strong: they are not controls. Nocturne's #595d6c measured 2.6:1 on the page
+     and was raised to this. */
+  --ui-control-line: #737789;
+  /* The top and sides of a text field: soft, at the owner's request (D-038). The field is
+     still found by its BOTTOM edge, which stays --ui-control-line, so the 3:1 rule for an
+     empty control holds (D-012); tests/contrast_test.php checks every field keeps it. */
+  --ui-control-soft: #3f424d;
+
+  /* One accent, for focus, links, the current place and the primary action — a line, a
+     bar or a fill, never a flood. Buttons stay FILLED with it, where Nocturne outlines them:
+     CLAUDE.md's "no control is ever invisible at rest" is the owner's rule (D-052).
+     --ui-accent-dark is the hover, and on a dark ground a hover raises, so it is lighter. */
+  --ui-accent: #9184d9;
+  --ui-accent-dark: #b5abfc;
+  /* The accent's tint behind a current row or a chosen item. Darker than Nocturne's
+     #2b2741, which left the accent itself at 4.43:1 on it. */
+  --ui-accent-soft: #262239;
+  --ui-on-accent: #161826;
+
+  /* Colour only for problems and their resolution; a normal state stays neutral. The tints
+     are dark enough that every ink above keeps 4.5:1 on them. */
+  --ui-danger: #e8958c;
+  --ui-danger-soft: #2f1d25;
+  --ui-success: #7fb98a;
+  --ui-success-soft: #1a2923;
+  --ui-warning: #d9a85c;
+  --ui-warning-soft: #2b2419;
+
+  /* The frame: the rail, and the palette dialog that sits over the page. Darker than the
+     page, so the tool reads as a frame around the work. Its inks are measured against it
+     alone. */
+  --ui-bar: #131522;
+  --ui-bar-ink: #e9e9ed;
+  --ui-bar-ink-muted: #a6aabb;
+  --ui-bar-raised: #23263a;
+  /* WHERE YOU ARE: the ground under the current entry in the rail and in the Settings
+     sub-navigation. Quieter than the accent tint it used to borrow — the accent is spent on
+     the bar down its left edge, and the ground only has to say "this row" (D-054). Deeper
+     than its surroundings in both palettes: on paper the pale lavender read as a highlight
+     rather than a place, which is what the owner saw. */
+  --ui-current: #262239;
+  /* The brand mark's colour, the one warm pixel in the admin. Decoration only: it never
+     carries text, and it is not to spread. */
+  --ui-mark: #ff6b3d;
+
+  /* The checkerboard behind a transparent picture, in the logo pickers. LIGHT IN BOTH
+     PALETTES, and so the one pair of tokens here that does not follow the theme: a logo is
+     drawn for a light site, and on a dark board a dark logo vanishes. No text ever sits on
+     it, which is why it is not in the contrast matrix. */
+  --ui-checker: #e9e9ed;
+  --ui-checker-square: #a6aabb;
+
+  /* Elevation on a dark ground is a hairline edge and ambient darkness, never a stack of
+     shadows. */
+  --ui-shadow-s: 0 0 0 1px rgb(233 233 237 / 0.04), 0 1px 2px rgb(5 6 12 / 0.4);
+  --ui-shadow-m: 0 0 0 1px rgb(233 233 237 / 0.06), 0 12px 32px rgb(5 6 12 / 0.55);
+  --ui-ring: 0 0 0 3px rgb(145 132 217 / 0.35);
+  /* What dims the page behind a dialog. */
+  --ui-scrim: rgb(9 10 17 / 0.6);
+
+  /* The browser's own parts — scrollbars, a select's list, a date picker, a checkbox —
+     drawn dark too, or they are white holes in the page. */
+  color-scheme: dark;
+}
+
+/* WARM PAPER (D-054). The same admin by daylight: the neutrals of D-007's first admin,
+   which had years of measurement behind them, in the Workbench's roles. A panel is still a
+   step up from the page and the rail still a step down — on paper that means the rail is
+   the darker one, where on the dark ground it was the lighter.
+   Two values are not the old ones, and both were measured rather than reasoned:
+     --ui-control-line went from #8b8579 to this, which was 2.94:1 on the rail;
+     --ui-mark went from #ff6b3d to this, which was 2.27:1 on the rail — orange on paper is
+     not the same colour as orange on ink, and the handoff's "the mark stays" is true of its
+     hue, not of its value. */
+.admin[data-ui-theme="light"] {
+  --ui-bg: #f3f1ec;
+  --ui-panel: #fbfaf6;
+  --ui-panel-sunken: #eae6dd;
+  --ui-ink: #1c1b18;
+  --ui-ink-muted: #524e46;
+  --ui-ink-faint: #625d54;
+  --ui-line: #e0dbd0;
+  --ui-line-strong: #cdc6b8;
+  --ui-control-line: #848072;
+  --ui-control-soft: #d3cdc1;
+
+  /* A deep indigo, and on paper the hover SINKS: darker, where the dark theme's rises. */
+  --ui-accent: #3b3fc4;
+  --ui-accent-dark: #2d30a3;
+  --ui-accent-soft: #ecebfb;
+  --ui-on-accent: #ffffff;
+
+  --ui-danger: #b3261e;
+  --ui-danger-soft: #fcebe9;
+  --ui-success: #17643c;
+  --ui-success-soft: #e6f4ec;
+  --ui-warning: #7f5300;
+  --ui-warning-soft: #fcf3e1;
+
+  --ui-bar: #eae6dd;
+  --ui-bar-ink: #1c1b18;
+  --ui-bar-ink-muted: #524e46;
+  --ui-bar-raised: #ded9cd;
+  --ui-current: #d3ccbd;
+  --ui-mark: #d94f1e;
+
+  /* Light here too, on purpose: see the default palette. */
+  --ui-checker: #ffffff;
+  --ui-checker-square: #d3cdc1;
+
+  --ui-shadow-s: 0 1px 0 rgb(28 27 24 / 0.04), 0 1px 3px rgb(28 27 24 / 0.06);
+  --ui-shadow-m: 0 1px 2px rgb(28 27 24 / 0.06), 0 8px 24px rgb(28 27 24 / 0.08);
+  --ui-ring: 0 0 0 3px rgb(59 63 196 / 0.22);
+  --ui-scrim: rgb(28 27 24 / 0.35);
+
+  color-scheme: light;
+}
+
+/* "Match system", when the system says light. THE SAME VALUES AS THE BLOCK ABOVE, written
+   out again because plain CSS has no way to give one declaration block two selectors across
+   a media query, and Boxlet has no build step to do it for us. The two must move together;
+   tests/contrast_test.php fails if they ever differ by a character. */
+@media (prefers-color-scheme: light) {
+  .admin[data-ui-theme="system"] {
+    --ui-bg: #f3f1ec;
+    --ui-panel: #fbfaf6;
+    --ui-panel-sunken: #eae6dd;
+    --ui-ink: #1c1b18;
+    --ui-ink-muted: #524e46;
+    --ui-ink-faint: #625d54;
+    --ui-line: #e0dbd0;
+    --ui-line-strong: #cdc6b8;
+    --ui-control-line: #848072;
+    --ui-control-soft: #d3cdc1;
+
+    --ui-accent: #3b3fc4;
+    --ui-accent-dark: #2d30a3;
+    --ui-accent-soft: #ecebfb;
+    --ui-on-accent: #ffffff;
+
+    --ui-danger: #b3261e;
+    --ui-danger-soft: #fcebe9;
+    --ui-success: #17643c;
+    --ui-success-soft: #e6f4ec;
+    --ui-warning: #7f5300;
+    --ui-warning-soft: #fcf3e1;
+
+    --ui-bar: #eae6dd;
+    --ui-bar-ink: #1c1b18;
+    --ui-bar-ink-muted: #524e46;
+    --ui-bar-raised: #ded9cd;
+    --ui-current: #d3ccbd;
+    --ui-mark: #d94f1e;
+
+    --ui-checker: #ffffff;
+    --ui-checker-square: #d3cdc1;
+
+    --ui-shadow-s: 0 1px 0 rgb(28 27 24 / 0.04), 0 1px 3px rgb(28 27 24 / 0.06);
+    --ui-shadow-m: 0 1px 2px rgb(28 27 24 / 0.06), 0 8px 24px rgb(28 27 24 / 0.08);
+    --ui-ring: 0 0 0 3px rgb(59 63 196 / 0.22);
+    --ui-scrim: rgb(28 27 24 / 0.35);
+
+    color-scheme: light;
+  }
+}

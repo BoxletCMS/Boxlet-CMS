@@ -1,0 +1,167 @@
+/* The library as a table (PLAN.md D-052): a thumbnail, the file, its facts in monospace,
+ * what uses it, whether it is described, and its menu. Admin tokens only (--ui-*), defined
+ * in admin-tokens.css. The grid the picker still uses is admin-media.css. */
+
+.media-table {
+  table-layout: fixed;
+  /* A picture has to be recognisable in its row (the owner, 2026-09-27): at 38×28 it was
+     a smudge. 72×54 keeps a row short enough to read the list and large enough to tell
+     one photograph from the next; the thumb preset is 200 across, sharp at 2x. */
+  --media-tile-w: 4.5rem;
+  --media-tile-h: 3.375rem;
+}
+
+.media-table .col-thumb { inline-size: 5.5rem; }
+.media-table .col-dimensions { inline-size: 7.5rem; }
+.media-table .col-size { inline-size: 5rem; }
+.media-table .col-used { inline-size: 7rem; }
+.media-table .col-described { inline-size: 7.5rem; }
+.media-table .col-menu { inline-size: 2.5rem; }
+
+.media-row-thumb img,
+.media-row-none {
+  display: block;
+  inline-size: var(--media-tile-w);
+  block-size: var(--media-tile-h);
+  object-fit: cover;
+  background: var(--ui-panel);
+  border-radius: var(--ui-radius-s);
+  box-shadow: inset 0 0 0 1px var(--ui-line-strong);
+}
+
+/* A file for visitors (D-126): the same small tile a picture's thumbnail takes, with the
+   file's icon on it in the ink every control here is legible in. */
+.media-row-file {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.125rem;
+  inline-size: var(--media-tile-w);
+  block-size: var(--media-tile-h);
+  color: var(--ui-ink-muted);
+  background: var(--ui-panel);
+  border-radius: var(--ui-radius-s);
+  box-shadow: inset 0 0 0 1px var(--ui-line-strong);
+}
+
+/* The kind of file, large enough to tell a table from slides at a glance. */
+.media-row-file .icon {
+  inline-size: 1.375rem;
+  block-size: 1.375rem;
+}
+
+/* The extension under the icon, PDF or XLSX: the program a visitor opens it with. */
+.media-row-file-ext {
+  font-family: var(--ui-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.media-row-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Numbers, sizes and dimensions in the monospace every figure is set in. */
+.media-table .numeric {
+  color: var(--ui-ink-muted);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+  white-space: nowrap;
+}
+
+.media-used {
+  color: var(--ui-ink-muted);
+  white-space: nowrap;
+}
+
+.media-unused {
+  color: var(--ui-ink-faint);
+}
+
+.media-described {
+  color: var(--ui-ink-faint);
+}
+
+.media-table .badge {
+  margin-inline-start: 0;
+  font-size: var(--ui-text-xs);
+  text-decoration: none;
+}
+
+/* The upload, as one compact row under the table: the whole screen takes a drop, and this
+   row says so and what is accepted. */
+.media-upload-row {
+  margin-top: var(--ui-5);
+}
+
+.media-upload-row .dropzone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-2) var(--ui-3);
+  min-block-size: 0;
+  padding: var(--ui-3) var(--ui-4);
+  border: var(--ui-border) dashed var(--ui-accent);
+  border-radius: var(--ui-radius-m);
+  text-align: left;
+}
+
+.media-upload-row .dropzone .icon {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  color: var(--ui-accent-dark);
+}
+
+.media-upload-row .dropzone-limits {
+  margin-inline-start: auto;
+  color: var(--ui-ink-faint);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+/* Something is being dragged over the screen: the whole column says it will take it. */
+.admin-main.is-dropping {
+  background-color: var(--ui-accent-soft);
+  outline: 2px dashed var(--ui-accent);
+  outline-offset: -0.5rem;
+}
+
+/* Fifty rows a page, and the way to the others (the owner, 2026-09-27). */
+.media-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-3);
+  margin-block-start: var(--ui-5);
+}
+
+.media-pager-where {
+  color: var(--ui-ink-muted);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+@media (max-width: 47.5rem) {
+  /* On a phone a row keeps what it is and what it is missing: the picture, its name,
+     its description and its menu. The size goes with the dimensions and the use, and the
+     tile shrinks, or the name — the one thing a row cannot lose — is squeezed to nothing. */
+  .media-table {
+    --media-tile-w: 3.5rem;
+    --media-tile-h: 2.625rem;
+  }
+
+  .media-table .col-thumb { inline-size: 4.25rem; }
+
+  .media-table .col-dimensions,
+  .media-table .col-size,
+  .media-table .col-used,
+  .media-table td:nth-child(3),
+  .media-table td:nth-child(4),
+  .media-table td:nth-child(5) {
+    display: none;
+  }
+}

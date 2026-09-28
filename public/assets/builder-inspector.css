@@ -1,0 +1,477 @@
+/* WHY :is(.panel-block, .panel-section). The panel holds two kinds of group since D-099 —
+   a block's own fields and the band it stands in — and every rule below dresses a group's
+   fields: the grid, the labels, the hints, the controls. They were written when there was
+   one kind. Naming both is the honest repair; giving the section group the block's class
+   would have been shorter and would have said, in the markup, that a band is a block. */
+
+/* The inspector: the panel beside the canvas, the block library, and the selected
+ * block's own fields. Split out of builder.css, which keeps the editor shell — the
+ * toolbar, the canvas and the frame around them. Admin tokens only (--ui-*).
+ *
+ * The panel is about 26rem of usable width, which is why so much of this narrows or
+ * unstacks what the fallback editor lays out wide.
+ */
+
+/* Page settings: a short fixed form above the library. */
+
+/* Folded by default (D-040): a summary line with a chevron, the fields when opened. On a
+   light grey ground of its own, title included, so it reads as one box apart from the
+   block being edited below it. --ui-bg, which every admin ink is measured against. */
+.panel-page {
+  padding: var(--ui-2) var(--ui-4);
+  background: var(--ui-bg);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.panel-page[open] {
+  padding-bottom: var(--ui-4);
+}
+
+.panel-page > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--ui-1);
+  font-family: var(--ui-font-display);
+  font-size: var(--ui-text-base);
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+
+.panel-page > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The chevron, drawn: it turns when the section is open. */
+.panel-page > summary::after {
+  content: "";
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-right: 2px solid var(--ui-ink-muted);
+  border-bottom: 2px solid var(--ui-ink-muted);
+  transform: rotate(45deg);
+  transition: transform 120ms ease;
+}
+
+.panel-page[open] > summary::after {
+  transform: rotate(225deg);
+}
+
+.panel-page-fields {
+  display: grid;
+  gap: var(--ui-4);
+  margin-top: var(--ui-4);
+}
+
+.panel-page .field input,
+.panel-page .field select {
+  max-inline-size: none;
+}
+
+.builder-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-4);
+  overflow-y: auto;
+  padding: var(--ui-4);
+  background: var(--ui-panel);
+  border-left: var(--ui-border) solid var(--ui-line);
+}
+
+.panel-library h2,
+.panel-header h2 {
+  margin: 0;
+  font-size: var(--ui-text-base);
+}
+
+/* CONTENT AND SECTION (D-086). Every control is legible at rest, pressed or not: the
+   unpressed tab is ordinary text on the panel and the pressed one carries the accent and
+   an underline, so which is which is readable without hovering anything.
+
+   The rules below hide one half of the field group, and they hang off the panel rather
+   than off the group so the SAME group markup serves the plain editor untouched. Without a
+   script nothing sets data-panel-tab, nothing matches, and both halves show. */
+.panel-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-2);
+  margin-block: var(--ui-2);
+  border-bottom: var(--ui-border) solid var(--ui-line);
+}
+
+.panel-tablist {
+  display: flex;
+  gap: var(--ui-1);
+}
+
+.panel-tab {
+  padding: var(--ui-2) var(--ui-3);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--ui-ink-muted);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.panel-tab:hover {
+  color: var(--ui-ink);
+}
+
+.panel-tab[aria-selected="true"] {
+  color: var(--ui-accent);
+  border-bottom-color: var(--ui-accent);
+}
+
+/* THE TWO HALVES OF THE PANEL (D-086), now two GROUPS rather than two halves of one
+   (D-099): the block's own fields, and the band it stands in. The band's group is rendered
+   once however many blocks stand in it, so this hides a whole group rather than reaching
+   inside one to hide a part of it. */
+.builder[data-panel-tab="content"] .panel-sections,
+.builder[data-panel-tab="section"] .panel-blocks {
+  display: none;
+}
+
+/* Without a script neither tab is pressed and both show, which is the panel drawn as the
+   plain editor draws it — the rule the tab strip has followed since D-086. */
+.builder:not([data-panel-tab]) .panel-sections,
+.builder:not([data-panel-tab]) .panel-blocks {
+  display: block;
+}
+
+/* It sits on the tab row's rule, so it must not look like a tab that is pressed. */
+.panel-tabs .hints-toggle {
+  margin-block-end: var(--ui-1);
+}
+
+/* Behind its own tab the style is not a thing to unfold: the tab already did that. */
+.builder[data-panel-tab] .panel-section [data-panel-part="section"] > summary {
+  display: none;
+}
+
+.panel-library .hint {
+  margin-bottom: var(--ui-3);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  padding-bottom: var(--ui-3);
+  border-bottom: var(--ui-border) solid var(--ui-line);
+}
+
+.panel-header h2 {
+  flex: 1;
+}
+
+/* The library: one column, so each preview is wide enough to read as a page rather
+   than as a thumbnail. */
+.library-grid {
+  display: grid;
+  gap: var(--ui-3);
+}
+
+.library-card {
+  display: grid;
+  gap: var(--ui-2);
+  padding: var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.library-card:hover {
+  border-color: var(--ui-accent);
+  box-shadow: var(--ui-shadow-s);
+}
+
+.library-card[aria-busy="true"] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* The preview renders at desktop width and is scaled down, so the card shows the block
+   as a visitor sees it rather than as a narrow phone layout.
+
+   THE CARD IS AS TALL AS THE BLOCK. It was a fixed 16/9 window, so a Text block drew 201px
+   of block and 692px of empty document, and every card was the same size whatever it held
+   — which loses the one thing a picture of a block can say that its name cannot: how much
+   room it takes. builder-library.js measures the rendered block and sets --library-block;
+   without it every card keeps the min-block-size, which is short and the same for all.
+
+   One scale, named once: it sets how wide the preview's viewport is (100% / scale) and
+   how much of the measured block a pixel of card is worth. */
+.library-frame {
+  --library-scale: 0.4;
+  position: relative;
+  display: block;
+  overflow: hidden;
+  block-size: calc(var(--library-block, 14rem) * var(--library-scale));
+  min-block-size: 3.5rem;
+  max-block-size: 14rem;
+  background: var(--ui-panel-sunken);
+  border-radius: var(--ui-radius-s);
+}
+
+.library-frame iframe {
+  position: absolute;
+  inset: 0 auto auto 0;
+  inline-size: calc(100% / var(--library-scale));
+  block-size: calc(100% / var(--library-scale));
+  border: 0;
+  transform: scale(var(--library-scale));
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+/* A block taller than the card is cut off, and a cut through a line of text reads as
+   damage. It fades out instead, so the edge says "there is more" rather than "this broke".
+   The gradient is the panel's own surface, never a literal.
+
+   ONLY WHEN THERE IS SOMETHING TO CUT. Drawn unconditionally it covered most of a short
+   card — the Text card is 3.5rem tall and the fade was 2.5rem of it — so five cards that
+   fitted perfectly well all looked like they were dissolving. builder-library.js marks the
+   frames that actually overflow. */
+.library-frame[data-cut]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  block-size: 1.5rem;
+  background: linear-gradient(to bottom, transparent, var(--ui-panel));
+  pointer-events: none;
+}
+
+/* The name carries the block's own icon (D-084): declared in every definition since the
+   first one and drawn nowhere until now. It is decoration beside text that already says the
+   same thing, so it is hidden from assistive technology by icon() itself. */
+.library-name {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  font-weight: 550;
+}
+
+.library-name .icon {
+  flex: none;
+  color: var(--ui-ink-muted);
+}
+
+/* One line saying what the block is FOR. The picture shows its shape and the name labels it;
+   neither says when to reach for it, which is the question somebody scrolling a library is
+   actually asking. */
+.library-summary {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  line-height: 1.35;
+}
+
+:is(.panel-block, .panel-section) .block-editor {
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* The panel header already names the selected block; the group's own legend would say
+   it a second time, two lines below. */
+:is(.panel-block, .panel-section) .block-editor-legend {
+  display: none;
+}
+
+/* The fallback editor reorders blocks by dragging their headers, and moves and removes
+   them by submitting the form. Here the canvas does both without a round trip, so those
+   controls would either do nothing or throw the user back into the plain editor. The
+   panel header carries the visual editor's own. */
+:is(.panel-block, .panel-section) .drag-handle,
+:is(.panel-block, .panel-section) .block-editor-controls {
+  display: none;
+}
+
+/* Earlier versions (D-088). A line is a time and a way back, and the way back is a real
+   button with a border, not a word that only looks like one when the pointer is near it. */
+/* Shown whether hints are on or off: it says what Restore does, not what a field means. */
+.history-note {
+  margin: var(--ui-2) 0 0;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  line-height: 1.45;
+}
+
+.history-list {
+  display: grid;
+  gap: var(--ui-1);
+  margin: var(--ui-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-2);
+  padding-block: var(--ui-1);
+}
+
+.history-when {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-1);
+  padding-block: var(--ui-3);
+}
+
+.panel-actions .button {
+  font-size: var(--ui-text-sm);
+}
+
+/* One field group should read as one thing. Without real space between groups, a help
+   text and the next group's label sit together and the panel becomes a single wall.
+   The layout is declared here because gap needs a grid to apply to, and the rule that
+   provides one (.block-body { display: grid }) lives in admin-pages.css, which belongs
+   to the plain editor and which the builder does not load. Measured before this line
+   existed: display block, the fields 0px apart with a 32px gap doing nothing. */
+:is(.panel-block, .panel-section) .block-body {
+  display: grid;
+  padding-inline: 0;
+  gap: var(--ui-6);
+}
+
+:is(.panel-block, .panel-section) .field > label,
+:is(.panel-block, .panel-section) .field > .field-label {
+  font-size: var(--ui-text-sm);
+  letter-spacing: 0.01em;
+}
+
+:is(.panel-block, .panel-section) .field .hint {
+  font-size: var(--ui-text-xs);
+  line-height: 1.45;
+}
+
+/* Rich text needs more room than anything else on this panel. */
+:is(.panel-block, .panel-section) .field textarea {
+  min-block-size: 9rem;
+}
+
+:is(.panel-block, .panel-section) .field textarea[rows="8"] {
+  min-block-size: 17rem;
+}
+
+/* The panel is narrow: two-column field rows do not fit in it.
+
+   display and gap are set here for the same reason .block-body's are above: they live in
+   admin-pages.css, which the builder does not load, so only grid-template-columns was
+   arriving and the grid it templates never existed. It did not show while the style was a
+   folded <details> at the foot of a long scroll; behind its own tab (D-086) it did, as six
+   controls with every hint touching the next field's label. */
+:is(.panel-block, .panel-section) .field-row,
+:is(.panel-block, .panel-section) .block-style-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ui-6);
+}
+
+:is(.panel-block, .panel-section) .field input,
+:is(.panel-block, .panel-section) .field select,
+:is(.panel-block, .panel-section) .field textarea {
+  max-inline-size: none;
+}
+
+@media (max-width: 64rem) {
+  .builder-panel {
+    border-left: 0;
+    border-top: var(--ui-border) solid var(--ui-line);
+  }
+}
+
+/* A stale block's notice (D-043, step 3): what changed in the original, folded, with the
+   button that records the block as current. */
+.stale-notice {
+  display: grid;
+  gap: var(--ui-2);
+  margin-block-end: var(--ui-3);
+}
+
+.stale-notice p {
+  margin: 0;
+}
+
+.stale-original dl {
+  display: grid;
+  gap: var(--ui-1) var(--ui-3);
+  margin: var(--ui-2) 0 0;
+}
+
+.stale-original dt {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+.stale-original dd {
+  margin: 0 0 var(--ui-2);
+}
+
+.stale-notice .button {
+  justify-self: start;
+}
+
+/* FINDING A BLOCK (PLAN.md D-104): a filter and a row of shelves over the same cards. */
+
+/* IT IS A FIELD, so it says so and wears what every admin field wears (PLAN.md D-108).
+   It carried only a width, so it fell through to the browser's own input: a pale box with a
+   hairline border in a dark panel, with no focus ring and no placeholder colour, because
+   admin-forms.css scopes all of that to `.field input`. The owner spotted it at a glance —
+   "filter input nije u stilu". Marking the wrapper rather than copying the declarations:
+   one definition of what an admin input looks like, not two that drift. `.field` already
+   carries the same `display: grid` and gap this rule used to declare for itself. */
+.library-find {
+  margin-block-end: var(--ui-3);
+}
+
+.library-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-1);
+}
+
+/* Visible at rest, every one of them: a shelf nobody can see is a shelf nobody presses. */
+.library-group {
+  padding: var(--ui-1) var(--ui-2);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: 999rem;
+  background: none;
+  color: var(--ui-ink-muted);
+  font: inherit;
+  font-size: var(--ui-text-xs);
+  cursor: pointer;
+}
+
+.library-group:hover,
+.library-group:focus-visible {
+  border-color: var(--ui-line-strong);
+  color: var(--ui-ink);
+}
+
+/* The one that is on, said twice: the fill AND the ink, so it is not a colour alone. */
+.library-group[aria-pressed="true"] {
+  border-color: var(--ui-accent);
+  background: var(--ui-accent-soft);
+  color: var(--ui-ink);
+}
+
+.library-none {
+  margin-block: 0 var(--ui-3);
+}

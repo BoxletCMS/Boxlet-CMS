@@ -1,0 +1,310 @@
+/* The page blocks' own styles: text, image and text, columns, form. Split out of site.css,
+   which keeps the page and what every block shares, when the two together passed the size
+   limit. The same rule: only custom properties from tokens.css and the --section-*
+   properties each section sets in sections.css. No literal colours, pixel values, fonts or
+   shadows. Linked straight after site.css, the order these rules had in it.
+
+   The nine blocks D-105 added are in blocks-words.css and blocks-media.css, linked straight
+   after this one: together they passed the hard size limit (PLAN.md D-117), and those nine
+   are the seam — they arrived together and share nothing with the five above. The hero is
+   blocks-hero.css, linked straight BEFORE this one, where its rules stood (D-118). */
+
+/* Text and image-text */
+
+.text-heading,
+.image-text-heading {
+  margin: 0 0 var(--space-m);
+  font-size: var(--text-2xl);
+}
+
+.layout-columns .richtext {
+  columns: 2;
+  column-gap: var(--space-xl);
+}
+
+.image-text {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  align-items: center;
+}
+
+.layout-image-right .image-text-media {
+  order: 2;
+}
+
+.fit-contain .media-placeholder {
+  aspect-ratio: 16 / 9;
+}
+
+/* A real picture is held to its column exactly as the placeholder is. Without this an
+   <img> renders at its intrinsic size — the wide variant is twelve hundred across — and in
+   a 1fr 1fr grid it pushes the text track off the page entirely. That could not happen
+   while every block drew a CSS-sized placeholder <div>, which is why it appeared only when
+   pictures did. (The size is spelt out because blocks_test forbids a px literal anywhere
+   in this file, comments included.)
+
+   The fit- classes name what the owner chose: cover fills the area and crops, contain
+   shows the whole picture. They match the placeholder's aspect ratios so a section does
+   not change height when a picture is chosen for it. */
+.image-text-media img,
+.hero-media img {
+  display: block;
+  max-inline-size: 100%;
+  inline-size: 100%;
+  block-size: auto;
+  border-radius: var(--radius-l);
+}
+
+.fit-cover .image-text-media img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.fit-contain .image-text-media img {
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+/* Columns (PLAN.md D-008)
+
+   The layout is how many columns share a row; more items start a new row on the same
+   grid. minmax(0, 1fr) rather than 1fr, so a long word or a picture's intrinsic width
+   cannot push one column wider than the others. */
+
+.columns-head {
+  margin-block-end: var(--space-l);
+}
+
+.columns-heading {
+  margin: 0;
+  font-size: var(--text-2xl);
+}
+
+.columns-intro {
+  max-inline-size: var(--container-narrow);
+  margin: var(--space-s) 0 0;
+  color: var(--section-muted);
+  /* Body size, not the hero's larger subheading: under Minimal's tight scale on a phone
+     the larger size came out as big as the block's own heading, and the introduction
+     read as the title. */
+  font-size: var(--text-base);
+}
+
+.align-center .columns-intro {
+  margin-inline: auto;
+}
+
+.columns-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-xl) var(--space-l);
+}
+
+.layout-two .columns-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.layout-four .columns-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-l) var(--space-m);
+}
+
+.columns-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.columns-media {
+  margin-block-end: var(--space-xs);
+}
+
+/* One shape for every picture in the block, so a row lines up whatever was uploaded. */
+.columns-media img,
+.columns-media .media-placeholder {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius-l);
+}
+
+.shape-square .columns-media img,
+.shape-square .columns-media .media-placeholder {
+  aspect-ratio: 1;
+}
+
+/* A portrait: smaller than the column, so a row of people reads as faces rather than as a
+   wall of photographs, and centred on the column when the section is. Cut to a circle
+   rather than rounded: a circle is a shape, not the character's radius, and border-radius
+   here may only take a token. */
+.shape-round .columns-media img,
+.shape-round .columns-media .media-placeholder {
+  inline-size: 60%;
+  aspect-ratio: 1;
+  clip-path: circle(50%);
+}
+
+.align-center .shape-round .columns-media img,
+.align-center .shape-round .columns-media .media-placeholder {
+  margin-inline: auto;
+}
+
+.columns-item-heading {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.columns-link {
+  margin: auto 0 0;
+  padding-block-start: var(--space-xs);
+  font-weight: var(--heading-weight);
+}
+
+/* Four in a row needs more room than a tablet gives it: two rows of two instead. */
+@media (max-width: 64rem) {
+  .layout-four .columns-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Form (PLAN.md D-046)
+
+   Fields in the section's own colours, so a form reads on a plain section and a contrast
+   one alike: the field is the section's background with an edge in its text colour. */
+
+.form-block-head {
+  margin-block-end: var(--space-l);
+}
+
+.form-block-heading {
+  margin: 0;
+  font-size: var(--text-2xl);
+}
+
+.form-block-intro {
+  max-inline-size: var(--container-narrow);
+  margin: var(--space-s) 0 0;
+  color: var(--section-muted);
+}
+
+.layout-beside .form-block {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.site-form {
+  display: grid;
+  gap: var(--space-m);
+  max-inline-size: var(--container-narrow);
+}
+
+.align-center .site-form {
+  margin-inline: auto;
+  text-align: start;
+}
+
+/* Beside its heading the form has a column of its own, and fills it: held to the reading
+   measure and centred there as well, it came out a narrow strip in the middle of the
+   column, measured at a sixth of the section's width. */
+.layout-beside .site-form {
+  max-inline-size: none;
+  margin-inline: 0;
+}
+
+.site-form-field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.site-form-field > label {
+  font-weight: var(--heading-weight);
+}
+
+.site-form-optional {
+  color: var(--section-muted);
+  font-weight: var(--body-weight);
+}
+
+.site-form input:not([type="checkbox"]),
+.site-form select,
+.site-form textarea {
+  inline-size: 100%;
+  box-sizing: border-box;
+  padding: var(--space-s) var(--space-m);
+  color: var(--section-text);
+  background: var(--section-bg);
+  /* The muted text colour, which is checked at 4.5:1 on every surface: an empty field is
+     a control, and its edge is all that shows it is there (CLAUDE.md). */
+  border: var(--border-width) solid var(--section-muted);
+  border-radius: var(--radius-m);
+  font: inherit;
+}
+
+.site-form input:focus-visible,
+.site-form select:focus-visible,
+.site-form textarea:focus-visible {
+  outline: var(--border-width) solid var(--section-link);
+  outline-offset: var(--border-width);
+}
+
+.site-form-check label {
+  display: flex;
+  gap: var(--space-s);
+  align-items: baseline;
+}
+
+.site-form-error,
+.site-form-alert {
+  margin: 0;
+  font-weight: var(--heading-weight);
+}
+
+/* The honeypot: out of sight and out of reach, never display: none, which some scripts
+   read as "leave this one empty". */
+.site-form-trap {
+  position: absolute;
+  inline-size: 0.0625rem;
+  block-size: 0.0625rem;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.site-form-actions {
+  margin: 0;
+}
+
+.form-block-sent {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--heading-weight);
+}
+
+@media (max-width: 40rem) {
+  .layout-split .hero,
+  .image-text {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-image-right .image-text-media {
+    order: 0;
+  }
+
+  .layout-columns .richtext {
+    columns: 1;
+  }
+
+  .columns-grid,
+  .layout-two .columns-grid,
+  .layout-four .columns-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .layout-beside .form-block {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

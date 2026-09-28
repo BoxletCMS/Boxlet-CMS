@@ -1,0 +1,139 @@
+/* Visit statistics (PLAN.md D-051): the trend chart, an SVG drawn by
+ * App\Modules\Stats\Chart; its colours are here, by class, never in the markup. Split from
+ * admin-stats.css when that passed the size limit. Admin tokens only (--ui-*), defined in
+ * admin-tokens.css. */
+
+/* The trend. */
+.stats-trend {
+  margin-bottom: var(--ui-5);
+}
+
+.stats-trend-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ui-2) var(--ui-4);
+  margin-bottom: var(--ui-4);
+}
+
+.stats-trend-head h2 {
+  margin: 0;
+}
+
+.stats-legend {
+  display: flex;
+  gap: var(--ui-4);
+  margin: 0;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+.stats-key::before {
+  content: "";
+  display: inline-block;
+  inline-size: 1rem;
+  block-size: 0.1875rem;
+  margin-right: var(--ui-2);
+  vertical-align: middle;
+  border-radius: var(--ui-radius-s);
+}
+
+.stats-key-visitors::before {
+  background: var(--ui-accent);
+}
+
+.stats-key-views::before {
+  background: var(--ui-control-line);
+}
+
+/* The numbers on the left are HTML, so they keep their size on a phone; the SVG beside
+   them stretches to fill the rest. */
+.stats-chart-plot {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  /* One row exactly as tall as the plot. An auto row takes the SVG's own proportions —
+     a 100 by 100 viewBox is as tall as it is wide — and measured 1226px inside 256. */
+  grid-template-rows: minmax(0, 1fr);
+  gap: var(--ui-3);
+  block-size: 16rem;
+}
+
+.stats-chart-y {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* Half a line above and below, so each number sits on its gridline. */
+  margin: -0.5em 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: right;
+}
+
+.stats-chart-lines {
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+}
+
+.stats-grid {
+  stroke: var(--ui-line);
+  stroke-width: 1;
+}
+
+.stats-area {
+  fill: var(--ui-accent-soft);
+}
+
+.stats-line-visitors {
+  fill: none;
+  stroke: var(--ui-accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.stats-line-views {
+  fill: none;
+  stroke: var(--ui-control-line);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  stroke-linejoin: round;
+}
+
+.stats-hit {
+  fill: transparent;
+}
+
+.stats-hit:hover {
+  fill: var(--ui-line);
+  fill-opacity: 0.35;
+}
+
+.stats-chart-x {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--ui-2);
+  padding-left: calc(3rem + var(--ui-3));
+  color: var(--ui-ink-faint);
+  font-size: var(--ui-text-xs);
+}
+
+.stats-numbers {
+  margin-top: var(--ui-4);
+}
+
+.stats-numbers summary {
+  color: var(--ui-accent);
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stats-numbers .stats-table {
+  margin-top: var(--ui-3);
+  max-inline-size: 28rem;
+}

@@ -1,0 +1,185 @@
+/* Front-end base: the page as a sheet and what every block shares. The blocks' own rules
+   are in blocks.css, the header and footer in chrome.css. Only custom properties: layer 1
+   from tokens.css and the --section-* properties each section sets in sections.css
+   (layer 2). No literal colours, pixel values, fonts or shadows. */
+
+/* The page as a sheet (PLAN.md D-031)
+
+   body carries what is AROUND the page and .page carries the page. The inset is one token:
+   zero when the design is not boxed, so the surrounding colour is never visible and no text
+   can sit on it — which is what keeps the palette's contrast guarantee intact without
+   adding a single pair to it.
+
+   Fallbacks name the old behaviour, so a site whose stylesheet predates these tokens
+   renders exactly as it did. */
+body {
+  margin: 0;
+  color: var(--color-text);
+  background: var(--page-bg, var(--color-background));
+  font-family: var(--font-body);
+  font-weight: var(--body-weight);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+/* The page is what surrounds the sheet; the frame is the room between them; the sheet is
+   the page itself (D-067). When the design is not boxed the frame is zero and the sheet
+   fills the window, so these three are one box and nothing here is conditional. */
+.page-frame {
+  /* Above and below, then the sides (D-116): two tokens, so the chrome that breaks out of
+     the sheet can be glued to it while the sides keep their margin. */
+  padding: var(--page-frame-block, var(--page-frame, 0)) var(--page-frame, 0);
+}
+
+.page-sheet {
+  /* A boxed page is a box of a width, centred (D-116); `none` when the page is not boxed,
+     so the sheet fills the window as it always did. */
+  max-inline-size: var(--page-sheet-width, none);
+  margin-inline: auto;
+  background: var(--page-sheet, var(--color-background));
+  border-radius: var(--page-sheet-radius, 0);
+  box-shadow: var(--page-sheet-shadow, none);
+  /* clip, not hidden: a corner has to cut the section under it, and `hidden` would make
+     this a scroll container and stop a sticky header sticking. */
+  overflow: clip;
+}
+
+
+.container {
+  max-width: var(--container-width);
+  margin-inline: auto;
+  padding-inline: var(--space-l);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
+  text-transform: var(--heading-transform);
+  line-height: var(--leading-heading);
+}
+
+a {
+  color: var(--section-link, var(--color-link));
+  text-decoration-thickness: var(--border-width);
+  text-underline-offset: 0.18em;
+}
+
+code {
+  padding: 0 var(--space-xs);
+  background: var(--color-surface);
+  border-radius: var(--radius-s);
+}
+
+.not-found {
+  padding-block: var(--space-2xl);
+}
+
+.not-found h1 {
+  font-size: var(--text-3xl);
+}
+
+.meta {
+  color: var(--color-muted);
+}
+
+.locale-switcher {
+  display: flex;
+  gap: var(--space-m);
+  padding-block: var(--space-l);
+}
+
+.locale-switcher [aria-current] {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* Shared parts of blocks */
+
+.button {
+  display: inline-block;
+  padding: var(--space-s) var(--space-l);
+  color: var(--section-button-text);
+  background: var(--section-button-bg);
+  border: var(--border-card) solid var(--section-text);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-s);
+  font-weight: var(--heading-weight);
+  text-decoration: none;
+}
+
+/* Tinted and outlined from the section's own text colour (see --section-placeholder in
+   sections.css), so it stays visible on a pale surface and on a dark one alike. A fill
+   picked to suit one surface reads as a hole on another. */
+.media-placeholder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--section-placeholder);
+  border: var(--border-width) solid var(--section-placeholder-edge);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-m);
+}
+
+/* A FLAT RECTANGLE READS AS DAMAGE; A RECTANGLE WITH A PICTURE IN IT READS AS A PICTURE
+   AREA (PLAN.md D-083). It is the same difference as between a blank frame on a wall and a
+   hole in it, and it matters most in the library, where a preview at two fifths of size
+   showed nothing but a grey slab where every block's picture goes.
+
+   Drawn as a MASK filled from the section's own token, never as a coloured image: the
+   glyph then takes the colour of whatever surface it lands on, which is the rule the whole
+   front end follows. One declaration serves the page, the canvas and the library preview,
+   because all three render the same block through this same class. */
+.media-placeholder::before {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  inline-size: min(2.5rem, 24%);
+  aspect-ratio: 1;
+  background: var(--section-placeholder-edge);
+  -webkit-mask: var(--placeholder-glyph) center / contain no-repeat;
+  mask: var(--placeholder-glyph) center / contain no-repeat;
+}
+
+.richtext > :first-child {
+  margin-top: 0;
+}
+
+.richtext > :last-child {
+  margin-bottom: 0;
+}
+
+.richtext h2 {
+  font-size: var(--text-xl);
+}
+
+.richtext h3 {
+  font-size: var(--text-lg);
+}
+
+/* The third level a rich text field can hold (PLAN.md D-016). It sits at body size and is
+   told apart by the heading family, weight and tracking the rule above gives it, so the
+   character decides how far it stands out rather than a size chosen here. */
+.richtext h4 {
+  font-size: var(--text-base);
+}
+
+.richtext blockquote {
+  margin-inline: 0;
+  padding-inline-start: var(--space-m);
+  border-inline-start: var(--border-width) solid var(--section-link);
+  font-size: var(--text-lg);
+}
+
+@media (max-width: 40rem) {
+  /* A boxed page keeps a sliver of its frame on a phone rather than the whole of it:
+     measured, Soft's frame took 144 of a 390-pixel screen and left the header 150 to
+     draw in. min() leaves an unboxed page (frame 0) exactly as it was. */
+  .page-frame {
+    padding: min(var(--page-frame-block, var(--page-frame, 0rem)), 3vw) min(var(--page-frame, 0rem), 3vw);
+  }
+}

@@ -1,0 +1,54 @@
+/* A form's edit screen (PLAN.md D-046): its fields as a numbered list of cards, each with
+   its label, kind and whether it is required on one line, its choices under it when it is
+   a list, and its own move and remove buttons. */
+
+.form-fields {
+  display: grid;
+  gap: var(--ui-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: form-field;
+}
+
+.form-field {
+  display: grid;
+  gap: var(--ui-3);
+  padding: var(--ui-4);
+  background: var(--ui-bg);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  counter-increment: form-field;
+}
+
+.form-field-main {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--ui-3);
+}
+
+.form-field-main > .field > label::before {
+  content: counter(form-field) ". ";
+  color: var(--ui-ink-muted);
+}
+
+.form-field-main > .field + .field > label::before {
+  content: none;
+}
+
+.form-field-required {
+  padding-block-end: var(--ui-2);
+  white-space: nowrap;
+}
+
+.form-field-actions {
+  display: flex;
+  gap: var(--ui-1);
+}
+
+@media (max-width: 40rem) {
+  .form-field-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

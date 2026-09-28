@@ -1,0 +1,168 @@
+/* The picture picker: the library's own cards, in a panel over the field.
+   Admin tokens only (--ui-*).
+
+   Split out of admin-media.css, which had grown past the 300-line rule. The seam is a real
+   one rather than a convenience: admin-media.css dresses the library SCREEN, while this is
+   a CONTROL that appears inside the page editors. Both editors load this and admin-media.css
+   — the card styles live there and one definition of a card is worth more than a shorter
+   include list.
+
+   media-picker.js builds every element below. Without JavaScript none of it exists and the
+   select underneath is the control (tests/editor_test.php). */
+
+.media-picker {
+  position: relative;
+  /* Allowed narrower than the chosen picture's whole name, which then truncates below.
+     As a grid item it otherwise sized itself to that name: on a phone the Branding logo
+     field, "logo-svejedobro-opt" beside a wide thumbnail, pushed the Settings screen two
+     pixels past the edge. */
+  min-inline-size: 0;
+}
+
+/* A legible resting state that reads as a CHOOSER, not as a text field somebody has typed
+   into. It carries the chosen picture's thumbnail, its name, and the verb for what pressing
+   it does — with "No picture" as a state of its own rather than a word sitting in a box.
+   The first version showed the bare filename and was mistaken for an input.
+
+   --ui-control-line, not --ui-line-strong: with no picture this control is empty at rest,
+   its border is the only thing saying it is there, and line-strong measured 1.55:1 against
+   the panel (PLAN.md D-012, which asks 3:1 for exactly this case). */
+.media-picker-current {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-3);
+  inline-size: 100%;
+  padding: var(--ui-2) var(--ui-3);
+  border-color: var(--ui-control-line);
+  text-align: start;
+}
+
+/* The thumbnail, or the square that stands where one would be. Fixed size either way, so
+   choosing and clearing a picture never moves the fields below it. */
+.media-picker-thumb {
+  flex: none;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  object-fit: cover;
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-s);
+}
+
+/* A logo's preview: the whole picture fitted into a wider box, never cropped to a square
+   (D-038). A wide logo is read as the logo, not as its middle letters. */
+.media-picker-thumb-whole {
+  inline-size: 6rem;
+  object-fit: contain;
+  padding: var(--ui-1);
+  box-sizing: border-box;
+  /* On a light checkerboard, the sign of a transparent picture: a logo is usually drawn
+     for a light site, and on the dark admin (D-052) a dark one vanished into its box. The
+     board keeps its own tokens because it stays light in both palettes — drawn in the ink
+     colours, it turned into a black-and-grey block the moment the admin went to paper
+     (D-054). */
+  background-color: var(--ui-checker);
+  background-image: conic-gradient(var(--ui-checker-square) 25%, transparent 0 50%,
+      var(--ui-checker-square) 0 75%, transparent 0);
+  background-size: 0.5rem 0.5rem;
+}
+
+/* Truncated, never broken. With overflow-wrap: anywhere — which the old text-only button
+   could afford — a long name in a narrow column wrapped to ONE CHARACTER PER LINE and the
+   control became a tall thin ladder of letters. Measured in the section style panel. */
+.media-picker-name {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The section style panel is a row of narrow columns sized for a <select>. A control that
+   carries a thumbnail, a name AND a verb does not fit one, so the background picture takes
+   the whole width of the grid rather than being squeezed into a twelfth of it. */
+.block-style-grid .block-style-picture {
+  grid-column: 1 / -1;
+}
+
+/* "No picture" is a state, not a filename: said in the muted ink so a real name reads as
+   the stronger of the two. */
+.media-picker-empty .media-picker-name {
+  color: var(--ui-ink-muted);
+}
+
+/* The verb. Kept to the end of the control so the eye finds the picture first and what it
+   can do second. */
+.media-picker-verb {
+  flex: none;
+  color: var(--ui-accent);
+  font-weight: 550;
+}
+
+.media-picker-panel {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc(100% + var(--ui-1));
+  z-index: 20;
+  display: grid;
+  gap: var(--ui-2);
+  padding: var(--ui-3);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-m);
+}
+
+.media-picker-search {
+  inline-size: 100%;
+}
+
+.media-picker-none {
+  justify-self: start;
+}
+
+/* Bounded, so a library of two hundred pictures cannot push the panel off the screen. */
+.media-picker-results {
+  max-block-size: 20rem;
+  overflow-y: auto;
+}
+
+.media-picker-results[aria-busy="true"] {
+  opacity: 0.6;
+}
+
+/* Inside the panel the column is narrow, so the grid packs tighter than on the library
+   screen. auto-fill for the same reason it is used there: two pictures should not stretch
+   to fill a row. */
+.media-grid-picking {
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  gap: var(--ui-2);
+}
+
+.media-grid-picking .media-card {
+  padding: var(--ui-2);
+}
+
+.media-grid-picking .media-facts {
+  display: none;
+}
+
+/* In the picker a card is a button, not a link. Without this reset it arrives wearing the
+   browser's default button chrome — grey, centred, its own font — inside a card that is
+   already a surface of its own. */
+.media-grid-picking .media-card-link {
+  appearance: none;
+  inline-size: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.media-grid-picking .media-card-link:focus-visible {
+  outline: var(--ui-border) solid var(--ui-accent);
+  outline-offset: 2px;
+}

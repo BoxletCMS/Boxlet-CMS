@@ -1,0 +1,93 @@
+/*
+ * The crop dialog (PLAN.md D-026). Loaded only on one picture's screen, alongside
+ * vendor/cropper.min.css.
+ *
+ * Split from admin-media.css, which passed 300 lines when this arrived. The seam is the
+ * one that file already names: admin-picker.css dresses a control, admin-media.css dresses
+ * the library screen, and this dresses a dialog that appears on one screen and loads the
+ * 38KB of Cropper with it. Keeping it here means the library listing carries neither.
+ *
+ * Cropper draws the box and the handles itself from its own stylesheet, which stays
+ * exactly upstream. Everything here is Boxlet's: the panel around it, the row of shapes,
+ * and the two buttons.
+ */
+
+.media-crop {
+  display: grid;
+  gap: var(--ui-4);
+  margin-top: var(--ui-5);
+  padding: var(--ui-4);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.media-crop h2 {
+  margin: 0;
+  font-size: var(--ui-text-lg);
+}
+
+/* Bounded, or a tall photograph pushes the buttons off the screen and the dialog has to be
+   scrolled before it can be used. */
+.media-crop-stage {
+  max-block-size: 60vh;
+  overflow: hidden;
+}
+
+.media-crop-stage img {
+  display: block;
+  max-inline-size: 100%;
+}
+
+.media-crop-shapes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+  align-items: center;
+}
+
+/* Every shape is legible at rest: the chosen one is filled, the rest keep a visible edge.
+   Hover and focus RAISE them; they never reveal them (CLAUDE.md). */
+.media-crop-shape {
+  padding: var(--ui-1) var(--ui-3);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font-size: var(--ui-text-sm);
+  cursor: pointer;
+}
+
+.media-crop-shape:hover {
+  border-color: var(--ui-accent);
+}
+
+.media-crop-shape[aria-pressed="true"] {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: var(--ui-on-accent);
+}
+
+/* Set apart from the row of shapes above. Choosing a shape is idle fiddling; the buttons
+   below it include one that destroys an original, and a control that cannot be undone
+   should not sit in the same visual band as the one that only changes a preview. */
+.media-crop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-3);
+  align-items: center;
+  margin-top: var(--ui-2);
+  padding-top: var(--ui-4);
+  border-top: var(--ui-border) solid var(--ui-line);
+}
+
+/* And Cancel is pushed away from Replace, so the safe way out is not adjacent to the
+   irreversible one. */
+.media-crop-actions [data-crop-cancel] {
+  margin-inline-start: auto;
+}
+
+.media-crop-actions .hint {
+  flex-basis: 100%;
+  margin: 0;
+}

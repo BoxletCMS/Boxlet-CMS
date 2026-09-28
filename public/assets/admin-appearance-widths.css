@@ -1,0 +1,186 @@
+/* EVERY THRESHOLD OF THE APPEARANCE SCREEN, IN ONE FILE (PLAN.md D-072).
+ *
+ * They used to be spread over three stylesheets measuring two different things — this screen
+ * at 64rem of window, the admin rail at 62.5rem of window — which is how a band appeared with
+ * a wide rail and stacked columns, and how the same 1100px window gave the screen 1048px one
+ * time and 884px the next. All but one are @container queries on `.appearance` now, so the
+ * screen measures the room it actually has.
+ *
+ * LOADED LAST, AND THAT IS LOAD-BEARING: several of these override a base rule of the same
+ * specificity in admin-appearance.css, -rail.css or -picture.css, so the cascade is decided
+ * by file order. AppearanceController lists this file after those three. */
+
+/* THE FRAME OWNS THE HEIGHT, NOT THIS SCREEN. It used to be
+   `calc(100dvh - var(--ui-bar-height))`, which is only true while the strip is exactly that
+   tall — and on Croatian labels it wraps to two rows, so the screen was that much too long
+   and the admin's background showed under it. Here the window is handed down: frame, column,
+   main, screen, each giving the next what is left.
+
+   Only from the width where the frame really is two columns. Under it the rail is above the
+   content (or a drawer), and a clipped frame would put the whole screen out of reach for
+   anyone without a script. */
+@media (min-width: 47.5625rem) {
+  .admin-frame:has(.appearance) {
+    block-size: 100dvh;
+    min-block-size: 0;
+    overflow: clip;
+  }
+
+  .admin-frame:has(.appearance) .admin-column {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    min-block-size: 0;
+  }
+
+  .admin-frame:has(.appearance) .admin-main-bare {
+    min-block-size: 0;
+    overflow: clip;
+  }
+}
+
+/* The subhead explains the screen; it is the first thing to go when the bar is crowded. */
+@container appearance (max-width: 68rem) {
+  .appearance-subhead {
+    display: none;
+  }
+}
+
+/* ---- three columns, then two, then one ------------------------------------------------ */
+
+/* NOT THREE TO ONE. 12.25 + 30 + 19.5rem is 988px of content, so the three stopped fitting
+   long before the old 64rem threshold let go of them — and the first thing to give up was
+   never the library of characters, which is a place to START from, but the inspector, which
+   is what the screen is used with. Here the characters fold into a panel and the inspector
+   keeps its column.
+
+   THE STACKED RULES ARE THE DEFAULT IN THIS RANGE and the script takes them back. Without
+   one there is no panel to open, so the screen stacks at 74rem instead of 56rem: one column
+   earlier is a fair price for not drawing a button the browser cannot press. */
+@container appearance (max-width: 74rem) {
+  .appearance-body {
+    flex: 0 0 auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .appearance-rail,
+  .appearance-inspector {
+    overflow: visible;
+    border: 0;
+    border-block-start: var(--ui-border) solid var(--ui-line);
+  }
+
+  /* In one column the order is the order they are read: what to look at, then what to
+     change with, then what to start over from. The rail has to be MOVED for that — it is
+     first in the markup because it is first on a wide screen, and for years this rule only
+     pulled the picture up and left the characters in the middle, which is not what the
+     comment beside it claimed. */
+  .appearance-stage-column {
+    order: -1;
+  }
+
+  .appearance-rail {
+    order: 1;
+  }
+
+  .preview-stage {
+    /* A SHARE OF THE PICTURE, NOT OF THE WINDOW. 70vh inside a screen that already scrolls
+       was a second scroll in the first one. */
+    block-size: auto;
+    aspect-ratio: 16 / 10;
+    min-block-size: 22rem;
+  }
+
+  .rail-panel-ready .appearance-body {
+    flex: 1 1 auto;
+    grid-template-columns: minmax(24rem, 1fr) 19.5rem;
+  }
+
+  .rail-panel-ready .appearance-inspector {
+    overflow-y: auto;
+    border: 0;
+    border-inline-start: var(--ui-border) solid var(--ui-line);
+  }
+
+  .rail-panel-ready .appearance-stage-column {
+    order: 0;
+  }
+
+  .rail-panel-ready .preview-stage {
+    block-size: 100%;
+    aspect-ratio: auto;
+    min-block-size: 0;
+  }
+
+  /* The characters: out of the layout, and back over it when the bar's button asks. Nothing
+     is duplicated — it is the same rail, in the same form, positioned differently. */
+  .rail-panel-ready .appearance-rail {
+    display: none;
+  }
+
+  .rail-panel-ready .appearance-rail[data-open] {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: 2;
+    display: grid;
+    inline-size: min(18rem, 90cqw);
+    max-block-size: 100%;
+    overflow-y: auto;
+    border: 0;
+    border-inline-end: var(--ui-border) solid var(--ui-line);
+    box-shadow: var(--ui-shadow-m);
+  }
+
+  .rail-panel-ready .appearance-rail-open {
+    display: inline-flex;
+  }
+}
+
+/* Under this even the inspector has no column to sit in. */
+@container appearance (max-width: 56rem) {
+  .rail-panel-ready .appearance-body {
+    flex: 0 0 auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rail-panel-ready .appearance-inspector {
+    overflow: visible;
+    border: 0;
+    border-block-start: var(--ui-border) solid var(--ui-line);
+  }
+
+  .rail-panel-ready .appearance-stage-column {
+    order: -1;
+  }
+
+  .rail-panel-ready .preview-stage {
+    block-size: auto;
+    aspect-ratio: 16 / 10;
+    min-block-size: 22rem;
+  }
+
+  /* AND THE CHARACTERS COME BACK INTO THE COLUMN. A panel earns its place while there are
+     still two columns to protect; here there is one, so a button that hides a list behind
+     itself buys nothing and costs a press. Found by the browser suite: it applies a
+     character at phone width, and the card it presses was display:none.
+     BOTH SELECTORS, because the panel rule above is `[data-open]` and would otherwise
+     outrank this one for anyone who had opened it before the window narrowed. */
+  .rail-panel-ready .appearance-rail[data-open],
+  .rail-panel-ready .appearance-rail {
+    position: static;
+    display: grid;
+    order: 1;
+    /* 100%, not auto: auto plus the measure's auto margins is a grid item that shrinks to
+       its widest card and floats in the middle of the column (admin-appearance.css). */
+    inline-size: 100%;
+    max-block-size: none;
+    overflow: visible;
+    border: 0;
+    border-block-start: var(--ui-border) solid var(--ui-line);
+    box-shadow: none;
+  }
+
+  .rail-panel-ready .appearance-rail-open {
+    display: none;
+  }
+}

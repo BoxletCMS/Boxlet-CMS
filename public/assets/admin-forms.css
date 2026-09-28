@@ -1,0 +1,346 @@
+/* The admin's form controls, tables and status pills. Admin tokens only (--ui-*): no
+ * value from the site's tokens.css ever reaches the admin. Loaded by the admin shell,
+ * the login screen and the installer. */
+
+/* Helpers */
+
+.visually-hidden {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* admin.js adds .js to <html>; without it, JavaScript-only controls stay hidden. */
+.js-only {
+  display: none;
+}
+
+.js .js-only {
+  display: inline-block;
+}
+
+.js .no-js-only {
+  display: none;
+}
+
+/* Groups */
+
+.stack {
+  display: grid;
+  gap: var(--ui-5);
+}
+
+.fieldset {
+  display: grid;
+  gap: var(--ui-5);
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--ui-6);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-s);
+  /* Fieldsets are min-content wide by default, which collapses them inside a grid. */
+  min-width: 0;
+  min-inline-size: 0;
+}
+
+.fieldset > legend {
+  float: left;
+  margin: 0;
+  padding: 0 0 var(--ui-4);
+  border-bottom: var(--ui-border) solid var(--ui-line);
+  font-family: var(--ui-font-display);
+  font-size: var(--ui-text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ui-ink);
+}
+
+/* A floated legend is laid out inside the box like any heading, so the grid gap below it
+   is the same as between fields, and as a grid item it stretches to the box's width by
+   itself. Giving it inline-size: 100% as well resolved against the fieldset's OWN
+   container on a phone and pushed the page 50px wider than the window. */
+.fieldset > legend + * {
+  clear: both;
+}
+
+/* Fields */
+
+.field {
+  display: grid;
+  gap: var(--ui-2);
+  min-width: 0;
+  /* Rows keep their own height. A row of fields stretches them to match the tallest —
+     .editor-meta is auto-fit columns with no align-items, so the default is stretch — and
+     a grid hands that surplus to its implicit rows. The field with LESS content then gets
+     the taller input: Title measured taller than Address beside it, because Address has a
+     hint line and Title does not. Nothing set a height, so nothing but this could undo
+     it. */
+  align-content: start;
+}
+
+.field > label,
+.field > .field-label {
+  font-weight: 600;
+  line-height: var(--ui-leading-tight);
+}
+
+.field input,
+.field select,
+.field textarea {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 34rem;
+  min-block-size: 2.5rem;
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.field textarea {
+  max-inline-size: none;
+  line-height: var(--ui-leading);
+  resize: vertical;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--ui-ink-faint);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--ui-accent);
+  box-shadow: var(--ui-ring);
+  outline: none;
+}
+
+.field input[type="checkbox"] {
+  inline-size: auto;
+  accent-color: var(--ui-accent);
+}
+
+.field .hint {
+  order: 3;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  font-weight: 500;
+}
+
+.checkbox input {
+  inline-size: auto;
+  accent-color: var(--ui-accent);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--ui-2);
+  max-inline-size: 34rem;
+}
+
+.field-row input {
+  max-inline-size: none;
+}
+
+.field-error {
+  margin: 0;
+  order: 4;
+  padding-inline-start: var(--ui-2);
+  border-inline-start: var(--ui-1) solid var(--ui-danger);
+  color: var(--ui-danger);
+  font-size: var(--ui-text-sm);
+  font-weight: 550;
+}
+
+.field-error[hidden] {
+  display: none;
+}
+
+/* A colour input, shown as the colour it holds rather than as a widget. The default
+   control collapses its swatch to a sliver as soon as the input has padding, so the
+   padding goes on the wrapper and the swatch is given the whole control. */
+
+.colour-field {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-3);
+}
+
+/* Two classes deep, so it beats the `.field input` sizing rather than stretching into a
+   full-width bar. */
+.colour-field .colour-input {
+  inline-size: 3.5rem;
+  block-size: 2.5rem;
+  max-inline-size: none;
+  flex: none;
+  padding: 0;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.colour-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.colour-input::-webkit-color-swatch {
+  border: 0;
+}
+
+.colour-input::-moz-color-swatch {
+  border: 0;
+}
+
+.colour-value {
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-sm);
+  color: var(--ui-ink-muted);
+}
+
+/* Repeater */
+
+/* A list of items, each a small group of fields (PLAN.md O-11). These rules are here
+   rather than in admin-pages.css or builder-inspector.css because BOTH editors render a
+   repeater and the shell loads this file on every admin screen — the same reason the
+   behaviour is one repeater.js rather than a copy in admin.js and another in builder.js.
+
+   A fieldset, not a .field: there is no single input for a label to point at, so the
+   legend names the group the way a label names a field. */
+
+.repeater {
+  display: grid;
+  gap: var(--ui-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  min-inline-size: 0;
+}
+
+.repeater-legend {
+  padding: 0;
+  font-weight: 550;
+  line-height: var(--ui-leading-tight);
+}
+
+.repeater-items {
+  display: grid;
+  gap: var(--ui-3);
+}
+
+/* One item reads as one thing: a sunken card inside the block's own panel, so a list of
+   three is three shapes rather than one wall of fields. */
+.repeater-item {
+  display: grid;
+  gap: var(--ui-4);
+  margin: 0;
+  padding: var(--ui-4);
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  min-width: 0;
+  min-inline-size: 0;
+}
+
+.repeater-item-legend {
+  padding-inline: var(--ui-2);
+  margin-inline-start: calc(var(--ui-2) * -1);
+  font-size: var(--ui-text-xs);
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ui-ink-muted);
+}
+
+.repeater-item-body {
+  display: grid;
+  gap: var(--ui-4);
+  min-width: 0;
+  min-inline-size: 0;
+}
+
+.repeater-item-controls,
+.repeater-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-1);
+}
+
+/* D-012: no control is invisible at rest. Add sits on the panel's own surface under the
+   list, so it keeps a real button's border rather than appearing on hover. */
+.repeater-controls .button {
+  font-size: var(--ui-text-sm);
+}
+
+/*
+ * A link: a page first, an address second (PLAN.md D-034). Choosing a page fills in its
+ * address, read-only, and its title as the text (admin.js, D-038).
+ */
+.link-field {
+  display: grid;
+  gap: var(--ui-2);
+  max-inline-size: 34rem;
+}
+
+.link-field select,
+.link-field input {
+  max-inline-size: none;
+}
+
+/* The address and the text, each named: small labels inside the one field. */
+.link-part {
+  display: grid;
+  gap: var(--ui-1);
+  font-size: var(--ui-text-sm);
+  font-weight: 550;
+  color: var(--ui-ink-muted);
+}
+
+/* An address a chosen page decides: shown, readable, and plainly not for typing into. */
+.field input[readonly] {
+  background: var(--ui-panel-sunken);
+  color: var(--ui-ink-muted);
+}
+
+/* Why a link is missing from the site: the page it points at is a draft or gone. */
+.hint-warning {
+  color: var(--ui-warning);
+}
+
+/* A panel of short choices, two to a row where there is room (the chrome's look). */
+.look-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--ui-5) var(--ui-4);
+}
+
+/* An input and its one button on a single line (a menu's name and Rename). */
+.field-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+  max-inline-size: 34rem;
+}
+
+.field-inline input {
+  flex: 1 1 14rem;
+  inline-size: auto;
+}
