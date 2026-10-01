@@ -31,17 +31,18 @@ final class MediaLibrary
     }
 
     /**
-     * Pictures, newest first, optionally filtered by filename.
+     * Pictures, newest first, optionally filtered by a search.
      *
-     * The search is on the generated filename rather than the original: the original is
-     * whatever the camera called it, and "DSC_0042" is not what anyone types.
+     * The search is on the generated filename, what the file was called, and the picture's
+     * description in any language (D-145): what someone remembers about a picture is as
+     * often what is in it as what it is called.
      *
      * $limit null is every row: the library's own list pages what it shows (the owner,
-     * 2026-09-27), and the picker keeps its newest 200 with a search for the rest.
+     * 2026-09-27). The media browser asks for a page at a time, from $offset.
      *
      * @return list<array<string, mixed>>
      */
-    public function all(string $search = '', ?int $limit = 200, ?string $kind = null): array
+    public function all(string $search = '', ?int $limit = 200, ?string $kind = null, int $offset = 0): array
     {
         // Pictures, files (D-126), or both. Bound, never spliced: it is a value from a query
         // string by the time it gets here, however the caller narrowed it.
@@ -53,13 +54,15 @@ final class MediaLibrary
         }
         $search = trim($search);
         if ($search !== '') {
-            $where[] = '(filename LIKE ? OR original_name LIKE ?)';
+            $where[] = '(filename LIKE ? OR original_name LIKE ? OR id IN (SELECT media_id FROM media_meta WHERE alt LIKE ?))';
+            $params[] = '%' . $search . '%';
             $params[] = '%' . $search . '%';
             $params[] = '%' . $search . '%';
         }
 
         return $this->rows(
-            'SELECT * FROM media' . ($where === [] ? '' : ' WHERE ' . implode(' AND ', $where)) . ' ORDER BY id DESC' . ($limit === null ? '' : ' LIMIT ' . $limit),
+            'SELECT * FROM media' . ($where === [] ? '' : ' WHERE ' . implode(' AND ', $where)) . ' ORDER BY id DESC'
+            . ($limit === null ? '' : ' LIMIT ' . $limit . ($offset > 0 ? ' OFFSET ' . $offset : '')),
             $params,
         );
     }

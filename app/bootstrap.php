@@ -30,6 +30,8 @@ use App\Modules\Mailer\MailController;
 use App\Modules\Mailer\MailSettings;
 use App\Modules\Media\MediaController;
 use App\Modules\Media\MediaCropController;
+use App\Modules\Media\MediaPickController;
+use App\Modules\Media\EmbedPoster;
 use App\Modules\Media\MediaEncoder;
 use App\Modules\Media\MediaItemController;
 use App\Modules\Media\MediaLibrary;
@@ -48,6 +50,8 @@ use App\Modules\Pages\PagesController;
 use App\Modules\Pages\Slug;
 use App\Modules\Pages\TranslationController;
 use App\Modules\Redirects\RedirectsController;
+use App\Modules\Settings\CacheController;
+use App\Modules\Settings\LogoController;
 use App\Modules\Settings\SettingsController;
 use App\Modules\Stats\StatsController;
 use App\Modules\Stats\StatsDataController;
@@ -59,6 +63,7 @@ use App\Modules\Update\Releases;
 use App\Modules\Update\UpdateController;
 use App\Modules\Update\UpdatesController;
 use App\Modules\Update\Upgrade;
+use App\Support\PageCache;
 use App\Support\Url;
 use App\Support\Version;
 
@@ -86,6 +91,9 @@ $chrome = Blocks::discover($root . '/app/Chrome');
 $request = Request::fromGlobals();
 Url::configure($request->basePath, '');
 Url::usePublicPath($root . '/public');
+// Where visitors' pages are kept (D-053): beside the compiled stylesheet. public/index.php
+// sets the same before it boots, to answer from it; this is for emptying and counting.
+PageCache::use($cache);
 
 $container = new Container();
 $container->set('config', fn () => $config);
@@ -118,6 +126,8 @@ $container->set('mail_transport', fn (Container $c) => MailSettings::transport($
 $container->set('media_encoder', fn () => new MediaEncoder());
 $container->set('media_writer', fn (Container $c) => new MediaWriter($c->get('media_encoder')));
 $container->set('media_upload', fn (Container $c) => new MediaUpload($c->get('db'), $storage, $c->get('media_encoder')));
+// A video's cover picture, fetched once from YouTube or Vimeo by the server (D-147).
+$container->set('embed_poster', fn () => new EmbedPoster());
 // Backups and restoring one (D-139): the site's own folders, and the key that seals its
 // secrets, which a backup records a print of. Read as ['key'] and so on rather than by
 // dotted keys, for the route guard's reason above.
@@ -260,6 +270,13 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // disk by the web server; no route here ever answers for one.
     $router->get('/admin/media', [MediaController::class, 'index'], $requireAdmin);
     $router->post('/admin/media', [MediaController::class, 'store'], $requireAdmin);
+    // The media browser a picture field opens (D-145): a page of cards, and an upload from
+    // inside the editor, cropped on the way in if asked.
+    $router->get('/admin/media/pick', [MediaPickController::class, 'index'], $requireAdmin);
+    $router->post('/admin/media/pick', [MediaPickController::class, 'store'], $requireAdmin);
+    $router->post('/admin/media/pick/{id:\d+}/finish', [MediaPickController::class, 'finish'], $requireAdmin);
+    // An Embed block's cover, taken from the video it shows (D-147).
+    $router->post('/admin/media/pick/poster', [MediaPickController::class, 'poster'], $requireAdmin);
     // Making every picture's sizes again, a step per request (D-048).
     $router->post('/admin/media/remake', [MediaRemakeController::class, 'start'], $requireAdmin);
     $router->post('/admin/media/remake/step', [MediaRemakeController::class, 'step'], $requireAdmin);
@@ -321,6 +338,9 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->get('/admin/settings', [SettingsController::class, 'show'], $requireAdmin);
     $router->post('/admin/settings', [SettingsController::class, 'save'], $requireAdmin);
     $router->post('/admin/settings/maintenance-message', [SettingsController::class, 'saveMessage'], $requireAdmin);
+    $router->post('/admin/settings/cache', [CacheController::class, 'save'], $requireAdmin);
+    // An SVG logo, cleaned on upload (D-142).
+    $router->post('/admin/settings/logo-svg', [LogoController::class, 'save'], $requireAdmin);
     // Mail (D-045): how the site sends, and a test message to prove it does.
     $router->post('/admin/settings/mail', [MailController::class, 'save'], $requireAdmin);
     $router->post('/admin/settings/mail/test', [MailController::class, 'test'], $requireAdmin);

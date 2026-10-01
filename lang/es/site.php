@@ -24,5 +24,7 @@ return [
     'site.embed.vimeo' => 'Vídeo',
     'site.embed.openstreetmap' => 'Mapa',
     'site.embed.googlemaps' => 'Mapa',
+    'site.embed.play' => 'Reproducir vídeo',
+    'site.embed.show_map' => 'Mostrar mapa',
     'site.embed.unknown' => 'Boxlet puede mostrar un vídeo de YouTube o Vimeo y un mapa de OpenStreetMap o Google Maps. Esa dirección no es ninguna de ellas.',
 ];

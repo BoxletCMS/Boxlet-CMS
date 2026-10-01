@@ -129,7 +129,7 @@ $fieldLabel = t($fieldKey) . ($fieldSpec['required'] ? ' ' . t('pages.required_m
                              the id never appears on screen. The picker replaces it when
                              JavaScript runs, and both post the same field, so the server
                              validates one thing (MediaReference, on save). */ ?>
-                    <select id="<?= e($fieldId) ?>" name="<?= e($fieldName) ?>" data-media-field<?= \App\Modules\Media\MediaReference::pickerAttributes() ?>>
+                    <select id="<?= e($fieldId) ?>" name="<?= e($fieldName) ?>" data-media-field<?= \App\Modules\Media\MediaReference::pickerAttributes($fieldKey) ?>>
                         <option value=""><?= e(t('pages.field.media_none')) ?></option>
 <?php foreach ($pictures as $picture): ?>
                         <option value="<?= e($picture['id']) ?>"<?= $picture['thumb'] === null ? '' : ' data-thumb="' . e($picture['thumb']) . '"' ?><?= (int) $fieldValue === $picture['id'] ? ' selected' : '' ?>><?= e($picture['name']) ?></option>

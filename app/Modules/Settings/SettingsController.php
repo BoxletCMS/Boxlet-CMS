@@ -19,6 +19,7 @@ use App\Modules\Stats\GeoDownload;
 use App\Modules\Stats\PrivacyText;
 use App\Modules\Stats\Tracker;
 use App\Support\Bytes;
+use App\Support\PageCache;
 use App\Support\Dates;
 use App\Support\Url;
 use DateTimeZone;
@@ -162,14 +163,18 @@ final class SettingsController
             'title' => t('settings.title'),
             'nav' => 'settings',
             // The picker's own stylesheets and script, the same set the page editor loads.
-            'styles' => ['admin-media.css', 'admin-picker.css', 'admin-two-step.css', 'admin-settings.css'],
-            'scripts' => ['media-picker.js', 'mail-settings.js', 'settings-nav.js', 'auto-continue.js'],
+            'styles' => ['admin-media.css', 'admin-picker.css', 'admin-browser.css', 'vendor/cropper.min.css', 'admin-crop.css', 'admin-two-step.css', 'admin-settings.css'],
+            'scripts' => ['vendor/cropper.min.js', 'media-browser-upload.js', 'media-browser.js', 'media-picker.js', 'mail-settings.js', 'settings-nav.js', 'auto-continue.js', 'logo-svg.js'],
             'values' => $values,
             'errors' => $errors,
             'notice' => $notice,
             'pictures' => MediaReference::choices($this->db()),
             'timezones' => DateTimeZone::listIdentifiers(),
             'maintenanceOn' => $this->container->get('maintenance')->isOn(),
+            // The page cache (D-053): on unless switched off, and how many pages it holds.
+            'pageCache' => ['on' => Settings::get($this->db(), 'page_cache', '1') !== '0', 'count' => PageCache::count()],
+            // The SVG logos (D-142), shown under the pickers they stand in for.
+            'logoSvg' => LogoSvg::all($this->db()),
             'languages' => Locales::all($this->db()),
             'addable' => Locales::addable($this->db()),
             'twoStep' => $this->twoStep(),

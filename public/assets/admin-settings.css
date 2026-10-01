@@ -93,6 +93,72 @@
   font-size: var(--ui-text-xs);
 }
 
+/* An SVG in place of the picture (D-142): under the picker it stands in for, in the same
+   column, with its own small row of controls. */
+.ledger .field > .logo-svg {
+  grid-column: 2;
+  grid-row: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-2);
+  max-inline-size: 25rem;
+  margin-block-start: var(--ui-2);
+}
+
+.logo-svg-label {
+  inline-size: 100%;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+.logo-svg-current {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+}
+
+/* The logo on the picker's light checkerboard (admin-picker.css), at the header's own sort of
+   size: a logo is usually drawn for a light site, and on a dark ground a dark one vanished. */
+.logo-svg-current img {
+  block-size: 2.5rem;
+  inline-size: auto;
+  max-inline-size: 10rem;
+  padding: var(--ui-1);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  background-color: var(--ui-checker);
+  background-image: conic-gradient(var(--ui-checker-square) 25%, transparent 0 50%,
+      var(--ui-checker-square) 0 75%, transparent 0);
+  background-size: 0.5rem 0.5rem;
+}
+
+.logo-svg-upload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-2);
+}
+
+.logo-svg-upload label.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-2);
+  cursor: pointer;
+}
+
+/* The hidden file control has the focus; the label that stands for it shows it. */
+.logo-svg-upload input:focus-visible + label.button {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+.logo-svg > .hint {
+  inline-size: 100%;
+  font-size: var(--ui-text-xs);
+  line-height: 1.4;
+}
+
 @media (max-width: 47.5rem) {
   .settings-layout {
     grid-template-columns: minmax(0, 1fr);
@@ -114,7 +180,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .ledger .field > :is(label, .hint, input, select, textarea, .media-picker, .field-error) {
+  .ledger .field > :is(label, .hint, input, select, textarea, .media-picker, .field-error, .logo-svg) {
     grid-column: 1;
     grid-row: auto;
   }

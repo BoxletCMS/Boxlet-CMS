@@ -41,15 +41,18 @@
   font-weight: 500;
 }
 
-/* A box inside a box: the mark, the one warm pixel in the admin. Drawn by CSS, so there is
-   no image to ship or theme. */
+/* The mark, the one warm colour in the admin: a box, the icon beside "Control panel"
+   (D-144). Drawn in --ui-mark, whose contrast on the rail is measured in both themes, so
+   there is no picture to ship or theme. */
 .rail-mark {
+  display: inline-flex;
   flex: none;
-  inline-size: 1rem;
-  block-size: 1rem;
-  box-sizing: border-box;
-  border: 0.25rem solid var(--ui-mark);
-  border-radius: var(--ui-radius-s);
+  color: var(--ui-mark);
+}
+
+.rail-mark svg {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
 }
 
 .rail-name {

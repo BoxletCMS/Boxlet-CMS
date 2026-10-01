@@ -17,6 +17,8 @@ return [
     'auth.throttled' => 'Too many login attempts. Try again in :minutes minutes.',
 
     'admin.brand' => 'Boxlet',
+    // Top left of the rail (D-144), in place of the site's name, which could be several words.
+    'admin.control_panel' => 'Control panel',
     'admin.skip' => 'Skip to content',
     'admin.nav.label' => 'Admin navigation',
     'admin.nav.dashboard' => 'Overview',

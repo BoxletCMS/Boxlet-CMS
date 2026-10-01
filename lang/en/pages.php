@@ -136,6 +136,7 @@ return [
     'block.downloads.layout.cards' => 'Cards side by side',
     'block.embed' => 'Video or map',
     'block.embed.url' => 'Address',
+    'block.embed.poster' => 'Cover picture',
     'block.embed.caption' => 'Caption',
     'block.embed.ratio' => 'Shape of the frame',
     'block.embed.ratio.wide' => 'Wide, like a video',

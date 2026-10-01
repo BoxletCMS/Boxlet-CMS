@@ -421,16 +421,37 @@ footer.block {
   gap: var(--space-xs) var(--space-l);
 }
 
-.layout-columns.footer-cols-3 .site-footer-nav ul {
+/* One link under another in every arrangement, when the owner asks (D-143): the columns
+   arrangement's list, offered to the others. Centred stays centred. */
+.links-list .site-footer-nav ul {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-xs) var(--space-l);
+}
+
+.layout-centred .links-list .site-footer-nav ul {
+  justify-items: center;
+}
+
+/* A long menu in two or three lists, in the columns arrangement. The layout class is on the
+   <footer> and the footer-cols one on the .site-footer inside it: written as one compound
+   selector until 2026-09-29, these rules matched nothing, and "Long menu" never split a menu
+   (D-143). Not for menus one under another in the other arrangements: a character's own
+   "Long menu" would split a list the owner only asked to stand upright. */
+.layout-columns .footer-cols-3 .site-footer-nav ul {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.layout-columns.footer-cols-4 .site-footer-nav ul {
+.layout-columns .footer-cols-4 .site-footer-nav ul {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* One list on a phone, whatever was asked: written as specific as the rules above, which
+   would win over a plainer one. */
 @media (max-width: 40rem) {
-  .layout-columns .site-footer-nav ul {
+  .layout-columns .site-footer-nav ul,
+  .layout-columns .footer-cols-3 .site-footer-nav ul,
+  .layout-columns .footer-cols-4 .site-footer-nav ul {
     grid-template-columns: minmax(0, 1fr);
   }
 }

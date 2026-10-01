@@ -11,7 +11,7 @@ use App\Support\Url;
  * picker it is a button that chooses it, because a picker that navigated away would lose
  * everything typed since the last save.
  *
- * @var list<array{id: int, filename: string, original: string, size: string, width: int, height: int, complete: bool, thumb: string|null, suggested: bool}> $pictures
+ * @var list<array{id: int, filename: string, original: string, size: string, width: int, height: int, complete: bool, thumb: string|null}> $pictures
  * @var string $search
  * @var bool $picking
  * @var string $csrf
@@ -26,7 +26,7 @@ use App\Support\Url;
 <?php foreach ($pictures as $picture): ?>
             <li class="media-card">
 <?php if ($picking): ?>
-                <button type="button" class="media-card-link" data-pick="<?= e($picture['id']) ?>" data-pick-name="<?= e($picture['filename']) ?>">
+                <button type="button" class="media-card-link" data-pick="<?= e($picture['id']) ?>" data-pick-name="<?= e($picture['filename']) ?>" data-pick-complete="<?= $picture['complete'] ? '1' : '0' ?>">
 <?php else: ?>
                 <a class="media-card-link" href="<?= e(Url::admin('media', $picture['id'])) ?>">
 <?php endif; ?>

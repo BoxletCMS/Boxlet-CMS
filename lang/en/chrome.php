@@ -120,6 +120,9 @@ return [
     'chrome.look.header_button.text' => 'Link',
     // Renamed (D-116's third round): "Footer menu columns: Three" read as the footer's three
     // columns, and the owner set it looking for them. It is how a long menu is listed.
+    'chrome.look.footer_links' => 'Menus in columns',
+    'chrome.look.footer_links.auto' => 'As the arrangement',
+    'chrome.look.footer_links.list' => 'One under another',
     'chrome.look.footer_columns' => 'Long menu',
     'chrome.look.footer_columns.2' => 'One list',
     'chrome.look.footer_columns.3' => 'Two lists',

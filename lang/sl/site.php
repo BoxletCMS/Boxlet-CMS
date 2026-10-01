@@ -24,5 +24,7 @@ return [
     'site.embed.vimeo' => 'Videoposnetek',
     'site.embed.openstreetmap' => 'Zemljevid',
     'site.embed.googlemaps' => 'Zemljevid',
+    'site.embed.play' => 'Predvajaj video',
+    'site.embed.show_map' => 'Prikaži zemljevid',
     'site.embed.unknown' => 'Boxlet lahko prikaže videoposnetek z YouTuba ali Vimea in zemljevid z OpenStreetMapa ali Google Maps. Ta naslov ni nobeden od njih.',
 ];

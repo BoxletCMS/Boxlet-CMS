@@ -62,7 +62,12 @@
    height is the owner's density choice (D-032), drawn by site.css on the bar itself. */
 .block-header,
 .block-footer {
-  --section-rhythm: 0;
+  /* 0rem, not 0: a shaped edge adds its depth to this (`calc(var(--section-rhythm) +
+     var(--divider-depth))`), and a unitless 0 added to a length is an invalid calc, which
+     the browser throws out whole. The footer's slant and curve then had no room at all
+     and covered its menu, from D-113 until it was measured on 2026-09-29 (D-143). A rem
+     rather than a pixel, which the front end never writes (blocks_test). */
+  --section-rhythm: 0rem;
 }
 
 /* The header runs to the content's measure or edge to edge: its own decision, not the

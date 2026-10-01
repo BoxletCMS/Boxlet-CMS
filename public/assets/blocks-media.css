@@ -207,52 +207,6 @@ a.logos-mark:focus-visible {
   color: var(--section-link);
 }
 
-/* Video or map (D-105)
-
-   The frame keeps its proportion at every width, so nothing below it moves when it loads.
-   An address nothing recognises draws NOTHING here: the note inside it is for the editor,
-   and canvas.css is what shows it. */
-
-.embed {
-  margin: 0;
-}
-
-.embed.is-empty {
-  display: none;
-}
-
-.layout-inset .embed-frame {
-  padding: var(--space-l);
-  background: var(--section-card);
-  border-radius: var(--radius-m);
-}
-
-.embed-frame iframe {
-  display: block;
-  inline-size: 100%;
-  block-size: 100%;
-  border: 0;
-  border-radius: var(--radius-m);
-}
-
-.ratio-wide .embed-frame {
-  aspect-ratio: 16 / 9;
-}
-
-.ratio-square .embed-frame {
-  aspect-ratio: 1;
-}
-
-.ratio-tall .embed-frame {
-  aspect-ratio: 3 / 4;
-}
-
-.embed-caption {
-  margin-block-start: var(--space-s);
-  color: var(--section-muted);
-  font-size: var(--text-sm);
-}
-
 /* On a narrow screen a row of pictures becomes two columns. Four across at phone width is
    four pictures nobody can see. */
 @media (max-width: 40rem) {

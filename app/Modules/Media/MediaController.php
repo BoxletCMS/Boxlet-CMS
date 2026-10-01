@@ -5,7 +5,6 @@ namespace App\Modules\Media;
 use App\Core\Container;
 use App\Core\Request;
 use App\Core\Response;
-use App\Core\View;
 use App\Modules\Admin\Activity;
 use App\Modules\Admin\AdminView;
 use App\Support\Bytes;
@@ -50,38 +49,14 @@ final class MediaController
     {
         $search = $request->query['q'] ?? '';
         $search = is_string($search) ? trim($search) : '';
-        // Pictures, files, or both (D-126). The picker only ever shows pictures: a picture
-        // field has nothing to do with a document.
-        $picking = ($request->query['picker'] ?? '') !== '';
+        // Pictures, files, or both (D-126). The media browser has its own listing now
+        // (MediaPickController, D-145), which renders the same cards.
         $kind = in_array($request->query['kind'] ?? '', ['pictures', 'files'], true) ? (string) $request->query['kind'] : '';
-        $only = $picking || $kind === 'pictures' ? 'picture' : ($kind === 'files' ? 'file' : null);
+        $only = $kind === 'pictures' ? 'picture' : ($kind === 'files' ? 'file' : null);
 
-        // Every row for the library, which pages what it shows below; the newest 200 for
-        // the picker, which is searched rather than paged.
         $pictures = [];
-        foreach ($this->library()->all($search, $picking ? 200 : null, $only) as $row) {
+        foreach ($this->library()->all($search, null, $only) as $row) {
             $pictures[] = self::card($row);
-        }
-
-        // The picker asks for the same listing with no screen around it: one query, one
-        // card, one set of markup, so the library and the picker cannot drift apart. HTML
-        // rather than JSON, because the server answers with markup everywhere in this
-        // admin and a second representation would be a second thing to keep correct.
-        if ($picking) {
-            // Stamped here rather than inside card(), which is handed one row and has no
-            // database: asking per card would be one query per picture. Only the picker's
-            // cards show it (D-025); the library's table stopped at D-038.
-            $suggested = MediaAlt::suggestedIds($this->container->get('db'), array_column($pictures, 'id'));
-            foreach ($pictures as $index => $picture) {
-                $pictures[$index]['suggested'] = isset($suggested[$picture['id']]);
-            }
-
-            return Response::admin((new View(__DIR__ . '/views'))->render('admin/cards', $locale, [
-                'pictures' => $pictures,
-                'search' => $search,
-                'picking' => true,
-                'csrf' => $this->container->get('session')->csrfToken(),
-            ], null));
         }
 
         // The library's table (D-052): what uses each picture, whether it is described in

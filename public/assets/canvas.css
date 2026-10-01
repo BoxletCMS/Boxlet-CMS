@@ -342,6 +342,14 @@
   font-size: 0.875rem;
 }
 
+/* A FRAME NEVER TAKES THE PRESS HERE (D-148). A click inside another site's frame is that
+   site's, and never reaches this document: an OpenStreetMap map — and until D-147 every video
+   — could not be selected, edited or removed by pressing it ("na click u editoru ne desi se
+   ništa"). The press goes through to the block instead; the map is for looking at here. */
+.bx-canvas iframe {
+  pointer-events: none;
+}
+
 /* A translation's block whose source changed after it was translated (D-043, step 3): an
    amber edge down its left side, at rest, so a stale block is found by looking at the
    page. Two tones like the insertion control — amber inside a dark line — so it reads

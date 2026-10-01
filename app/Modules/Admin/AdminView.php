@@ -4,7 +4,6 @@ namespace App\Modules\Admin;
 
 use App\Core\Container;
 use App\Core\Response;
-use App\Core\Settings;
 use App\Core\View;
 use App\Support\Dates;
 use App\Support\Url;
@@ -24,7 +23,6 @@ final class AdminView
     public static function render(Container $container, string $directory, string $template, array $data, int $status = 200): Response
     {
         $session = $container->get('session');
-        $siteName = Settings::text($container->get('db'), 'site_name');
         $flash = $session->get('flash');
         // A refusal dressed as a confirmation is worse than no message: the owner reads the
         // colour before the words. One slot, two kinds — 'success' unless a controller says
@@ -46,7 +44,6 @@ final class AdminView
             // A screen that fills the window itself rather than sitting in the reading
             // column: the visual editor, whose canvas is the screen.
             'bare' => false,
-            'siteName' => $siteName,
             'flash' => is_string($flash) ? $flash : null,
             // 'error' as well: five controllers set it for a refusal, and until D-051 found
             // it here it was drawn as 'success' — the very thing the comment above forbids.

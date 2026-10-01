@@ -83,26 +83,66 @@ final class MediaReference
     }
 
     /**
+     * The crop shape the media browser opens with for a block's picture (D-145): the shape
+     * the block draws it in, where that is fixed or chosen by one of the block's own fields.
+     * Anything else opens with Free. Named by MediaCrop::RATIOS.
+     *
+     * Kept here, beside the picker's other server half, rather than in each block's
+     * definition: it is a convenience of the admin, not part of the block contract (SPEC
+     * §5.3), and a block that is missing from this list only loses a preselected button.
+     */
+    private const CROP_FOR = [
+        'hero' => 'hero',
+        'quote' => 'thumb',
+        'picture' => ['shape' => ['wide' => 'hero', 'square' => 'thumb', 'round' => 'thumb']],
+        'gallery' => ['shape' => ['wide' => 'hero', 'square' => 'thumb', 'round' => 'thumb']],
+        'columns' => ['image_shape' => ['wide' => 'card', 'square' => 'thumb', 'round' => 'thumb']],
+    ];
+
+    /**
      * The data attributes media-picker.js reads off a <select data-media-field>.
      *
      * Extracted from the block editor's view when site settings became a second screen
-     * with pickers on it. Six attributes copied into a second template is how one of them
-     * quietly stops matching the script and that screen's picker loses its labels.
+     * with pickers on it. Several attributes copied into a second template is how one of
+     * them quietly stops matching the script and that screen's picker loses its labels.
      *
      * Presentation in a data class, which is not where it belongs — but the alternatives
      * were a one-method class in Support or a partial that returns a string, and the
      * vocabulary already lives beside choices(), which is the picker's other server half.
      * The keys stay under pages.field.* because that is where they were written; renaming
      * them would touch two templates and change no behaviour.
+     *
+     * $fieldKey is a block field's label key (block.{type}.{field}…), which names the block
+     * the crop shape is chosen for; empty for a picture that is not a block's.
      */
-    public static function pickerAttributes(): string
+    public static function pickerAttributes(string $fieldKey = ''): string
     {
-        return ' data-picker-url="' . e(\App\Support\Url::admin('media')) . '"'
+        $crop = self::CROP_FOR[explode('.', $fieldKey)[1] ?? ''] ?? null;
+        if (is_array($crop)) {
+            // One field per block: the one whose value names the shape.
+            $hint = '';
+            foreach ($crop as $field => $map) {
+                $hint = ' data-picker-crop-field="' . e($field) . '" data-picker-crop-map="' . e((string) json_encode($map)) . '"';
+            }
+            $crop = $hint;
+        } else {
+            $crop = $crop === null ? '' : ' data-picker-crop="' . e($crop) . '"';
+        }
+
+        // An Embed block's cover can be taken from the video itself (D-147).
+        if ($fieldKey === 'block.embed.poster') {
+            $crop .= ' data-poster-url="' . e(\App\Support\Url::admin('media', 'pick', 'poster')) . '"'
+                . ' data-text-poster-fetch="' . e(t('embed.poster_fetch')) . '"'
+                . ' data-text-poster-fetching="' . e(t('embed.poster_fetching')) . '"'
+                . ' data-text-poster-fetched="' . e(t('embed.poster_fetched')) . '"';
+        }
+
+        return ' data-picker-url="' . e(\App\Support\Url::admin('media', 'pick')) . '"'
             . ' data-text-none="' . e(t('pages.field.media_none')) . '"'
-            . ' data-text-search="' . e(t('media.search')) . '"'
             . ' data-text-failed="' . e(t('media.pick_failed')) . '"'
             . ' data-text-choose="' . e(t('media.pick_choose')) . '"'
-            . ' data-text-change="' . e(t('media.pick_change')) . '"';
+            . ' data-text-change="' . e(t('media.pick_change')) . '"'
+            . $crop;
     }
 
     /**

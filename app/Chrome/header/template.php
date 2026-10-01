@@ -31,13 +31,27 @@ $brand = is_string($look['brand'] ?? null) ? $look['brand'] : 'logo';
    knows the palette and the section under a header laid over the page; the template only
    draws what it is handed. */
 $onDark = ($resolved['logo_dark'] ?? false) === true;
-$logoId = $onDark && is_int($content['logo_dark'] ?? null) && isset($media[$content['logo_dark']])
+/* An SVG logo (D-142) comes before the picture in its slot, and a slot counts as set when
+   either is: a dark-surface logo that is only an SVG is still the dark-surface logo. */
+$svg = is_array($resolved['svg'] ?? null) ? $resolved['svg'] : [];
+$darkSlot = $onDark && ((is_int($content['logo_dark'] ?? null) && isset($media[$content['logo_dark']])) || is_array($svg['logo_dark'] ?? null));
+$vector = $darkSlot ? ($svg['logo_dark'] ?? null) : ($svg['logo'] ?? null);
+$logoId = $darkSlot && is_int($content['logo_dark'] ?? null)
     ? $content['logo_dark']
     : (is_int($content['logo'] ?? null) ? $content['logo'] : null);
 /* `natural` and `full`, the presets that are never cropped (SPEC §5.5): a logo keeps the
    shape it was uploaded in (D-038). thumb and card cut a wide logo down to its middle.
    `natural` first since D-119, so a logo 20em wide is not sent at up to 2400 px. */
 $logoTag = \App\Modules\Media\MediaPicture::tag($logoId === null ? null : ($media[$logoId] ?? null), ['natural', 'full'], '20em', true);
+/* The SVG as an <img>, never inline: a browser runs nothing an image holds, which is the
+   second line behind the cleaning (D-142). Its width and height come from its viewBox, so
+   the bar keeps its place while it loads. Its words are the site's name when the name is
+   not written beside it, and nothing when it is. */
+if (is_array($vector)) {
+    $alt = $brand === 'logo' && is_string($resolved['site_name'] ?? null) ? trim($resolved['site_name']) : '';
+    $logoTag = '<img class="site-logo-svg" src="' . e((string) $vector['url']) . '" width="' . (int) $vector['width']
+        . '" height="' . (int) $vector['height'] . '" alt="' . e($alt) . '" decoding="async">';
+}
 $button = $content['button'];
 
 /* A colour of the owner's own (D-076) is a CLASS on the bar, and the class is what lets

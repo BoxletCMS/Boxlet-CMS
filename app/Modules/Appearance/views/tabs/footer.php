@@ -91,6 +91,7 @@ $richInline = static function (string $name, string $value, string $code, string
                     <span class="hint" id="footer_menu_<?= e((string) $n) ?>-hint"><?= e($n === 1 ? t('chrome.footer_menu_hint') : t('chrome.footer_column_menu_hint')) ?></span>
                 </div>
 <?php endforeach; ?>
+                <?= $lookGroup('footer_links') ?>
                 <?= $lookGroup('footer_columns') ?>
                 <?= $lookGroup('small_print_row') ?>
                 <?= $lookGroup('footer_surface') ?>

@@ -13,7 +13,6 @@ use App\Support\Url;
  * @var string $locale
  * @var string $title
  * @var string $content rendered HTML of the page template
- * @var string $siteName
  * @var string $nav current section: dashboard, pages, media, menus, forms, design, chrome, settings or statistics
  * @var list<string> $styles extra stylesheets under public/assets
  * @var list<string> $scripts extra scripts under public/assets, in load order
@@ -111,8 +110,10 @@ foreach ($rail as $entries) {
                  script it is simply there — beside the content, or above it on a phone. */ ?>
         <aside class="admin-rail" id="admin-rail" data-admin-rail>
             <div class="rail-brand">
-                <span class="rail-mark" aria-hidden="true"></span>
-                <span class="rail-name"><?= e($siteName !== '' ? $siteName : t('admin.brand')) ?></span>
+                <?php /* An icon and "Control panel" (D-144), not the site's name, which can be
+                         several words and did not fit; the strip above names the site. */ ?>
+                <span class="rail-mark" aria-hidden="true"><?= icon('box') ?></span>
+                <span class="rail-name"><?= e(t('admin.control_panel')) ?></span>
             </div>
             <?php /* Search: a link to the Search screen, which works without a script;
                      admin-palette.js opens the ⌘K palette over the page instead. */ ?>

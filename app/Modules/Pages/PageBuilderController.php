@@ -158,8 +158,11 @@ final class PageBuilderController
 
         $response = Response::admin($body);
         // The one admin document that may be framed, and only by the admin itself.
+        // One frame of another site's may show: an OpenStreetMap map, the only embed drawn
+        // before a press (D-147), so the editor shows the map the page will. It cannot be
+        // pressed here (canvas.css, D-148).
         $response->headers['Content-Security-Policy'] = "default-src 'self'; img-src 'self' data:; "
-            . "form-action 'none'; frame-ancestors 'self'; base-uri 'none'";
+            . "frame-src https://www.openstreetmap.org; form-action 'none'; frame-ancestors 'self'; base-uri 'none'";
         $response->headers['X-Frame-Options'] = 'SAMEORIGIN';
 
         return $response;
@@ -354,8 +357,8 @@ final class PageBuilderController
             'nav' => 'pages',
             // Both: the picker shows the library's own cards (admin-media.css) inside its
             // own panel (admin-picker.css), and one definition of a card beats a short list.
-            'styles' => ['admin-richtext.css', 'builder.css', 'builder-inspector.css', 'admin-media.css', 'admin-picker.css'],
-            'scripts' => ['vendor/tiptap.bundle.min.js', 'richtext.js', 'media-picker.js', 'repeater.js'],
+            'styles' => ['admin-richtext.css', 'builder.css', 'builder-inspector.css', 'admin-media.css', 'admin-picker.css', 'admin-browser.css', 'vendor/cropper.min.css', 'admin-crop.css'],
+            'scripts' => ['vendor/tiptap.bundle.min.js', 'richtext.js', 'vendor/cropper.min.js', 'media-browser-upload.js', 'media-browser.js', 'media-picker.js', 'repeater.js'],
             'wide' => true,
             'bare' => true,
             'page' => $page,

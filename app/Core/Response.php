@@ -55,7 +55,10 @@ final class Response
     {
         $response = self::html($body, $status);
         $response->headers += [
-            'Content-Security-Policy' => "default-src 'self'; img-src 'self' data:; form-action 'self'; "
+            // blob: for pictures only: the media browser shows a file before it is sent, so
+            // it can be cropped on the way in (D-145). A blob URL is made by this page from
+            // a file the admin chose; it cannot name anything on another site.
+            'Content-Security-Policy' => "default-src 'self'; img-src 'self' data: blob:; form-action 'self'; "
                 . "frame-ancestors 'none'; base-uri 'none'",
             'X-Frame-Options' => 'DENY',
             'X-Content-Type-Options' => 'nosniff',

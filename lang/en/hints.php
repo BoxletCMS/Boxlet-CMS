@@ -65,6 +65,7 @@ return [
     'hint.block.logos.items.name' => 'Who it is. Shown in type when there is no picture, and read out when there is.',
     'hint.block.logos.items.link' => 'Where the mark leads, if anywhere.',
     'hint.block.embed.url' => 'Paste the address from the browser’s bar: a video from YouTube or Vimeo, a map from OpenStreetMap or Google Maps. Nothing else can be shown, which is what keeps other people’s code off your site.',
+    'hint.block.embed.poster' => 'What visitors see until they press Play. A video’s own picture is fetched for you when you paste its address; choose another if you like. Nothing from YouTube, Vimeo or Google loads until a visitor presses, so the page stays free of their cookies.',
     'hint.block.embed.caption' => 'A line under the frame. It is also what a screen reader announces the frame as.',
     'hint.block.embed.ratio' => 'How tall the frame is for its width. A video is wide; a map usually wants more height.',
     'hint.block.columns.intro' => 'An optional sentence or two under the heading, before the columns.',
@@ -134,7 +135,8 @@ return [
     'hint.look.nav_style' => 'How the menu’s words are set: as they are; in small capitals with a little space between the letters; the current page on a pill; a bar under the current page and under the pointer; or every entry a bordered chip. Submenus follow the same style.',
     'hint.look.nav_ink' => 'Whether the menu’s words take the accent colour or the ordinary text colour.',
     'hint.look.header_button' => 'The button at the right of the header: filled with the accent, outlined, or a plain link.',
-    'hint.look.footer_columns' => 'How a LONG menu inside a footer column is listed: as one list, or split into two or three lists side by side. Not the footer’s columns — those are the arrangement above.',
+    'hint.look.footer_links' => 'How each column’s menu is laid out: as the arrangement has it — in a row, or a list when the footer is in columns — or always one link under another, like the columns of links at the foot of many sites.',
+    'hint.look.footer_columns' => 'How a LONG menu inside a footer column is listed when the footer is in columns: as one list, or split into two or three lists side by side. Not the footer’s columns — those are the arrangement above.',
     'hint.look.logo_size' => 'How tall the logo is drawn. Its shape never changes.',
 
     // Media

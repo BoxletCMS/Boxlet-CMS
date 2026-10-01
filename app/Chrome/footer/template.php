@@ -48,7 +48,7 @@ foreach (array_slice($columns, 0, $shown) as $i => $column) {
          is for (D-067, D-113). `own-colour` when the footer takes a colour of the owner's
          (D-076): the class is what lets chrome.css set the section's tokens with no
          fallback, because a fallback naming the token itself is a cycle (D-110). */ ?>
-<div class="site-footer density-<?= e($look['density'] ?? 'normal') ?> footer-cols-<?= e($look['footer_columns'] ?? '2') ?> foot-<?= e($look['small_print_row'] ?? 'left') ?> drawn-<?= e((string) count($drawn)) ?><?= ($resolved['own'] ?? false) === true ? ' own-colour' : '' ?>">
+<div class="site-footer density-<?= e($look['density'] ?? 'normal') ?> footer-cols-<?= e($look['footer_columns'] ?? '2') ?> links-<?= e($look['footer_links'] ?? 'auto') ?> foot-<?= e($look['small_print_row'] ?? 'left') ?> drawn-<?= e((string) count($drawn)) ?><?= ($resolved['own'] ?? false) === true ? ' own-colour' : '' ?>">
 <?php foreach ($drawn as $column): ?>
     <div class="site-footer-col">
 <?php if ($column['title'] !== ''): ?>

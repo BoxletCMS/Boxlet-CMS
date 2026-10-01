@@ -17,6 +17,8 @@ use App\Support\Url;
  * @var list<array{id: int, name: string, thumb: string|null, whole: string|null}> $pictures
  * @var list<string> $timezones
  * @var bool $maintenanceOn
+ * @var array{on: bool, count: int} $pageCache
+ * @var array{logo: array{url: string, width: int, height: int}|null, logo_dark: array{url: string, width: int, height: int}|null} $logoSvg
  * @var string|null $lastSaved when these settings were last saved, from the activity log
  * @var string $title
  * @var string $csrf
@@ -46,6 +48,32 @@ $picker = static function (string $key, int $chosen, bool $whole = false) use ($
 
     return $html . '</select>';
 };
+
+/* An SVG in place of the picture (D-142). Its controls stand here, under the picker they
+   stand in for, but belong to a form of their own after this one (form="…"): the upload is
+   a file, cleaned the moment it arrives, and forms cannot nest. */
+$vector = static function (string $slot) use ($logoSvg): string {
+    $form = 'logo-svg-' . $slot;
+    $current = $logoSvg[$slot] ?? null;
+    $html = '<div class="logo-svg"><span class="logo-svg-label">' . e(t('svg.or')) . '</span>';
+    if ($current !== null) {
+        $html .= '<span class="logo-svg-current"><img src="' . e($current['url']) . '" alt="" width="' . $current['width']
+            . '" height="' . $current['height'] . '"><span class="hint">' . e(t('svg.current')) . '</span></span>'
+            . '<button type="submit" form="' . e($form) . '" name="action" value="remove" class="button button-ghost button-danger">'
+            . e(t('svg.remove')) . '</button>';
+    }
+    /* The browser's own file control speaks the browser's language and cannot be styled, so
+       it is hidden and a label in the admin's words opens it, as the media library does
+       (D-038). Choosing a file sends it (logo-svg.js); without a script, Upload does. */
+    $input = 'logo-svg-file-' . $slot;
+    $html .= '<span class="logo-svg-upload">'
+        . '<input type="file" id="' . e($input) . '" name="svg" accept=".svg,image/svg+xml" form="' . e($form) . '" class="visually-hidden" data-logo-svg>'
+        . '<label for="' . e($input) . '" class="button button-secondary">' . icon('cloud-upload') . ' ' . e(t($current === null ? 'svg.upload' : 'svg.replace')) . '</label>'
+        . '<button type="submit" form="' . e($form) . '" name="action" value="upload" class="button no-js-only">' . e(t('svg.send')) . '</button>'
+        . '</span>';
+
+    return $html . '<span class="hint">' . e(t('svg.hint')) . '</span></div>';
+};
 ?>
         <div class="page-header">
             <h1><?= e($title) ?></h1>
@@ -60,7 +88,7 @@ $picker = static function (string $key, int $chosen, bool $whole = false) use ($
                  the part wanted. Plain anchors; settings-nav.js only marks where you are. */ ?>
         <div class="settings-layout">
         <nav class="settings-nav" aria-label="<?= e(t('settings.sections')) ?>" data-settings-nav>
-<?php foreach (['general' => 'settings.general', 'branding' => 'settings.branding', 'maintenance' => 'maintenance.title', 'languages' => 'languages.title', 'mail' => 'mail.title', 'account' => 'account.title', 'statistics' => 'stats.title'] as $anchor => $key): ?>
+<?php foreach (['general' => 'settings.general', 'branding' => 'settings.branding', 'maintenance' => 'maintenance.title', 'cache' => 'cache.title', 'languages' => 'languages.title', 'mail' => 'mail.title', 'account' => 'account.title', 'statistics' => 'stats.title'] as $anchor => $key): ?>
             <a href="#<?= e($anchor) ?>"><?= e(t($key)) ?></a>
 <?php endforeach; ?>
         </nav>
@@ -107,6 +135,7 @@ $picker = static function (string $key, int $chosen, bool $whole = false) use ($
                     <label for="site_logo"><?= e(t('settings.logo')) ?></label>
                     <?= $picker('site_logo', $picked('site_logo'), true) ?>
                     <span class="hint"><?= e(t('settings.logo_hint')) ?></span>
+                    <?= $vector('logo') ?>
                 </div>
 
                 <?php /* A second logo for dark surfaces (D-112): a dark wordmark vanishes on a
@@ -116,6 +145,7 @@ $picker = static function (string $key, int $chosen, bool $whole = false) use ($
                     <label for="site_logo_dark"><?= e(t('settings.logo_dark')) ?></label>
                     <?= $picker('site_logo_dark', $picked('site_logo_dark'), true) ?>
                     <span class="hint"><?= e(t('settings.logo_dark_hint')) ?></span>
+                    <?= $vector('logo_dark') ?>
                 </div>
 
                 <div class="field">
@@ -138,6 +168,15 @@ $picker = static function (string $key, int $chosen, bool $whole = false) use ($
 <?php endif; ?>
             </div>
         </form>
+
+        <?php /* The SVG logos' own forms (D-142), empty: their file inputs and buttons stand
+                 under Branding above and name these by id. */ ?>
+<?php foreach (App\Modules\Settings\LogoSvg::SLOTS as $slot): ?>
+        <form method="post" action="<?= e(Url::admin('settings', 'logo-svg')) ?>" enctype="multipart/form-data" id="logo-svg-<?= e($slot) ?>" hidden>
+            <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+            <input type="hidden" name="slot" value="<?= e($slot) ?>">
+        </form>
+<?php endforeach; ?>
 
         <?php /* MAINTENANCE IN ONE PLACE (D-038): the switch, and the message visitors see
                  while it is on. Two forms, because HTML has none nested and the switch posts
@@ -175,6 +214,8 @@ $picker = static function (string $key, int $chosen, bool $whole = false) use ($
                 </div>
             </form>
         </div>
+
+<?php require __DIR__ . '/cache-panel.php'; ?>
 
 <?php require dirname(__DIR__, 2) . '/Languages/views/panel.php'; ?>
 

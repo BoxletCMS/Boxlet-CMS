@@ -13,6 +13,7 @@ use App\Modules\Media\MediaPicture;
 use App\Modules\Menus\MenuTree;
 use App\Modules\Settings\ChromeLook;
 use App\Modules\Settings\ChromeWords;
+use App\Modules\Settings\LogoSvg;
 use App\Modules\Settings\SiteChrome;
 
 /**
@@ -281,7 +282,9 @@ final class PageLayoutData
         // show (D-110): a page with the site's name at the top is right, and a site without a
         // logo is most sites on their first day.
         $siteName = Settings::text($db, 'site_name');
-        $hasHeader = $header['logo'] !== null || $header['button']['url'] !== '' || $menu !== [] || trim($siteName) !== '';
+        // An SVG logo (D-142), which the template draws in place of the picture in its slot.
+        $svg = LogoSvg::all($db);
+        $hasHeader = $header['logo'] !== null || $svg['logo'] !== null || $header['button']['url'] !== '' || $menu !== [] || trim($siteName) !== '';
         // "Made with Boxlet", when the owner leaves it on (O-20). It is part of what makes a
         // footer worth drawing: a site whose footer is otherwise empty still has this line,
         // and without it here the credit would be switched on and never appear.
@@ -308,7 +311,7 @@ final class PageLayoutData
             'headerBleed' => ($bleeds['header_bleed'] ?? 'sheet') === 'full' ? 'full' : 'sheet',
             'footerBleed' => ($bleeds['footer_bleed'] ?? 'sheet') === 'full' ? 'full' : 'sheet',
             'headerHtml' => $hasHeader
-                ? $registry->render('header', $header, ['surface' => $resolved['header_surface']], $resolved['header_arrangement'], $media, true, 'header', ['menu' => $menu, 'look' => $resolved, 'own' => isset($own['header']), 'site_name' => $siteName, 'logo_dark' => $logoDark], $locale, $locales)
+                ? $registry->render('header', $header, ['surface' => $resolved['header_surface']], $resolved['header_arrangement'], $media, true, 'header', ['menu' => $menu, 'look' => $resolved, 'own' => isset($own['header']), 'site_name' => $siteName, 'logo_dark' => $logoDark, 'svg' => $svg], $locale, $locales)
                 : '',
             'footerHtml' => $hasFooter
                 // The footer's edge is a section divider (D-113): the same layer-2 key, the

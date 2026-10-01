@@ -1,5 +1,5 @@
-/* The picture picker: the library's own cards, in a panel over the field.
-   Admin tokens only (--ui-*).
+/* The picture picker: a control in the field, and the media browser it opens over the
+   page (PLAN.md D-145), which shows the library's own cards. Admin tokens only (--ui-*).
 
    Split out of admin-media.css, which had grown past the 300-line rule. The seam is a real
    one rather than a convenience: admin-media.css dresses the library SCREEN, while this is
@@ -99,44 +99,12 @@
   font-weight: 550;
 }
 
-.media-picker-panel {
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: calc(100% + var(--ui-1));
-  z-index: 20;
-  display: grid;
-  gap: var(--ui-2);
-  padding: var(--ui-3);
-  background: var(--ui-panel);
-  border: var(--ui-border) solid var(--ui-line-strong);
-  border-radius: var(--ui-radius-l);
-  box-shadow: var(--ui-shadow-m);
-}
-
-.media-picker-search {
-  inline-size: 100%;
-}
-
-.media-picker-none {
-  justify-self: start;
-}
-
-/* Bounded, so a library of two hundred pictures cannot push the panel off the screen. */
-.media-picker-results {
-  max-block-size: 20rem;
-  overflow-y: auto;
-}
-
-.media-picker-results[aria-busy="true"] {
-  opacity: 0.6;
-}
-
-/* Inside the panel the column is narrow, so the grid packs tighter than on the library
-   screen. auto-fill for the same reason it is used there: two pictures should not stretch
-   to fill a row. */
+/* The browser's grid packs tighter than the library screen's: it is a place to find a
+   picture, not to look at one. auto-fill for the same reason it is used there: two
+   pictures should not stretch to fill a row. */
 .media-grid-picking {
-  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
-  gap: var(--ui-2);
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: var(--ui-3);
 }
 
 .media-grid-picking .media-card {
@@ -165,4 +133,37 @@
 .media-grid-picking .media-card-link:focus-visible {
   outline: var(--ui-border) solid var(--ui-accent);
   outline-offset: 2px;
+}
+
+/* The picture the field holds now: ringed, and named as chosen in words as well, so the
+   state does not rest on colour alone. */
+.media-grid-picking .media-card-link {
+  position: relative;
+}
+
+.media-grid-picking .media-card-link.is-chosen .media-thumb {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: -3px;
+}
+
+.media-grid-picking .media-card-link.is-chosen::after {
+  content: attr(data-chosen-label);
+  position: absolute;
+  inset-block-start: var(--ui-1);
+  inset-inline-start: var(--ui-1);
+  padding: 0 var(--ui-2);
+  background: var(--ui-accent);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-on-accent);
+  font-size: var(--ui-text-sm);
+  font-weight: 550;
+}
+
+.media-picker-poster {
+  margin-block-start: var(--ui-2);
+}
+
+.media-picker-failed {
+  margin: var(--ui-1) 0 0;
+  color: var(--ui-danger);
 }

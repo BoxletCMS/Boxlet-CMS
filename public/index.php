@@ -4,8 +4,10 @@ use App\Core\ErrorHandler;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\RewriteCheck;
+use App\Core\Settings;
 use App\Modules\Stats\Tracker;
 use App\Modules\Update\UpdateGate;
+use App\Support\PageCache;
 use App\Support\Url;
 use Dotenv\Dotenv;
 
@@ -68,6 +70,31 @@ if (Request::fromGlobals()->path === RewriteCheck::PROBE_PATH) {
     exit;
 }
 
+// A visitor's page kept from an earlier visit (PLAN.md D-053), answered before the container,
+// the router or the database. After .env, not before the autoloader as D-053 first put it:
+// the cache and storage folders can be moved in .env, and only then is it known where they are.
+$fromRoot = static fn (string $path): string => str_starts_with($path, '/') ? $path : $root . '/' . $path;
+$storageDirectory = $fromRoot((string) env('STORAGE_PATH', 'storage'));
+PageCache::use($fromRoot((string) env('CACHE_PATH', 'public/cache')));
+if (is_file($storageDirectory . '/install.lock') && PageCache::serve($_SERVER, $storageDirectory)) {
+    // Still counted (SPEC §5.7): the visitor has the page, and the application boots only to
+    // count it, after the connection is released.
+    if (function_exists('fastcgi_finish_request')) {
+        fastcgi_finish_request();
+    }
+    $container = require $root . '/app/bootstrap.php';
+    $request = $container->get('request');
+    $kept = new Response('', 200, ['Content-Type' => 'text/html; charset=utf-8']);
+    if (Tracker::wanted($request, $kept)) {
+        try {
+            Tracker::record($container->get('db'), $request, $kept, null, $storageDirectory);
+        } catch (Throwable $e) {
+            error_log('Statistics: ' . get_class($e) . ': ' . $e->getMessage());
+        }
+    }
+    exit;
+}
+
 $container = require $root . '/app/bootstrap.php';
 
 if (!$container->get('installed')) {
@@ -91,6 +118,21 @@ if ($gate !== null) {
 $request = $container->get('request');
 $response = UpdateGate::bar($container, $request, $container->get('router')->dispatch($request));
 $response->send();
+
+// Kept for the next visitor if it may be, or every kept page emptied after a change in the
+// admin (D-053). Whether the owner has the cache on is read only for a page that could be kept.
+try {
+    PageCache::after(
+        $_SERVER,
+        $storageDirectory,
+        $response->status,
+        (string) ($response->headers['Content-Type'] ?? ''),
+        $response->body,
+        static fn (): bool => Settings::get($container->get('db'), 'page_cache', '1') !== '0',
+    );
+} catch (Throwable $e) {
+    error_log('Page cache: ' . get_class($e) . ': ' . $e->getMessage());
+}
 
 // Visit statistics (PLAN.md D-051), counted after the page has gone: the connection is
 // released first where PHP-FPM can do that, so the visitor never waits for the count, and

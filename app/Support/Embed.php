@@ -30,7 +30,12 @@ final class Embed
     /**
      * The provider and the address to frame, or null when nothing here recognises it.
      *
-     * @return array{provider: string, src: string}|null
+     * Also, since D-147: the id the address was reduced to, the address that opens the same
+     * thing on the provider's own site (what a press does without JavaScript), and whether
+     * the frame waits for a press. YouTube, Vimeo and Google Maps wait: loaded, each writes
+     * to the visitor's browser or calls home. OpenStreetMap does neither and is framed at once.
+     *
+     * @return array{provider: string, src: string, id: string, open: string, deferred: bool}|null
      */
     public static function parse(string $url): ?array
     {
@@ -78,7 +83,7 @@ final class Embed
      * sets no advertising cookie until the visitor presses play.
      *
      * @param array<array-key, array<mixed>|string> $query parse_str()’s own shape: a key may repeat as a list
-     * @return array{provider: string, src: string}|null
+     * @return array{provider: string, src: string, id: string, open: string, deferred: bool}|null
      */
     private static function youtube(string $host, string $path, array $query): ?array
     {
@@ -98,13 +103,19 @@ final class Embed
             return null;
         }
 
-        return ['provider' => 'youtube', 'src' => "https://www.youtube-nocookie.com/embed/{$id}"];
+        return [
+            'provider' => 'youtube',
+            'src' => "https://www.youtube-nocookie.com/embed/{$id}",
+            'id' => $id,
+            'open' => "https://www.youtube.com/watch?v={$id}",
+            'deferred' => true,
+        ];
     }
 
     /**
      * vimeo.com/123456789 and player.vimeo.com/video/123456789.
      *
-     * @return array{provider: string, src: string}|null
+     * @return array{provider: string, src: string, id: string, open: string, deferred: bool}|null
      */
     private static function vimeo(string $host, string $path): ?array
     {
@@ -115,7 +126,13 @@ final class Embed
             return null;
         }
 
-        return ['provider' => 'vimeo', 'src' => "https://player.vimeo.com/video/{$found[1]}"];
+        return [
+            'provider' => 'vimeo',
+            'src' => "https://player.vimeo.com/video/{$found[1]}",
+            'id' => $found[1],
+            'open' => "https://vimeo.com/{$found[1]}",
+            'deferred' => true,
+        ];
     }
 
     /**
@@ -125,7 +142,7 @@ final class Embed
      * computed: at zoom z the whole world is 2^z tiles across, and one screen is a couple of
      * tiles of it. Two tiles' worth is what the map looks like when you copied the address.
      *
-     * @return array{provider: string, src: string}|null
+     * @return array{provider: string, src: string, id: string, open: string, deferred: bool}|null
      */
     private static function openStreetMap(string $host, string $path, string $fragment): ?array
     {
@@ -148,7 +165,15 @@ final class Embed
             self::degrees($lon + $span), self::degrees($lat + $span / 2),
         ]);
 
-        return ['provider' => 'openstreetmap', 'src' => "https://www.openstreetmap.org/export/embed.html?bbox={$box}&layer=mapnik"];
+        $at = (int) $zoom . '/' . self::degrees($lat) . '/' . self::degrees($lon);
+
+        return [
+            'provider' => 'openstreetmap',
+            'src' => "https://www.openstreetmap.org/export/embed.html?bbox={$box}&layer=mapnik",
+            'id' => $at,
+            'open' => "https://www.openstreetmap.org/#map={$at}",
+            'deferred' => false,
+        ];
     }
 
     /**
@@ -159,7 +184,7 @@ final class Embed
      * putting text somebody pasted into a query string, and the coordinates say where it is.
      *
      * @param array<array-key, array<mixed>|string> $query parse_str()’s own shape: a key may repeat as a list
-     * @return array{provider: string, src: string}|null
+     * @return array{provider: string, src: string, id: string, open: string, deferred: bool}|null
      */
     private static function googleMaps(string $host, string $path, array $query): ?array
     {
@@ -187,10 +212,14 @@ final class Embed
         [$lat, $lon] = $point;
         $zoom = max(1, min(21, (int) $found[3]));
 
+        $where = self::degrees($lat) . ',' . self::degrees($lon);
+
         return [
             'provider' => 'googlemaps',
-            'src' => 'https://maps.google.com/maps?q=' . self::degrees($lat) . ',' . self::degrees($lon)
-                . "&z={$zoom}&output=embed",
+            'src' => "https://maps.google.com/maps?q={$where}&z={$zoom}&output=embed",
+            'id' => $where,
+            'open' => "https://maps.google.com/maps?q={$where}&z={$zoom}",
+            'deferred' => true,
         ];
     }
 

@@ -1,0 +1,259 @@
+/* The media browser a picture field opens (PLAN.md D-145). Admin tokens only (--ui-*).
+
+   Split from admin-picker.css, which passed 300 lines when this arrived. The seam: that
+   file dresses the CONTROL in the field and the library's cards as the browser shows them;
+   this dresses the dialog around them — its tools, its drop zone, the crop step and the
+   wait. The crop's row of shapes is admin-crop.css's, shared with the library's crop.
+
+   app/Modules/Media/views/admin/browser.php is the markup; media-picker.js opens it. */
+
+/* THE MEDIA BROWSER. A .dialog (admin-ui.css) made wide and tall: the picture is chosen by
+   looking, and a column a few hundred pixels wide was the weakness this replaced. A flex
+   column when open, so the grid takes what the head and the tools leave and scrolls on its
+   own while they stay put. */
+.media-browser {
+  inline-size: min(68rem, calc(100vw - 2 * var(--ui-4)));
+  block-size: min(48rem, calc(100dvh - 2 * var(--ui-4)));
+  padding: var(--ui-5);
+  overflow: hidden;
+}
+
+.media-browser[open] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-3);
+}
+
+.media-browser .dialog-head {
+  margin-bottom: 0;
+  align-items: center;
+}
+
+.media-browser-close {
+  flex: none;
+}
+
+.media-browser-error {
+  margin: 0;
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-danger-soft);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+}
+
+.media-browser-pick,
+.media-browser-crop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-3);
+  flex: 1;
+  min-block-size: 0;
+}
+
+.media-browser-pick[hidden],
+.media-browser-crop[hidden] {
+  display: none;
+}
+
+.media-browser-tools {
+  display: flex;
+  gap: var(--ui-3);
+  align-items: center;
+}
+
+/* The search, with its magnifier inside the field. */
+.media-browser-search {
+  position: relative;
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.media-browser-search .icon {
+  position: absolute;
+  inset-inline-start: var(--ui-3);
+  inset-block-start: 50%;
+  translate: 0 -50%;
+  color: var(--ui-ink-muted);
+  pointer-events: none;
+}
+
+.media-browser-search input {
+  inline-size: 100%;
+  padding-inline-start: calc(var(--ui-3) * 2 + 1rem);
+}
+
+/* The drop zone: one line across the top, not the library's tall box — the grid below is
+   what this dialog is for. Visible at rest by its dashed edge (--ui-control-line, 3:1). */
+.media-browser-drop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2) var(--ui-3);
+  align-items: center;
+  justify-content: center;
+  padding: var(--ui-4);
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) dashed var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.media-browser-drop .icon {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  color: var(--ui-ink-muted);
+}
+
+.media-browser-browse {
+  color: var(--ui-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.media-browser-limits {
+  flex-basis: 100%;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  text-align: center;
+}
+
+.media-browser-drop:hover,
+.media-browser-drop:focus-within {
+  border-color: var(--ui-accent);
+}
+
+.media-browser-drop:focus-within {
+  outline: var(--ui-border) solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+.media-browser-drop.is-dropping {
+  background: var(--ui-accent-soft);
+  border-color: var(--ui-accent);
+}
+
+/* The grid scrolls on its own, so the tools above it never leave the screen. */
+.media-browser-results {
+  flex: 1;
+  min-block-size: 0;
+  overflow-y: auto;
+  padding: var(--ui-1);
+}
+
+.media-browser-results[aria-busy="true"] {
+  opacity: 0.6;
+}
+
+.media-picker-more {
+  display: flex;
+  margin: var(--ui-4) auto var(--ui-2);
+}
+
+/* THE CROP STEP. The stage takes the height the bar leaves; Cropper sizes itself to it. */
+.media-browser-stage {
+  flex: 1;
+  min-block-size: 0;
+  background: var(--ui-panel-sunken);
+  border-radius: var(--ui-radius-m);
+  overflow: hidden;
+}
+
+.media-browser-stage img {
+  display: block;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+}
+
+.media-browser-crop .hint {
+  margin: 0;
+}
+
+.media-browser-crop-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-3) var(--ui-4);
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--ui-3);
+  border-top: var(--ui-border) solid var(--ui-line);
+}
+
+.media-browser-crop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+  margin-inline-start: auto;
+}
+
+/* Uploading, and making the sizes: over the whole dialog, so nothing in it can be pressed
+   twice while a picture is on its way. */
+.media-browser-busy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-3);
+  align-items: center;
+  justify-content: center;
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+}
+
+.media-browser-busy[hidden] {
+  display: none;
+}
+
+.media-browser-busy p {
+  margin: 0;
+}
+
+.media-browser-spinner {
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: 3px solid var(--ui-line);
+  border-block-start-color: var(--ui-accent);
+  border-radius: 50%;
+  animation: media-browser-spin 0.8s linear infinite;
+}
+
+@keyframes media-browser-spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-browser-spinner {
+    animation-duration: 3s;
+  }
+}
+
+/* A phone: the dialog is the whole screen, and the tools stack. */
+@media (max-width: 40rem) {
+  /* The browser's own dialog limits (a margin of 2em and a little) are lifted too, or the
+     "whole screen" stops short of every edge. */
+  .media-browser {
+    inline-size: 100vw;
+    block-size: 100dvh;
+    max-inline-size: 100vw;
+    max-block-size: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    padding: var(--ui-4);
+  }
+
+  .media-browser-tools {
+    flex-wrap: wrap;
+  }
+
+  .media-browser-search {
+    flex-basis: 100%;
+  }
+
+  .media-grid-picking {
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    gap: var(--ui-2);
+  }
+}

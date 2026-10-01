@@ -1,0 +1,157 @@
+/* The Embed block: a video or a map (D-105), and since D-147 the press that loads it.
+   Site tokens only.
+
+   Split from blocks-media.css when the press arrived: that file dresses pictures, and this
+   is a frame of someone else's that the site keeps closed until a visitor opens it. */
+
+/* The frame keeps its proportion at every width, so nothing below it moves when it loads.
+   An address nothing recognises draws NOTHING here: the note inside it is for the editor,
+   and canvas.css is what shows it. */
+
+.embed {
+  margin: 0;
+}
+
+.embed.is-empty {
+  display: none;
+}
+
+.layout-inset .embed-frame {
+  padding: var(--space-l);
+  background: var(--section-card);
+  border-radius: var(--radius-m);
+}
+
+.embed-frame iframe {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  border-radius: var(--radius-m);
+}
+
+/* THE PRESS (D-147). Until a visitor presses, a video or a Google map is this link: the
+   site's own cover picture filling the frame, and in the middle a button in the section's
+   button colours, which the design layer already holds to contrast on every surface. It is
+   solid, so it reads over a picture of any brightness without a veil. Without a cover the frame is the placeholder
+   every other block uses. */
+.embed-play {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-m);
+  color: var(--section-text);
+  text-decoration: none;
+}
+
+.embed-play.is-bare {
+  background: var(--section-placeholder);
+  border: var(--border-width) solid var(--section-placeholder-edge);
+}
+
+.embed-play picture,
+.embed-play img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.embed-play-label {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-s);
+}
+
+.embed-play-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-l);
+  background: var(--section-button-bg);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-m);
+  color: var(--section-button-text);
+  font-weight: 600;
+  transition: transform 120ms ease;
+}
+
+/* The play triangle, drawn in the button's own text colour. A map has none. */
+.embed-play:not(.provider-googlemaps) .embed-play-text::before {
+  content: "";
+  inline-size: 0.7em;
+  block-size: 0.8em;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+/* A YOUTUBE VIDEO'S PLAY IS YOUTUBE'S OWN BUTTON (D-149, the owner's choice): red, with a
+   white triangle, as in YouTube's player. An IMAGE, not a colour of the site's: it is
+   YouTube's mark, the way a logo is a picture, and the rule that a front-end stylesheet
+   never holds a colour of its own stands. Its words are kept for a screen reader only:
+   white on YouTube's red is 4.0:1, below what the site holds text to, and as an icon it
+   needs 3:1, which it has. */
+.embed-play-youtube {
+  inline-size: 4.25rem;
+  aspect-ratio: 68 / 48;
+  background-image: url("embed-youtube.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  transition: transform 120ms ease;
+}
+
+.provider-youtube .embed-play-text {
+  position: absolute;
+  inline-size: 1em;
+  block-size: 1em;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Hover and focus raise the button; it is legible at rest either way. */
+.embed-play:hover .embed-play-text,
+.embed-play:focus-visible .embed-play-text,
+.embed-play:hover .embed-play-youtube,
+.embed-play:focus-visible .embed-play-youtube {
+  transform: scale(1.06);
+}
+
+/* The focus ring in the link colour, as thick as two of the character's borders. */
+.embed-play:focus-visible {
+  outline: calc(var(--border-width) * 2) solid var(--section-link);
+  outline-offset: calc(var(--border-width) * 2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .embed-play-text,
+  .embed-play-youtube {
+    transition: none;
+  }
+}
+
+.ratio-wide .embed-frame {
+  aspect-ratio: 16 / 9;
+}
+
+.ratio-square .embed-frame {
+  aspect-ratio: 1;
+}
+
+.ratio-tall .embed-frame {
+  aspect-ratio: 3 / 4;
+}
+
+.embed-caption {
+  margin-block-start: var(--space-s);
+  color: var(--section-muted);
+  font-size: var(--text-sm);
+}
+

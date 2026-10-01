@@ -34,4 +34,14 @@ DirectoryIndex index.php
 <IfModule !mod_rewrite.c>
     ErrorDocument 404 /index.php
 </IfModule>
+
+# An SVG logo opened on its own, as a page of this site, may run nothing (D-142). It is
+# cleaned on upload and drawn as an <img>, where a browser runs nothing anyway; this is the
+# third line, for the address typed or linked straight to the file. Needs mod_headers.
+<IfModule mod_headers.c>
+    <If "%{REQUEST_URI} =~ m#/m/logo/[^/]+\.svg$#">
+        Header set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; sandbox"
+        Header set X-Content-Type-Options "nosniff"
+    </If>
+</IfModule>
 # END Boxlet
