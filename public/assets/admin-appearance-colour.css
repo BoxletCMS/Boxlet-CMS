@@ -10,8 +10,7 @@
  * values on an SVG or as an input's value, never as a declaration here: a stylesheet of the
  * admin's that held a site colour is the bug tests/contrast_test.php exists to catch.
  *
- * The contrast gauge is here too: it is the palette measured, and it was the last thing
- * left in the old Design screen's stylesheet (PLAN.md O-24). */
+ * The contrast check, the palette measured, moved to admin-appearance-contrast.css (D-160). */
 /* ---- the palette as ONE list of roles (PLAN.md D-074) --------------------------------- */
 
 /* It used to be two lists: fifteen colours that could not be touched, and a folded panel
@@ -141,12 +140,44 @@
   display: none;
 }
 
-.field:has(.roles input[type="checkbox"]:checked) .palette-reset {
+.control-group:has(.roles input[type="checkbox"]:checked) .palette-reset {
   display: inline-flex;
 }
 
-.role .field-error {
-  grid-column: 1 / -1;
+/* The dot of a role set by hand (D-158) sits after its name, inside it, so the row keeps the
+   palette's four columns. */
+.role.is-changed .role-name .control-changed {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* The note and "give them all back" share a line; the button only while there is one to give. */
+.palette-head {
+  display: flex;
+  align-items: start;
+  gap: var(--ui-2);
+}
+
+.palette-head .hint {
+  flex: 1 1 auto;
+}
+
+.roles-more {
+  font-size: var(--ui-text-sm);
+}
+
+.roles-more > summary {
+  padding-block: var(--ui-1);
+  color: var(--ui-ink-muted);
+  cursor: pointer;
+}
+
+.roles-more > summary:hover {
+  color: var(--ui-ink);
+}
+
+.roles-more .roles {
+  margin-block-start: var(--ui-2);
 }
 
 /* ---- or a colour of your own (PLAN.md D-076) ------------------------------------------ */
@@ -187,81 +218,44 @@
   display: none;
 }
 
-.own-colour:has(input[type="checkbox"]:checked) .role-value {
+/* By the row's own switch: a place's light and dark rows (D-187) are each the owner's or not. */
+.own-colour .role:has(input[type="checkbox"]:checked) .role-value {
   display: inline;
 }
 
-.own-colour:has(input[type="checkbox"]:checked) .role-derived {
+.own-colour .role:has(input[type="checkbox"]:checked) .role-derived {
   display: none;
 }
 
-/* ---- the contrast gauge (PLAN.md D-058) ---------------------------------------------- */
+/* THE OWNER'S DARK COLOURS (D-187): while Mode is Dark, each role set by hand shows its dark
+   row instead of its light one — a colour picked there is for dark mode only. Driven by the
+   Mode control itself, so the rows change as it is pressed, without a round trip. */
+.role-dark,
+.role-dark-hint {
+  display: none;
+}
 
-/* The contrast gauge (PLAN.md D-058): every pair, what it looks like, what it measures.
-   The sample is an SVG whose two fills are the site's colours — the only site colour that
-   ever reaches this screen, and it reaches it as data, never as a stylesheet value. */
-
-.gauge-list {
+[data-design-form]:has(input[name="mode"][value="dark"]:checked) .role-dark {
   display: grid;
-  gap: var(--ui-1);
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
-/* 1.75rem of sample, not 2.5rem (PLAN.md D-078). D-075 shrank the SVG's viewBox from 40×24
-   to 28×18 and said the sample was smaller; it was not, because this rule still gave the box
-   40×24 and an SVG scales its contents to the box it is given. Sixteen rows share a 312px
-   column and the sample only has to show a pair of colours against each other, so the box
-   moves too and the name gets the twelve pixels. */
-.gauge-row {
-  display: grid;
-  grid-template-columns: 1.75rem minmax(0, 1fr) auto;
-  gap: var(--ui-2);
-  align-items: center;
-  font-size: var(--ui-text-sm);
+[data-design-form]:has(input[name="mode"][value="dark"]:checked) .role-dark-hint {
+  display: block;
 }
 
-.gauge-sample {
-  inline-size: 1.75rem;
-  block-size: 1.125rem;
-  border-radius: var(--ui-radius-s);
-  border: var(--ui-border) solid var(--ui-line);
+[data-design-form]:has(input[name="mode"][value="dark"]:checked) .roles-palette > .role:not(.role-dark) {
+  display: none;
 }
 
-.gauge-ratio {
-  font-variant-numeric: tabular-nums;
+/* "only in dark": said while the colour is the owner's for dark, beside its name. */
+.role-only-dark {
+  display: none;
   color: var(--ui-ink-muted);
-  font-size: var(--ui-text-xs);
-  white-space: nowrap;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-/* The verdict is a word, never a colour alone: a red dot says nothing to a reader who
-   cannot see red, and nothing at all to one reading it aloud. */
-.gauge-verdict {
-  color: var(--ui-success);
-}
-
-.gauge-fails .gauge-verdict {
-  color: var(--ui-danger);
-  font-weight: 600;
-}
-
-.gauge-more {
-  margin-block-start: var(--ui-2);
-  font-size: var(--ui-text-sm);
-}
-
-.gauge-more summary {
-  cursor: pointer;
-  color: var(--ui-ink-muted);
-  padding-block: var(--ui-1);
-}
-
-.gauge-more summary:hover {
-  color: var(--ui-ink);
-}
-
-.gauge-more .gauge-list {
-  margin-block-start: var(--ui-2);
+.role-dark:has(input[type="checkbox"]:checked) .role-only-dark {
+  display: inline;
 }

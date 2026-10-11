@@ -1,6 +1,7 @@
-/* HOW A DECISION IS MADE on the Appearance screen: five tabs, and inside them the rows of
- * buttons, the sliders, the typeface cards and the specimen (PLAN.md D-059, D-062, D-065,
- * D-066, D-075).
+/* HOW A DECISION IS MADE on the Appearance screen: the home and the sections (D-157), and
+ * inside them the typeface cards, the specimen and the ramp (PLAN.md D-059, D-062, D-065,
+ * D-066, D-075). The rows, sliders and groups themselves are the admin's shared controls
+ * (admin-controls.css).
  *
  * How a COLOUR is shown and taken over is admin-appearance-colour.css, which split off here
  * when the two together passed 500 lines. The seam is the one they already had: nothing in
@@ -9,76 +10,6 @@
  * Admin tokens only (--ui-*), with ONE exception that is the point of the screen: the
  * typeface cards and the specimen are set in the faces being chosen, because a list of
  * names is not a choice anybody can make. */
-
-.tabs {
-  display: grid;
-  gap: var(--ui-4);
-}
-
-/* The strip reads as a row of tabs at rest — each one has its own edge, not only the
-   selected one, because a control that appears on hover is a control nobody knew was
-   there.
-   SIX EQUAL COLUMNS, NOT A WRAPPING ROW. Six tabs in 19.5rem minus padding is about
-   280px, which fits in English and does not in Croatian: "Boja · Tipografija · Oblik ·
-   Stranica · Zaglavlje" broke into two ragged rows, and a strip that wraps unevenly reads
-   as two strips. Equal columns wrap as one block or not at all, and a name too long for
-   its column gives way at the end with the whole of it in the title.
-   THREE COLUMNS, TWO ROWS since D-111, when the header and the footer got a tab each: six
-   names in one row of 280px cut "Colour", "Header" and "Footer" to "Col…", "Hea…" and
-   "Foo…" in English, and a tab whose name cannot be read is not a tab. Two even rows are
-   what D-075 allowed; uneven ones are what it refused. */
-.tab-strip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ui-1);
-  padding: var(--ui-1);
-  background: var(--ui-panel-sunken);
-  border: var(--ui-border) solid var(--ui-line);
-  border-radius: var(--ui-radius-l);
-}
-
-/* The strip's own colour wins over the admin's link colour: these are tabs, and a tab that
-   is painted like a link reads as somewhere else to go rather than as this screen's parts. */
-.tab-strip .tab {
-  color: var(--ui-ink-muted);
-}
-
-.tab-strip .tab:hover,
-.tab-strip .tab-current,
-.tab-strip .tab[aria-selected="true"] {
-  color: var(--ui-ink);
-}
-
-.tab {
-  min-inline-size: 0;
-  overflow: hidden;
-  padding: var(--ui-2) var(--ui-1);
-  border-radius: var(--ui-radius-m);
-  color: var(--ui-ink-muted);
-  font-size: var(--ui-text-xs);
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tab:hover {
-  background: var(--ui-panel);
-  color: var(--ui-ink);
-}
-
-.tab-current,
-.tab[aria-selected="true"] {
-  background: var(--ui-panel);
-  color: var(--ui-ink);
-  box-shadow: var(--ui-shadow-s);
-}
-
-.tab-panel {
-  display: grid;
-  gap: var(--ui-4);
-}
 
 /* ---- hints on demand (PLAN.md D-078) -------------------------------------------------- */
 
@@ -94,61 +25,7 @@
   accent-color: var(--ui-accent);
 }
 
-/* The follow segment is the one that says "not mine", so it reads quieter than a choice. */
-.segment-follow {
-  flex-basis: 100%;
-}
-
-/* ---- the typefaces, and the specimen ------------------------------------------------- */
-
-.typefaces {
-  display: grid;
-  gap: var(--ui-1);
-}
-
-.typeface {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--ui-3);
-  padding: var(--ui-2);
-  background: var(--ui-panel);
-  border: var(--ui-border) solid var(--ui-line);
-  border-radius: var(--ui-radius-m);
-  cursor: pointer;
-}
-
-.typeface:has(input:checked) {
-  border-color: var(--ui-accent);
-  box-shadow: 0 0 0 1px var(--ui-accent);
-}
-
-.typeface:has(input:focus-visible) {
-  outline: 2px solid var(--ui-accent);
-  outline-offset: 2px;
-}
-
-/* The one place the admin shows the SITE's typefaces: they are what is being chosen, and a
-   list of names is not a choice anybody can make. The families are the same files the site
-   serves, named in admin-appearance-fonts.css. */
-.typeface-sample {
-  flex: 0 0 2rem;
-  font-size: 1.35rem;
-  line-height: 1;
-  text-align: center;
-}
-
-.typeface-name {
-  display: grid;
-  font-size: var(--ui-text-sm);
-  font-weight: 600;
-}
-
-.typeface-name span {
-  color: var(--ui-ink-faint);
-  font-size: var(--ui-text-xs);
-  font-weight: 400;
-}
+/* ---- the specimen (the two families' pickers and the pairings: admin-appearance-fonts.css) */
 
 /* The sizes the two controls above decide, AT those sizes and in the face being chosen
    (D-075). The panel is the admin's; what is set inside it is the site's, for the same
@@ -173,6 +50,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* THE HEADINGS WRAP, NEVER CUT (the owner's review of D-170): "A site that loo…" showed a
+   heading as a fragment. Two lines at most: appearance-readouts.js shrinks a heading that
+   would need a third, that heading alone, and the readout beside it keeps its real size. */
+.specimen-4xl span,
+.specimen-2xl span {
+  white-space: normal;
+  text-wrap: balance;
+  line-height: 1.15;
 }
 
 .specimen-line em {
@@ -257,10 +144,6 @@
   gap: var(--ui-1);
 }
 
-.appearance-inspector .tab-panel {
-  gap: var(--ui-3);
-}
-
 /* ---- what the form itself is, and the line under a control (PLAN.md O-24) ------------ */
 
 /* Moved from admin-design.css when that file went: the form is this screen's form, and the
@@ -284,31 +167,3 @@
   overflow-wrap: anywhere;
 }
 
-/* ---- one language's words, folded (PLAN.md D-111) ------------------------------------ */
-
-/* With several languages each one's words are a <details>, and the language the picture is
-   drawn in stands open. The summary is drawn like a group's legend, and it is a control at
-   rest: a chevron the browser gives it, and a name. */
-.words > summary {
-  cursor: pointer;
-  padding-block: var(--ui-1);
-  color: var(--ui-ink);
-  font-size: var(--ui-text-sm);
-  font-weight: 600;
-}
-
-.words > summary:hover {
-  color: var(--ui-accent);
-}
-
-.words-previewed {
-  color: var(--ui-ink-faint);
-  font-size: var(--ui-text-xs);
-  font-weight: 400;
-}
-
-.words-inside {
-  display: grid;
-  gap: var(--ui-3);
-  padding-block-start: var(--ui-2);
-}

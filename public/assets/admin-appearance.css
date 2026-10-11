@@ -1,9 +1,9 @@
-/* The Appearance screen (PLAN.md D-064, D-072): a bar, then the three columns that scroll
- * independently — the characters, the picture, the controls.
+/* The Appearance screen (PLAN.md D-064, D-072, D-157): a bar, then the two columns that
+ * scroll independently — the picture and the inspector.
  *
  * THIS FILE IS THE SCREEN ITSELF: what the bar holds, how the columns are laid out, and the
  * strip over the picture. What is INSIDE each column has its own file beside this one
- * (-rail, -picture, -inspector), and every threshold at which this screen rearranges is in
+ * (-home, -picture, -inspector, -colour, -layout), and every threshold at which this screen rearranges is in
  * admin-appearance-widths.css, which is loaded LAST so its overrides win. One file of a
  * thousand lines was past the point where it is read rather than searched, and the
  * thresholds scattered through it were the fault docs/ispravci.md §A was written about.
@@ -56,22 +56,21 @@
   white-space: nowrap;
 }
 
-.appearance-title strong {
+/* The screen's heading (D-181: a page has one h1), at the size the bar's name always had —
+   over `.admin h1`, which is a page's heading. */
+.admin .appearance-title .appearance-name {
+  margin: 0;
+  font-family: inherit;
   font-size: var(--ui-text-base);
+  font-weight: 700;
+  line-height: inherit;
+  letter-spacing: normal;
 }
 
 /* The subhead says what the screen is for, and goes first when there is no room for it. */
 .appearance-subhead {
   color: var(--ui-ink-faint);
   font-size: var(--ui-text-xs);
-}
-
-/* Opens the characters as a panel once they stop being a column. Shown by the container
-   query in admin-appearance-widths.css, and only when appearance-rail.js is there to open
-   it: without a script the screen stacks instead, and a button that could not do anything
-   would be worse. */
-.appearance-rail-open {
-  display: none;
 }
 
 .appearance-bar .preview-tools {
@@ -97,7 +96,7 @@
   border-radius: 0;
 }
 
-/* ---- the three columns --------------------------------------------------------------- */
+/* ---- the picture and the inspector ------------------------------------------------------ */
 
 .appearance-body {
   position: relative;
@@ -107,7 +106,9 @@
      long before any threshold fired — the two side columns are fixed, so every pixel the
      window loses came out of the one thing the screen exists to show. 30rem is a 1280px
      page at a little over 0.6, still a page rather than a smudge. */
-  grid-template-columns: 12.25rem minmax(30rem, 1fr) 19.5rem;
+  /* The inspector at 384px, giving way to 45% of the screen and no less than 300px (D-157):
+     the characters' column it had beside it went into the inspector as tiles. */
+  grid-template-columns: minmax(30rem, 1fr) clamp(18.75rem, 45cqw, 24rem);
   min-height: 0;
   margin: 0;
   gap: 0;
@@ -120,7 +121,6 @@
    Left static, those escape the scroll container and make the DOCUMENT taller than the
    window, which is the dead band under the screen and the page scrollbar with it. One rule
    here rather than hunting each of them down. */
-.appearance-rail,
 .appearance-inspector {
   position: relative;
   min-height: 0;
@@ -134,30 +134,15 @@
   padding: var(--ui-3);
 }
 
-.appearance-rail {
-  display: grid;
-  align-content: start;
-  gap: var(--ui-2);
-  background: var(--ui-panel-sunken);
-  border-inline-end: var(--ui-border) solid var(--ui-line);
-}
-
 .appearance-inspector {
   background: var(--ui-panel);
   border-inline-start: var(--ui-border) solid var(--ui-line);
 }
 
-/* A MEASURE, NOT A WIDTH. In its column this does nothing — the column is 19.5rem — and
-   stacked it stops a slider and a row of five segments from being drawn across nine hundred
-   pixels. One rule rather than one per stacked state, so there is nothing to keep in sync.
-   (This is more than docs/ispravci.md asked for: it asked only that the columns stack.) */
-.appearance-inspector .tabs,
-.appearance-rail {
-  /* 100% FIRST, and it is not decoration. The rail is a GRID ITEM, and an auto margin on one
-     of those turns off the stretch that would otherwise fill its track: left at `auto` width
-     it shrank to the widest card it happened to hold — 241px in a 390px column, floating in
-     the middle. A definite width takes the question away, the maximum clamps it, and the
-     margins then have something left over to centre. */
+/* A MEASURE, NOT A WIDTH. In its column this does nothing; stacked under the picture it
+   stops a slider and a row of segments being drawn across nine hundred pixels. */
+.appearance-inspector > .inspector-view,
+.appearance-inspector > .inspector-panels {
   box-sizing: border-box;
   inline-size: 100%;
   max-inline-size: 42rem;
@@ -210,6 +195,28 @@
   font-size: var(--ui-text-xs);
 }
 
+/* What pressing the picture does (D-181): said once, quietly, between the page and the size. */
+.stage-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-1);
+  min-inline-size: 0;
+  margin-inline-start: auto;
+  overflow: hidden;
+  color: var(--ui-ink-muted);
+  white-space: nowrap;
+}
+
+.stage-hint[hidden] {
+  display: none;
+}
+
+.stage-hint .icon {
+  flex: none;
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+}
+
 /* The one thing in this strip that is a warning rather than a fact, so it is the one that
    is coloured — and it is words, not a colour alone. */
 .stage-tight {
@@ -224,15 +231,25 @@
   white-space: nowrap;
 }
 
-/* Publish asking how to apply a character (PLAN.md D-068). Under the bar, across the whole
-   screen, because it is a question about the whole screen and the answer is destructive. */
+/* A question the screen asks — load a character over the owner's changes, how to publish
+   one, what to do with an imported file (D-068, D-152, D-158). At the top of the inspector
+   since D-157, not a band across the screen pushing the picture down. */
 
 .appearance-confirm {
   display: grid;
   gap: var(--ui-2);
   padding: var(--ui-3);
   background: var(--ui-warning-soft);
-  border-block-end: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+/* ONLY PUBLISH'S QUESTION WARNS (D-161): it is the one whose answer can overwrite the site's
+   section styles. The import's and the load's ask what to do with a design, and stand on the
+   neutral ground the cards do. */
+.import-confirm,
+.load-confirm {
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
 }
 
 .confirm-question {
@@ -244,6 +261,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--ui-4);
+}
+
+.confirm-options {
+  gap: var(--ui-2) var(--ui-3);
 }
 
 .confirm-options > span {
@@ -271,5 +292,17 @@
 .design-form:has(input[name="boxed"][value="no"]:checked) .segment:has(input[name="footer_width"][value="full"]:not(:checked)),
 .design-form:has(input[name="boxed"][value="yes"]:checked):has(input[name="header_bleed"][value="sheet"]:checked) .segment:has(input[name="header_width"][value="window"]:not(:checked)),
 .design-form:has(input[name="boxed"][value="yes"]:checked):has(input[name="footer_bleed"][value="sheet"]:checked) .segment:has(input[name="footer_width"][value="window"]:not(:checked)) {
+  display: none;
+}
+
+/* ASKED ONLY WHERE IT MEANS SOMETHING (D-157), read off the form's own state like the boxed
+   page's controls above: the second colour's picker while there is a second colour; a logo's
+   size where the header shows a logo; how many columns the footer's menu runs in for the one
+   arrangement that has columns; how see-through and blurred the header is, for a bar that
+   moves with the page (D-164). The fields stay in the form and are posted either way. */
+.design-form:has(input[name="use_secondary"]:not(:checked)) .when-secondary,
+.design-form:has(input[name="look_header_behaviour"][value="static"]:checked) .when-moving,
+.design-form:has(input[name="look_brand"][value="name"]:checked) [data-control="logo_size"],
+.design-form:has(input[name="look_footer_layout"]:checked:not([value="columns"])) [data-control="footer_columns"] {
   display: none;
 }

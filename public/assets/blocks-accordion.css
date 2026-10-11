@@ -1,0 +1,104 @@
+/* Questions (PLAN.md D-105, D-189, D-190). Split from blocks-words.css with its cards' own
+   chevron (D-190), under blocks.css's rule: only custom properties from tokens.css and the
+   --section-* properties each section sets in sections.css. No literal colours, pixel values,
+   fonts or shadows. Linked after blocks-words.css.
+
+   <details> and <summary>, styled without taking away what they do. In a list the marker is
+   the browser's own, rotated by the browser when the panel opens. As cards it is a chevron of
+   the block's own on the right (D-190, the owner), its open state drawn with it. */
+
+.accordion-heading {
+  margin: 0 0 var(--space-l);
+}
+
+/* RANGED TO THE EDGE EVEN IN A CENTRED BAND, which is not the block overruling the design
+   layer but the rule the form block already follows (.align-center .site-form). A summary
+   row is a CONTROL: its marker sits on the leading edge and its hit area is the whole row,
+   so centring makes every question start at a different place and puts the marker in the
+   middle of nothing. The block's own heading still follows the band. */
+.accordion-items {
+  display: grid;
+  gap: var(--space-s);
+}
+
+/* How wide the rows run is the block's measure (D-188), centred with it. */
+.align-center .accordion-items {
+  text-align: start;
+}
+
+.accordion-item {
+  border-block-end: var(--border-width) solid var(--section-border);
+}
+
+.accordion-question {
+  padding-block: var(--space-s);
+  font-weight: var(--heading-weight);
+  cursor: pointer;
+}
+
+/* The words move, not the block: a summary that shifts its own padding on open makes the
+   whole list jump under the pointer. */
+.accordion-question:hover,
+.accordion-question:focus-visible {
+  color: var(--section-link);
+}
+
+.accordion-answer {
+  padding-block-end: var(--space-m);
+}
+
+.layout-cards .accordion-items {
+  gap: var(--space-m);
+}
+
+/* A card in every character, drawn as a Cards block's card is (D-189, D-190, the owner): its
+   surface, edge, corners, padding and shadow, and its question at a card heading's size. On
+   --border-card, 0 in four characters, the card colour alone was all it had — 1.05:1 to the
+   page in Editorial — and the questions read as plain text; then, one line in a pale box with
+   a hairline and small corners, as a form's field. */
+.layout-cards .accordion-item {
+  padding-inline: calc(var(--space-m) * 1.125);
+  background: var(--section-card);
+  border: var(--border-width) solid var(--section-border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-s);
+}
+
+/* ITS OWN CHEVRON, ON THE RIGHT (D-190, the owner), in place of the browser's triangle: a
+   corner of two strokes, turned to point up while the answer is open. Still a <summary>, so it
+   opens and closes without a script. */
+.layout-cards .accordion-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-m);
+  padding-block: calc(var(--space-m) * 1.125);
+  font-size: var(--text-lg);
+  list-style: none;
+}
+
+.layout-cards .accordion-question::-webkit-details-marker {
+  display: none;
+}
+
+.layout-cards .accordion-question::after {
+  content: "";
+  flex: none;
+  inline-size: 0.5em;
+  block-size: 0.5em;
+  /* Never thinner than a stroke that can be seen: a character may have no rules at all. */
+  border-inline-end: max(0.125em, calc(var(--border-width) * 2)) solid currentColor;
+  border-block-end: max(0.125em, calc(var(--border-width) * 2)) solid currentColor;
+  transform: translateY(-25%) rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.layout-cards .accordion-item[open] > .accordion-question::after {
+  transform: translateY(25%) rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout-cards .accordion-question::after {
+    transition: none;
+  }
+}

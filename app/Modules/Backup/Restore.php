@@ -44,10 +44,11 @@ final class Restore
         private readonly string $storage,
         private readonly string $cache,
         private readonly string $public,
+        string $customDesigns = '',
     ) {
         $this->rows = new RestoreRows($db, $root, $backups . '/restore.work');
         $this->kept = new Backups($backups);
-        $this->files = new RestoreFiles($uploads, $media);
+        $this->files = new RestoreFiles($uploads, $media, $customDesigns);
     }
 
     public function running(): bool

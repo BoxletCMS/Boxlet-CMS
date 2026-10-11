@@ -49,6 +49,9 @@ final class AdminView
             // it here it was drawn as 'success' — the very thing the comment above forbids.
             'flashKind' => in_array($kind, ['warning', 'error'], true) ? $kind : 'success',
             'csrf' => $session->csrfToken(),
+            // What a rich text editor draws a replacement tag as (D-201), on every screen
+            // that has one; a read of the snippets, small.
+            'tags' => \App\Modules\Snippets\Tags::editorData($container->get('db')),
             // Statistics has a place in the rail only while it counts (D-051).
             'statsOn' => \App\Modules\Stats\Tracker::settings($container->get('db'))['enabled'],
         ] + self::frame($container);

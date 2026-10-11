@@ -1,0 +1,242 @@
+/* THE BUILDER'S RAIL (PLAN.md D-175, README 4.2): the strip of three tabs and the fold, and the
+   panel beside it — Structure's tree and Page's form (Add's list is builder-add.css). The
+   admin's tokens only, on the panel colour the inspector shares: the bar alone is the bar's. */
+
+.pb-tabs {
+  display: flex;
+  background: var(--ui-panel);
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ui-1);
+  padding-block: var(--ui-2);
+  border-inline-end: var(--ui-border) solid var(--ui-line);
+}
+
+.pb-tab {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ui-radius-m);
+  background: transparent;
+  color: var(--ui-ink-muted);
+  cursor: pointer;
+}
+
+.pb-tab:hover {
+  background: var(--ui-panel-sunken);
+  color: var(--ui-ink);
+}
+
+.pb-tab[aria-pressed="true"] {
+  background: var(--ui-panel-sunken);
+  color: var(--ui-ink);
+  box-shadow: inset 2px 0 0 var(--ui-accent);
+}
+
+.pb-tab-fold {
+  margin-block-start: auto;
+}
+
+.pb-rail {
+  min-block-size: 0;
+  background: var(--ui-panel);
+  overflow-y: auto;
+  border-inline-end: var(--ui-border) solid var(--ui-line);
+}
+
+.pb-panel {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-3);
+  padding: var(--ui-3);
+}
+
+.pb-panel[hidden] {
+  display: none;
+}
+
+.pb-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ui-2);
+}
+
+/* `.admin` because `.admin h2, .admin h3` (admin.css) outrank a class: measured, the group
+   names drew at the size of a page heading. */
+.admin .pb-panel-head h2,
+.admin .pb-add-group {
+  margin: 0;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin .pb-add-group {
+  margin-block-start: var(--ui-3);
+}
+
+.pb-panel-count {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+/* ---- Structure ---------------------------------------------------------------------------- */
+
+.pb-tree,
+.pb-tree-blocks {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb-tree-blocks {
+  padding-inline-start: var(--ui-4);
+}
+
+.pb-tree-section {
+  display: grid;
+  gap: 2px;
+  margin-block-end: var(--ui-2);
+}
+
+.pb-tree-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  min-block-size: 2rem;
+  padding: 0 var(--ui-2);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink);
+  cursor: pointer;
+}
+
+.pb-tree-row:hover {
+  background: var(--ui-panel-sunken);
+}
+
+.pb-tree-row.is-selected {
+  background: var(--ui-panel-sunken);
+  box-shadow: inset 0 0 0 var(--ui-border) var(--ui-accent);
+}
+
+.pb-tree-row .icon {
+  flex: none;
+  inline-size: 0.95rem;
+  block-size: 0.95rem;
+}
+
+.pb-tree-grip {
+  display: inline-flex;
+  color: var(--ui-ink-muted);
+  cursor: grab;
+}
+
+.pb-tree-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pb-tree-meta {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  white-space: nowrap;
+}
+
+/* A band's columns (O-56): each named, and each a place to drop into, an empty one too. */
+.pb-tree-column {
+  margin: var(--ui-1) 0 0;
+  padding-inline-start: var(--ui-4);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+.pb-tree-blocks.is-column {
+  min-block-size: 2rem;
+  margin-inline-start: var(--ui-4);
+  padding-inline-start: 0;
+  border-inline-start: var(--ui-border) dashed var(--ui-control-line);
+}
+
+.pb-tree-empty {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+/* ---- Page --------------------------------------------------------------------------------- */
+
+.pb-page .field {
+  display: grid;
+  gap: var(--ui-1);
+}
+
+.pb-page .field label {
+  font-size: var(--ui-text-sm);
+}
+
+.pb-page .field input,
+.pb-page .field select,
+.pb-page .field textarea {
+  max-inline-size: none;
+}
+
+.pb-page .hint-line {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+.pb-serp {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--ui-3);
+  border-radius: var(--ui-radius-m);
+  background: var(--ui-panel-sunken);
+  color: var(--ui-ink);
+}
+
+.pb-serp p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.pb-serp-title {
+  font-weight: 600;
+}
+
+.pb-serp-url,
+.pb-serp-text {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+.pb-history {
+  display: grid;
+  gap: var(--ui-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb-history li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-2);
+  font-size: var(--ui-text-sm);
+}
+
+.pb-history .icon {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+}

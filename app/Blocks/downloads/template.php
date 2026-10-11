@@ -16,34 +16,34 @@
 $files = is_array($resolved['files'] ?? null) ? $resolved['files'] : [];
 ?>
 <div class="downloads">
-<?php if ($content['heading'] !== ''): ?>
-    <h2 class="downloads-heading"><?= e($content['heading']) ?></h2>
+<?php if (edit_show($content['heading'] !== '')): ?>
+    <h2 class="downloads-heading"<?= edit_attr('heading') ?>><?= e($content['heading']) ?></h2>
 <?php endif; ?>
     <ul class="downloads-list">
-<?php foreach ($content['items'] as $item):
+<?php foreach ($content['items'] as $at => $item):
     $file = is_int($item['file']) ? ($files[$item['file']] ?? null) : null;
     $title = $item['title'] !== '' ? $item['title'] : ($file['name'] ?? '');
     ?>
 <?php if ($file === null): ?>
-        <li class="downloads-item is-empty">
+        <li class="downloads-item is-empty"<?= edit_item('items', $at) ?>>
             <span class="downloads-type" aria-hidden="true"></span>
             <span class="downloads-text">
-                <span class="downloads-title"><?= e($title) ?></span>
-<?php if ($item['description'] !== ''): ?>
-                <span class="downloads-description"><?= e($item['description']) ?></span>
+                <span class="downloads-title"<?= edit_attr('items', $at, 'title') ?>><?= e($title) ?></span>
+<?php if (edit_show($item['description'] !== '')): ?>
+                <span class="downloads-description"<?= edit_attr('items', $at, 'description') ?>><?= e($item['description']) ?></span>
 <?php endif; ?>
             </span>
         </li>
 <?php else: ?>
-        <li class="downloads-item">
+        <li class="downloads-item"<?= edit_item('items', $at) ?>>
             <?php /* The whole item is the link: the type, the title and the line about it
                      are one thing to press, and the address ends in the file's own name. */ ?>
             <a class="downloads-link" href="<?= e($file['url']) ?>" download>
                 <span class="downloads-type" aria-hidden="true"><?= e(strtoupper($file['extension'])) ?></span>
                 <span class="downloads-text">
-                    <span class="downloads-title"><?= e($title) ?></span>
-<?php if ($item['description'] !== ''): ?>
-                    <span class="downloads-description"><?= e($item['description']) ?></span>
+                    <span class="downloads-title"<?= edit_attr('items', $at, 'title') ?>><?= e($title) ?></span>
+<?php if (edit_show($item['description'] !== '')): ?>
+                    <span class="downloads-description"<?= edit_attr('items', $at, 'description') ?>><?= e($item['description']) ?></span>
 <?php endif; ?>
                     <span class="downloads-meta"><?= e(strtoupper($file['extension'])) ?> · <?= e($file['size']) ?></span>
                 </span>
@@ -51,5 +51,6 @@ $files = is_array($resolved['files'] ?? null) ? $resolved['files'] : [];
         </li>
 <?php endif; ?>
 <?php endforeach; ?>
+<?= edit_add('items', 'downloads-item', 'li') ?>
     </ul>
 </div>

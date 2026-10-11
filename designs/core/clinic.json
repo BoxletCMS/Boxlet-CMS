@@ -1,0 +1,315 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "clinic",
+    "name": {
+        "en": "Clinic",
+        "hr": "Clinic"
+    },
+    "description": {
+        "en": "Calm blue-green, soft corners, clear type. For doctors, physiotherapists and dentists.",
+        "hr": "Mirna plavo-zelena, meki kutovi, jasno pismo. Za liječnike, fizioterapeute i stomatologe."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#0f6b6b",
+        "surface_contrast": "22",
+        "heading_font": "figtree",
+        "body_font": "figtree",
+        "text_size": "17",
+        "spacing": "1.1",
+        "section_gap": "88",
+        "radius": "16",
+        "shadow": "soft",
+        "shadow_strength": "20",
+        "container": "64",
+        "button_radius": "24",
+        "button_height": "48"
+    },
+    "dark": {
+        "seed": "#5fc4c0",
+        "surface_contrast": "26",
+        "shadow_strength": "50"
+    },
+    "look": {
+        "header_arrangement": "inline",
+        "header_behaviour": "sticky",
+        "header_opacity": "96",
+        "header_blur": "6",
+        "header_surface": "plain",
+        "header_edge": "line",
+        "header_height": "72",
+        "logo_size": "32",
+        "brand": "both",
+        "nav_style": "plain",
+        "nav_ink": "ink",
+        "header_button": "filled",
+        "footer_layout": "columns",
+        "footer_columns": "3",
+        "footer_links": "auto",
+        "small_print_row": "split",
+        "footer_surface": "tinted",
+        "footer_edge": "none"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "normal",
+            "align": "left",
+            "divider": "none",
+            "animation": "fade"
+        },
+        "surfaces": {
+            "stats": "tinted",
+            "accordion": "tinted"
+        },
+        "dividers": {},
+        "layouts": {
+            "hero": "split",
+            "cards": "grid",
+            "accordion": "cards",
+            "stats": "three",
+            "quote": "card",
+            "cta": "beside",
+            "image_text": "image-right",
+            "form": "beside"
+        },
+        "options": {
+            "cards": {
+                "image_shape": "round"
+            }
+        }
+    },
+    "patterns": [
+        {
+            "id": "clinic-welcome",
+            "name": {
+                "en": "Welcome",
+                "hr": "Dobrodošlica"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "split",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Care that takes its time",
+                            "hr": "Skrb koja ima vremena"
+                        },
+                        "subheading": {
+                            "en": "A small practice with longer appointments and the same doctor each visit.",
+                            "hr": "Mala ordinacija s dužim pregledima i istim liječnikom pri svakom dolasku."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "Book an appointment",
+                                "hr": "Naručite se"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "clinic-offer",
+            "name": {
+                "en": "What we offer",
+                "hr": "Što nudimo"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {
+                        "per_row": "3"
+                    },
+                    "content": {
+                        "heading": {
+                            "en": "How we help",
+                            "hr": "Kako pomažemo"
+                        },
+                        "intro": {
+                            "en": "Most visits can be booked online.",
+                            "hr": "Većinu pregleda možete rezervirati online."
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "Check-ups",
+                                    "hr": "Pregledi"
+                                },
+                                "body": {
+                                    "en": "<p>Yearly checks and advice for the whole family.</p>",
+                                    "hr": "<p>Godišnji pregledi i savjeti za cijelu obitelj.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Physiotherapy",
+                                    "hr": "Fizioterapija"
+                                },
+                                "body": {
+                                    "en": "<p>Recovery after injury, surgery or long sitting.</p>",
+                                    "hr": "<p>Oporavak nakon ozljede, operacije ili dugog sjedenja.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Follow-up",
+                                    "hr": "Praćenje"
+                                },
+                                "body": {
+                                    "en": "<p>We call you after treatment to see how you are.</p>",
+                                    "hr": "<p>Nazovemo vas nakon terapije da čujemo kako ste.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "clinic-numbers",
+            "name": {
+                "en": "In numbers",
+                "hr": "U brojkama"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "tinted"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "stats",
+                    "layout": "three",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Since 2009",
+                            "hr": "Od 2009."
+                        },
+                        "items": [
+                            {
+                                "value": {
+                                    "en": "15"
+                                },
+                                "label": {
+                                    "en": "years",
+                                    "hr": "godina"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "4"
+                                },
+                                "label": {
+                                    "en": "doctors",
+                                    "hr": "liječnika"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "30 min"
+                                },
+                                "label": {
+                                    "en": "per visit",
+                                    "hr": "po pregledu"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "clinic-voice",
+            "name": {
+                "en": "A client's words",
+                "hr": "Riječi klijenta"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "quote",
+                    "layout": "card",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "For the first time a doctor listened to the end of my sentence.",
+                            "hr": "Prvi put me liječnik saslušao do kraja rečenice."
+                        },
+                        "attribution": {
+                            "en": "Marko T.",
+                            "hr": "Marko T."
+                        },
+                        "role": {
+                            "en": "Patient",
+                            "hr": "Pacijent"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "clinic-call",
+            "name": {
+                "en": "Call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "beside",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Need an appointment?",
+                            "hr": "Trebate termin?"
+                        },
+                        "body": {
+                            "en": "Call or book online, we answer the same day.",
+                            "hr": "Nazovite ili rezervirajte online, odgovaramo isti dan."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Book now",
+                                "hr": "Rezervirajte"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -65,7 +65,14 @@ use App\Support\Url;
 <?php elseif ($rows === []): ?>
         <p class="hint"><?= e(t('media.show.none')) ?> <a href="<?= e(Url::admin('media')) ?>"><?= e(t('media.show.every')) ?></a></p>
 <?php else: ?>
-<?php require __DIR__ . '/table.php'; ?>
+<?php
+    $bulkId = 'media-bulk';
+    $bulkAction = Url::admin('media', 'delete');
+    $bulkWords = 'media.bulk';
+    $bulkKeep = ['q' => $search, 'show' => $show, 'kind' => $kind, 'page' => $page > 1 ? (string) $page : ''];
+    require dirname(__DIR__, 3) . '/Admin/views/bulk.php';
+    require __DIR__ . '/table.php';
+?>
 <?php if ($pages > 1):
     $at = static fn (int $n): string => Url::withQuery(Url::admin('media'), array_filter(['q' => $search, 'show' => $show, 'kind' => $kind, 'page' => $n > 1 ? (string) $n : '']));
     ?>

@@ -34,11 +34,11 @@ final class MediaWriter
      * once more at a lower setting (MediaVariants), and it is passed rather than stored
      * because the default is right for every picture but one in ten.
      *
-     * WHETHER IT IS OBEYED DEPENDS ON THE DELEGATE, and the defaults above are not a
-     * promise. GD honours it for all three. ImageMagick 6.9.12 honours it for JPEG and
-     * silently ignores it for AVIF and WebP — so on such a host those two are written at
-     * whatever the delegate's own default is, and the 50 and 82 never apply. Measured in
-     * MediaVariants::smallerAvif().
+     * WHETHER IT IS OBEYED DEPENDS ON THE DELEGATE, and was not always (PLAN.md O-18). GD
+     * honours it for all three. ImageMagick 6.9.12 honours it for JPEG, for AVIF only through
+     * the wand's setter as well as the image's (both are set below), and never for WebP: so
+     * where the encoder finds that, a WebP is still oriented, cropped and resized here and
+     * then written by GD's imagewebp, which takes the quality it is given (D-209).
      *
      * @param array{x: int, y: int, width: int, height: int, targetWidth: int, targetHeight: int} $crop
      * @return array{width: int, height: int, bytes: int}
@@ -122,8 +122,29 @@ final class MediaWriter
         // Location, camera serial and the orientation tag all go: the pixels are already
         // the right way up, so a tag would turn them a second time.
         $image->stripImage();
-        $image->setImageFormat($format === 'jpg' ? 'jpeg' : $format);
         $level = $quality ?? ($format === 'avif' ? 50 : 82);
+        // WebP from an ImageMagick that writes it at one quality whatever it is told: the
+        // pixels as Imagick made them, the encode GD's (O-18). PNG carries the alpha across.
+        if ($format === 'webp' && function_exists('imagewebp') && !$this->encoder->imagickWebpQuality()) {
+            $image->setImageFormat('png');
+            $gd = imagecreatefromstring((string) $image->getImageBlob());
+            $image->clear();
+            if ($gd === false) {
+                throw new RuntimeException('Writing webp failed.');
+            }
+            if (!imageistruecolor($gd)) {
+                imagepalettetotruecolor($gd);
+            }
+            imagesavealpha($gd, true);
+            $written = imagewebp($gd, $target, $level);
+            imagedestroy($gd);
+            if ($written === false) {
+                throw new RuntimeException('Writing webp failed.');
+            }
+
+            return;
+        }
+        $image->setImageFormat($format === 'jpg' ? 'jpeg' : $format);
         // BOTH setters. The image's own quality is what JPEG reads; the AVIF writer on
         // ImageMagick 6.9.12 reads the wand's instead and ignored the first alone — the
         // same 1920×1080 photograph came out at 285,806 B at every quality asked through

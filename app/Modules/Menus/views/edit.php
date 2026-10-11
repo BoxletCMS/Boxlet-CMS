@@ -41,7 +41,7 @@ $parents = array_values(array_filter($items, static fn (array $item): bool => $i
         <div class="page-header">
             <h1><?= e($title) ?></h1>
             <span class="status"><?= e($menu['locale']) ?></span>
-            <a class="button button-secondary" href="<?= e(Url::admin('menus')) ?>"><?= e(t('menus.title')) ?></a>
+            <a class="button button-secondary" href="<?= e(Url::admin('navigation')) ?>"><?= e(t('admin.nav.menus')) ?></a>
         </div>
 
         <div class="panel">
@@ -72,7 +72,7 @@ $parents = array_values(array_filter($items, static fn (array $item): bool => $i
             <input type="hidden" name="order" value="">
         </form>
         <div class="table-wrap">
-            <table class="table page-tree">
+            <table class="table page-tree menu-items">
                 <thead>
                     <tr>
                         <th scope="col"><span class="visually-hidden"><?= e(t('menus.col.order')) ?></span></th>
@@ -92,8 +92,8 @@ $parents = array_values(array_filter($items, static fn (array $item): bool => $i
                             <button type="submit" form="menu-move-<?= e($item['id']) ?>" name="move" value="down" title="<?= e(t('menus.move_down')) ?>"
                                     class="button button-ghost move-button"<?= $item['last'] ? ' disabled' : '' ?>><?= icon('arrow-down') ?><span class="visually-hidden"><?= e(t('menus.move_down')) ?></span></button>
                         </td>
-                        <td class="depth-<?= e($item['depth']) ?>"><?= e($item['label']) ?></td>
-                        <td>
+                        <td class="menu-item-label depth-<?= e($item['depth']) ?>"><?= e($item['label']) ?></td>
+                        <td class="menu-item-target">
 <?php if ($item['broken']): ?>
                             <?php /* A badge, not a notice. notice-warning is a full-width
                                      block meant for the top of a screen; inside a table cell

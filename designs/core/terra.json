@@ -1,0 +1,445 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "terra",
+    "name": {
+        "en": "Terra",
+        "hr": "Terra"
+    },
+    "description": {
+        "en": "Warm and grounded: terracotta on a sand page, a classic serif pairing, generous room. For studios, makers, restaurants and small hotels.",
+        "hr": "Toplo i prizemljeno: terakota na pješčanoj stranici, klasičan serifni par, puno prostora. Za studije, obrtnike, restorane i male hotele."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#a0472a",
+        "secondary": "#2f3a33",
+        "surface_contrast": "28",
+        "color_background": "#f7f2ec",
+        "heading_font": "source-serif-4",
+        "text_size": "17",
+        "scale": "1.25",
+        "line_height": "1.65",
+        "heading_weight": "500",
+        "tracking": "-0.01",
+        "caps": "no",
+        "nudge_h1": "4",
+        "spacing": "1.15",
+        "section_gap": "104",
+        "radius": "10",
+        "shadow": "soft",
+        "shadow_strength": "24",
+        "container": "64",
+        "button_radius": "24",
+        "button_height": "48"
+    },
+    "dark": {
+        "seed": "#d98a6a",
+        "color_background": "#1d1916",
+        "surface_contrast": "32",
+        "shadow_strength": "55"
+    },
+    "look": {
+        "header_arrangement": "inline",
+        "header_behaviour": "sticky",
+        "header_opacity": "92",
+        "header_blur": "8",
+        "header_surface": "plain",
+        "header_edge": "line",
+        "header_height": "76",
+        "logo_size": "32",
+        "brand": "both",
+        "nav_style": "plain",
+        "nav_ink": "ink",
+        "header_button": "outline",
+        "footer_layout": "columns",
+        "footer_columns": "3",
+        "footer_links": "auto",
+        "small_print_row": "split",
+        "footer_surface": "contrast",
+        "footer_edge": "curve"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "normal",
+            "align": "left",
+            "divider": "none",
+            "animation": "up"
+        },
+        "surfaces": {
+            "stats": "tinted",
+            "cta": "contrast"
+        },
+        "dividers": {
+            "cta": "curve"
+        },
+        "layouts": {
+            "hero": "cover-left",
+            "cards": "list",
+            "quote": "big",
+            "accordion": "cards",
+            "stats": "three",
+            "cta": "banner",
+            "image_text": "image-right",
+            "gallery": "three"
+        },
+        "options": {
+            "hero": {
+                "height": "tall",
+                "veil": "medium"
+            },
+            "text": {
+                "measure": "comfortable"
+            },
+            "quote": {
+                "measure": "wide"
+            },
+            "cards": {
+                "image_shape": "wide"
+            },
+            "gallery": {
+                "shape": "square"
+            },
+            "picture": {
+                "shape": "wide"
+            }
+        }
+    },
+    "patterns": [
+        {
+            "id": "terra-welcome",
+            "name": {
+                "en": "Welcome",
+                "hr": "Dobrodošlica"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "split",
+                    "column": 0,
+                    "options": {
+                        "height": "tall"
+                    },
+                    "content": {
+                        "heading": {
+                            "en": "Made slowly, by hand, to last",
+                            "hr": "Rađeno polako, ručno, da traje"
+                        },
+                        "subheading": {
+                            "en": "A small workshop on the edge of town. We make furniture and objects from local oak and clay.",
+                            "hr": "Mala radionica na rubu grada. Izrađujemo namještaj i predmete od domaćeg hrasta i gline."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "Visit the workshop",
+                                "hr": "Posjetite radionicu"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "terra-offer",
+            "name": {
+                "en": "What we offer",
+                "hr": "Što nudimo"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {
+                        "per_row": "3",
+                        "image_shape": "wide"
+                    },
+                    "content": {
+                        "heading": {
+                            "en": "What we offer",
+                            "hr": "Što nudimo"
+                        },
+                        "intro": {
+                            "en": "Three ways to work with us.",
+                            "hr": "Tri načina suradnje."
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "Made to order",
+                                    "hr": "Po narudžbi"
+                                },
+                                "body": {
+                                    "en": "<p>A piece drawn for your room, from the first sketch to delivery.</p>",
+                                    "hr": "<p>Komad nacrtan za vaš prostor, od prve skice do dostave.</p>"
+                                },
+                                "link": {
+                                    "label": {
+                                        "en": "How it works",
+                                        "hr": "Kako to ide"
+                                    },
+                                    "url": "/how-we-work"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "From the shelf",
+                                    "hr": "Iz police"
+                                },
+                                "body": {
+                                    "en": "<p>Bowls, boards and lamps, ready to take home.</p>",
+                                    "hr": "<p>Zdjele, daske i svjetiljke, spremne za ponijeti.</p>"
+                                },
+                                "link": {
+                                    "label": {
+                                        "en": "See the shop",
+                                        "hr": "Pogledajte trgovinu"
+                                    },
+                                    "url": "/shop"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Workshops",
+                                    "hr": "Radionice"
+                                },
+                                "body": {
+                                    "en": "<p>Saturday mornings at the bench, for beginners and the curious.</p>",
+                                    "hr": "<p>Subotom ujutro za stolom, za početnike i znatiželjne.</p>"
+                                },
+                                "link": {
+                                    "label": {
+                                        "en": "Book a place",
+                                        "hr": "Rezervirajte mjesto"
+                                    },
+                                    "url": "/contact"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "terra-numbers",
+            "name": {
+                "en": "In numbers",
+                "hr": "U brojkama"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "tinted"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "stats",
+                    "layout": "three",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Twelve years at the bench",
+                            "hr": "Dvanaest godina za stolom"
+                        },
+                        "items": [
+                            {
+                                "value": {
+                                    "en": "12"
+                                },
+                                "label": {
+                                    "en": "years",
+                                    "hr": "godina"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "900+"
+                                },
+                                "label": {
+                                    "en": "pieces made",
+                                    "hr": "izrađenih komada"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "4"
+                                },
+                                "label": {
+                                    "en": "makers",
+                                    "hr": "majstora"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "terra-voice",
+            "name": {
+                "en": "A client's words",
+                "hr": "Riječi klijenta"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "align": "center"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "quote",
+                    "layout": "big",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "The table is the first thing guests touch when they sit down. It feels like it has always been here.",
+                            "hr": "Stol je prvo što gosti dotaknu kad sjednu. Kao da je oduvijek bio ovdje."
+                        },
+                        "attribution": {
+                            "en": "Lea K.",
+                            "hr": "Lea K."
+                        },
+                        "role": {
+                            "en": "Owner, Konoba Mali Porat",
+                            "hr": "Vlasnica, Konoba Mali Porat"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "terra-questions",
+            "name": {
+                "en": "Questions",
+                "hr": "Pitanja"
+            },
+            "section": {
+                "layout": "wide-right",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "text",
+                    "layout": "single",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Before you order",
+                            "hr": "Prije narudžbe"
+                        },
+                        "body": {
+                            "en": "<p>Most answers are here. For anything else, write to us.</p>",
+                            "hr": "<p>Većina odgovora je ovdje. Za sve ostalo, pišite nam.</p>"
+                        }
+                    }
+                },
+                {
+                    "type": "accordion",
+                    "layout": "cards",
+                    "column": 1,
+                    "options": {},
+                    "content": {
+                        "start": "first-open",
+                        "items": [
+                            {
+                                "question": {
+                                    "en": "How long does a piece take?",
+                                    "hr": "Koliko traje izrada?"
+                                },
+                                "answer": {
+                                    "en": "<p>Six to ten weeks, depending on the wood and the season.</p>",
+                                    "hr": "<p>Šest do deset tjedana, ovisno o drvu i sezoni.</p>"
+                                }
+                            },
+                            {
+                                "question": {
+                                    "en": "Do you deliver?",
+                                    "hr": "Dostavljate li?"
+                                },
+                                "answer": {
+                                    "en": "<p>Yes, across the country, and we set it up in place.</p>",
+                                    "hr": "<p>Da, po cijeloj zemlji, i postavljamo na mjestu.</p>"
+                                }
+                            },
+                            {
+                                "question": {
+                                    "en": "Can I see the wood first?",
+                                    "hr": "Mogu li prvo vidjeti drvo?"
+                                },
+                                "answer": {
+                                    "en": "<p>Of course. Come by the workshop and choose the boards yourself.</p>",
+                                    "hr": "<p>Naravno. Svratite u radionicu i sami odaberite daske.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "terra-call",
+            "name": {
+                "en": "Call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast",
+                    "divider": "curve"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "banner",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Have a room in mind?",
+                            "hr": "Imate prostor na umu?"
+                        },
+                        "body": {
+                            "en": "Tell us about it. We answer within two days.",
+                            "hr": "Opišite nam ga. Odgovaramo u roku od dva dana."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Get in touch",
+                                "hr": "Javite se"
+                            },
+                            "url": "/contact"
+                        },
+                        "second": {
+                            "label": {
+                                "en": "See our work",
+                                "hr": "Pogledajte radove"
+                            },
+                            "url": "/work"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

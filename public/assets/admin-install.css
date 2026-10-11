@@ -1,0 +1,125 @@
+/* THE INSTALLER'S OWN PARTS, loaded by the installer alone: "Start over", the requirement
+ * checks, and the last step at work. Admin tokens only (--ui-*). The first two came from
+ * admin-ui.css (D-212), where nothing else used them. */
+
+.restart {
+  margin-top: var(--ui-6);
+}
+
+/* Requirement checks */
+
+.checks {
+  display: grid;
+  gap: var(--ui-2);
+  margin: 0 0 var(--ui-5);
+  padding: 0;
+  list-style: none;
+}
+
+/* ONE ROW, TWO COLUMNS: the verdict in its own, the words in theirs. Reported by the owner
+   from a real install, and it is the rows that print a path that show it — the label wraps,
+   and without a column of its own the second line goes back under the word "OK". Measured
+   on the installer's own screen: three of eighteen rows at 1200px, eight of eighteen on a
+   phone. "Missing" and "Optional" are wider than "OK", so the column is sized to its
+   content rather than to a guess. */
+.check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--ui-1) var(--ui-3);
+  align-items: baseline;
+}
+
+/* A hint, or the rewrite rules under a failed check, line up with the words rather than
+   with the verdict. */
+.check > :not(.check-status) {
+  grid-column: 2;
+  /* A path is one long word with no spaces. Where it cannot fit, it breaks inside itself
+     rather than pushing the card wider than the window. */
+  overflow-wrap: anywhere;
+}
+
+.check-status {
+  font-weight: 700;
+}
+
+.check-fail .check-status {
+  color: var(--ui-danger);
+}
+
+.check-warn .check-status {
+  color: var(--ui-warning);
+}
+
+.check-ok .check-status {
+  color: var(--ui-success);
+}
+
+/* The last step at work (PLAN.md D-212). Installing with the demo makes every
+ * size of its pictures in one request, and for a minute the page showed nothing; the
+ * browser tab's spinner was the only sign. A bar that moves, not one that counts: a single
+ * request cannot say how far it has got. */
+
+.install-busy {
+  display: grid;
+  gap: var(--ui-2);
+}
+
+.install-busy-bar {
+  position: relative;
+  height: var(--ui-2);
+  overflow: hidden;
+  /* The strong line: the plain one all but vanished on the dark panel (seen in the shot). */
+  background: var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+}
+
+.install-busy-bar::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: 40%;
+  background: var(--ui-accent);
+  border-radius: inherit;
+  animation: install-busy 1.4s ease-in-out infinite;
+}
+
+@keyframes install-busy {
+  from { left: -40%; }
+  to { left: 100%; }
+}
+
+/* Still, it is a full bar of the accent colour; the words beside it say what is going on. */
+@media (prefers-reduced-motion: reduce) {
+  .install-busy-bar::before {
+    width: 100%;
+    left: 0;
+    animation: none;
+  }
+}
+
+/* The demo's pictures, counted (D-214): a bar that fills, since here each request knows how
+   far the pictures have got. The same track and fill as the moving bar above. */
+.install-progress {
+  appearance: none;
+  width: 100%;
+  height: var(--ui-2);
+  border: 0;
+  border-radius: var(--ui-radius-m);
+  background: var(--ui-line-strong);
+  overflow: hidden;
+}
+
+.install-progress::-webkit-progress-bar {
+  background: var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+}
+
+.install-progress::-webkit-progress-value {
+  background: var(--ui-accent);
+  border-radius: var(--ui-radius-m);
+}
+
+.install-progress::-moz-progress-bar {
+  background: var(--ui-accent);
+  border-radius: var(--ui-radius-m);
+}

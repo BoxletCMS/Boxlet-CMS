@@ -69,6 +69,21 @@ final class Response
         return $response;
     }
 
+    /**
+     * A JSON answer for the admin's own scripts (PLAN.md D-175): never cached, and readable
+     * when a value cannot be encoded — the rest of the answer is still the answer.
+     *
+     * @param array<string, mixed> $data
+     */
+    public static function json(array $data, int $status = 200): self
+    {
+        return new self(
+            (string) json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR),
+            $status,
+            ['Content-Type' => 'application/json; charset=utf-8', 'Cache-Control' => 'no-store', 'X-Content-Type-Options' => 'nosniff'],
+        );
+    }
+
     public static function redirect(string $location, int $status = 302): self
     {
         return new self('', $status, ['Location' => $location]);

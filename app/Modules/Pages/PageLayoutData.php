@@ -7,6 +7,7 @@ use App\Core\Db;
 use App\Core\Settings;
 use App\Modules\Design\Design;
 use App\Modules\Design\Palette;
+use App\Modules\Design\PaletteInks;
 use App\Modules\Design\Color;
 use App\Modules\Design\Tokens;
 use App\Modules\Media\MediaPicture;
@@ -41,6 +42,9 @@ use App\Modules\Settings\SiteChrome;
  *     shareImage: string|null,
  *     hreflang: list<array{hreflang: string, href: string}>,
  *     breadcrumbs: string,
+ *     noindex: bool,
+ *     designPreview: bool,
+ *     fontPreloads: list<string>,
  *     headerBleed: string,
  *     footerBleed: string,
  *     headerHtml: string,
@@ -53,7 +57,7 @@ final class PageLayoutData
      * What the layout is handed, beside View's own $locale and $content. The test above
      * asserts this list against the template, so it is a fact rather than a comment.
      */
-    public const KEYS = ['title', 'description', 'canonical', 'icon', 'shareImage', 'hreflang', 'breadcrumbs', 'headerBleed', 'footerBleed', 'headerHtml', 'footerHtml'];
+    public const KEYS = ['title', 'description', 'canonical', 'icon', 'shareImage', 'hreflang', 'breadcrumbs', 'noindex', 'designPreview', 'fontPreloads', 'siteStyles', 'headerBleed', 'footerBleed', 'headerHtml', 'footerHtml'];
 
     /**
      * A visitor's page, or an error page.
@@ -64,7 +68,7 @@ final class PageLayoutData
      * a "not found" without the site's own header around it reads as a broken site rather
      * than a wrong address.
      *
-     * @param array{title: string, description?: string, canonical?: string|null, shareImage?: string|null, first_surface?: string, breadcrumbs?: string} $head
+     * @param array{title: string, description?: string, canonical?: string|null, shareImage?: string|null, first_surface?: string, breadcrumbs?: string, noindex?: bool} $head
      * @param array<string, mixed>|null $page the page being drawn; null on an error page
      * @param string $current its address, for marking the menu; '' on an error page
      * @return LayoutData
@@ -76,6 +80,7 @@ final class PageLayoutData
         // home where it is not translated (D-043, step 4). What the switcher draws, and what
         // hreflang is made from.
         $alternates = Alternates::for($db, $page, $container->get('locales'));
+        $design = self::design($db);
 
         return [
             'title' => $head['title'],
@@ -90,7 +95,12 @@ final class PageLayoutData
             'hreflang' => Alternates::hreflang($alternates, self::primary($container->get('locales'))),
             // BreadcrumbList JSON-LD for a page under a parent, '' otherwise (D-129).
             'breadcrumbs' => $head['breadcrumbs'] ?? '',
-        ] + self::chrome($container, $locale, $alternates, $current, self::design($db) + ['first_surface' => $head['first_surface'] ?? '']);
+            // A page its owner keeps out of search engines (D-170).
+            'noindex' => ($head['noindex'] ?? false) === true,
+            'designPreview' => false,
+            'fontPreloads' => self::fontPreloads($design['decisions']),
+            'siteStyles' => self::siteStyles($container),
+        ] + self::chrome($container, $locale, $alternates, $current, $design + ['first_surface' => $head['first_surface'] ?? '']);
     }
 
     /**
@@ -128,7 +138,46 @@ final class PageLayoutData
             // An admin address must never announce itself as a translation of anything.
             'hreflang' => [],
             'breadcrumbs' => '',
+            'noindex' => true,
+            // The Appearance screen's picture, which marks an empty picture as one (D-170).
+            'designPreview' => true,
+            // None in the preview: its faces change with every family tried, and it is redrawn
+            // only for what changes its markup (appearance-stage.js).
+            'fontPreloads' => [],
+            'siteStyles' => self::siteStyles($container),
         ] + self::chrome($container, $locale, Alternates::for($db, null, $container->get('locales')), '', $trying);
+    }
+
+    /**
+     * THE TWO FAMILIES' FIRST FILES, FETCHED AT ONCE (D-185): the heading's latin file at its
+     * weight and the text's at 400, so the words are drawn in their own face the first time.
+     *
+     * @param array<string, string> $decisions resolved
+     * @return list<string> addresses
+     */
+    private static function fontPreloads(array $decisions): array
+    {
+        $heading = \App\Modules\Design\Fonts::known($decisions['heading_font'] ?? '');
+        $weight = $decisions['heading_weight'] ?? '';
+        $weight = $weight !== '' ? (int) $weight : \App\Modules\Design\Fonts::ALL[$heading]['heading'][0];
+
+        return array_map(
+            // Versioned as tokens.css's @font-face is, or the preload is a second download.
+            static fn (string $path): string => \App\Support\Url::asset('assets/fonts/' . \App\Modules\Design\Typography::versioned($path)),
+            \App\Modules\Design\Typography::preloads($heading, $decisions['body_font'] ?? '', $weight),
+        );
+    }
+
+    /**
+     * The visitor's stylesheets as one file (D-204), beside tokens.css; '' where it cannot be
+     * written, and the layout then links the nineteen.
+     */
+    private static function siteStyles(Container $container): string
+    {
+        $cache = (string) (($container->get('config')->get('app', []))['cache_path'] ?? '');
+        $file = $cache === '' ? '' : \App\Support\SiteStyles::file($cache);
+
+        return $file === '' ? '' : \App\Support\Url::asset('cache/' . $file);
     }
 
     /**
@@ -142,7 +191,7 @@ final class PageLayoutData
      */
     private static function design(Db $db): array
     {
-        $decisions = Design::load($db);
+        $decisions = Design::resolved($db);
 
         return ['bleeds' => $decisions, 'own' => Tokens::ownChrome($decisions), 'decisions' => $decisions];
     }
@@ -165,10 +214,10 @@ final class PageLayoutData
         if ($decisions === []) {
             return false;
         }
-        $colors = Palette::colors($decisions['seed'], $decisions['secondary'], $decisions['surface_contrast'], Tokens::byHand($decisions));
+        $colors = Palette::forDecisions($decisions);
         $surface = ($look['header_behaviour'] ?? '') === 'over' ? $firstSurface : ($look['header_surface'] ?? 'plain');
         if (($look['header_behaviour'] ?? '') !== 'over' && isset($own['header'])) {
-            $ink = Palette::inksOn($own['header'], $colors)['text'];
+            $ink = PaletteInks::inksOn($own['header'], $colors)['text'];
         } else {
             $ink = $colors[match ($surface) {
                 'contrast', 'image' => 'on-contrast',
@@ -251,19 +300,26 @@ final class PageLayoutData
         $words = $trying['words'] ?? [];
         $header['button']['label'] = $words['button_label'] ?? $header['button']['label'];
         $header['button']['url'] = $words['button_url'] ?? $header['button']['url'];
-        // Each column's words as HTML whatever version stored them (D-113, D-115): a plain
-        // text from before becomes one paragraph with its breaks, which is what the page
-        // drew for it.
+        // Each column's words, rich text since D-113 (D-115).
         $columns = [];
         foreach (ChromeWords::COLUMN_FIELDS as $n => [$titleField, $textField]) {
             $stored = $footer['columns'][$n - 1] ?? ['title' => '', 'text' => ''];
             $columns[] = [
                 'title' => $words[$titleField] ?? $stored['title'],
-                'text' => ChromeWords::asHtml($words[$textField] ?? $stored['text']),
+                'text' => $words[$textField] ?? $stored['text'],
             ];
+        }
+        // The replacement tags in the footer's words (D-201): its columns' rich text, and — said
+        // as more than SPEC §5.6 asks — the small print, the line where © {{year}} belongs.
+        $tags = \App\Modules\Snippets\Tags::context($db, $locale, null, false);
+        foreach ($columns as $i => $column) {
+            $columns[$i]['text'] = \App\Modules\Snippets\Tags::expand($column['text'], $tags);
         }
         $footer['columns'] = $columns;
         $footer['small_print'] = $words['small_print'] ?? $footer['small_print'];
+        // Escaped first, its tags then drawn; handed over beside the content, which the block
+        // machinery keeps to the footer's declared fields.
+        $smallPrint = \App\Modules\Snippets\Tags::expand(e($footer['small_print']), $tags);
         $header['button'] = PageLinks::link(
             $header['button'],
             PageLinks::targets($db, $registry, $locale, [['type' => 'header', 'content' => $header]]),
@@ -316,7 +372,7 @@ final class PageLayoutData
             'footerHtml' => $hasFooter
                 // The footer's edge is a section divider (D-113): the same layer-2 key, the
                 // same classes, drawn by sections.css exactly as on a band.
-                ? $registry->render('footer', $footer, ['surface' => $resolved['footer_surface'], 'divider' => $resolved['footer_edge']], $resolved['footer_layout'], [], false, 'footer', ['menus' => $footerMenus, 'look' => $resolved, 'credit' => $credit, 'own' => isset($own['footer'])], $locale, $locales)
+                ? $registry->render('footer', $footer, ['surface' => $resolved['footer_surface'], 'divider' => $resolved['footer_edge']], $resolved['footer_layout'], [], false, 'footer', ['menus' => $footerMenus, 'look' => $resolved, 'credit' => $credit, 'own' => isset($own['footer']), 'small_print' => $smallPrint], $locale, $locales)
                 : '',
         ];
     }

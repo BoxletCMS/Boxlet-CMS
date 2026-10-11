@@ -6,8 +6,9 @@ use App\Support\Url;
  * The canvas document, shown in the editor's iframe.
  *
  * It links exactly what a visitor's page links, so the canvas is the page and not an
- * approximation of it. canvas.css adds the editor's own chrome; it is written in its own
- * literal values and never reads a site token, the same rule the admin follows.
+ * approximation of it. canvas.css and canvas-marks.css add the editor's own chrome; they are
+ * written in their own literal values and never read a site token, the same rule the admin
+ * follows.
  *
  * @var string $locale
  * @var string $title
@@ -24,24 +25,28 @@ use App\Support\Url;
     <link rel="stylesheet" href="<?= e(Url::stylesheet()) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/site.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-hero.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-hero-split.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-cards.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-words.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-accordion.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-stats.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-media.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-logos.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-embed.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-downloads.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/sections.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/sections-edges.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/sections-steps.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/sections-columns.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/canvas.css')) ?>">
-    <?php /* Reordering happens here, inside the canvas, because drag events do not cross
-             a document boundary. See SPEC 3 for the vendored front-end asset rule. */ ?>
-    <script src="<?= e(Url::versioned('assets/vendor/sortable.min.js')) ?>" defer></script>
-    <script src="<?= e(Url::versioned('assets/canvas.js')) ?>" defer></script>
-    <script src="<?= e(Url::versioned('assets/canvas-tools.js')) ?>" defer></script>
-    <script src="<?= e(Url::versioned('assets/canvas-drag.js')) ?>" defer></script>
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/canvas-inserter.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/canvas-inline.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/canvas-marks.css')) ?>">
+    <?php /* No script of its own: the builder draws over this document from the parent, which
+             it can reach because both are this site's (builder-overlay.js, D-175). */ ?>
 </head>
-<body class="bx-canvas" data-insert-labels="<?= e(implode('|', [t('pages.insert_here'), t('pages.insert_at_end'), t('pages.insert_in_column'), t('pages.insert_word.section'), t('pages.insert_word.block')])) ?>"
-      data-block-labels="<?= e(implode('|', [t('pages.move_up'), t('pages.move_down'), t('pages.duplicate'), t('pages.remove')])) ?>"
-      data-empty-label="<?= e(t('pages.canvas_empty_block')) ?>"
-      data-icons="<?= e(Url::versioned('assets/vendor/icons.svg')) ?>">
+<body class="bx-canvas">
     <?php /* Sections are direct children of main, exactly as on the front end: their CSS
              depends on being siblings, so nothing may be inserted between them. */ ?>
     <main data-bx-blocks>

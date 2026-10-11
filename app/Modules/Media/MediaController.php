@@ -99,7 +99,7 @@ final class MediaController
             'title' => t('media.title'),
             'nav' => 'media',
             'styles' => ['admin-media.css', 'admin-media-table.css'],
-            'scripts' => ['media.js', 'auto-continue.js'],
+            'scripts' => ['media.js', 'auto-continue.js', 'admin-bulk.js'],
             'wide' => true,
             'pictures' => $pictures,
             'rows' => $rows,

@@ -155,8 +155,18 @@ final class Redirects
     private static function history(Db $db, Request $request, string $locale): ?array
     {
         $segments = array_values(array_filter(explode('/', $request->path), static fn (string $s): bool => $s !== ''));
+        // An additional locale's prefix is the locale, not a segment of the address.
+        if ($segments !== [] && $segments[0] === $locale) {
+            array_shift($segments);
+        }
         $last = $segments === [] ? '' : strtolower((string) end($segments));
         if ($last === '') {
+            return null;
+        }
+        // ONLY AN ADDRESS THAT WAS REAL (SPEC §5.1, D-200): every segment in front a slug a page
+        // had, as for a live page's moved address. The last segment alone sent /admin/{old},
+        // /m/{old} and /x/y/{old} on to the page.
+        if (!\App\Modules\Pages\PagePaths::known($db, $locale, array_map('strtolower', array_slice($segments, 0, -1)))) {
             return null;
         }
 

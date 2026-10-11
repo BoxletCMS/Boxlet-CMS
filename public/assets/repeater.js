@@ -99,8 +99,8 @@
 
   /**
    * One bubbling `change`, which two existing mechanisms already listen for: admin.js
-   * marks the form dirty so leaving it warns, and builder-blocks.js redraws the block in
-   * the canvas. Adding an item is a change to the block's content and should reach both by
+   * marks the form dirty so leaving it warns, and builder-inspector.js sends the block's
+   * fields and redraws it in the canvas. Adding an item is a change to the block's content and should reach both by
    * the same path a person typing in a field takes.
    */
   function changed(repeater) {

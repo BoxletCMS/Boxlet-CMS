@@ -6,9 +6,8 @@ Upload a ZIP, open a page in your browser, answer four questions. Fifteen minute
 have a multilingual site that looks designed, not like a template with the logo swapped. No
 shell, no Composer, no Node, no build step. An FTP client and a browser are enough.
 
-> **This is a preview.** Boxlet works and installs cleanly, but it hasn't reached v0.1 yet.
-> Until then, things may still change between versions in ways that need a fresh install.
-> Try it, poke at it, tell us what breaks. Don't bet a client's site on it just yet.
+> **This is a release candidate for v0.1.** It is what v0.1 will be unless testing finds a
+> fault. From v0.1 on, updates keep your site as it is: no fresh install between versions.
 
 ![The Boxlet admin: the overview screen](https://raw.githubusercontent.com/BoxletCMS/boxlet-cms-dev/main/tools/release/readme/overview.png)
 
@@ -228,7 +227,9 @@ host's file manager.
 **The primary language can't be changed later**, so choose it with care.
 
 If you like, the installer adds a demo site, so you can try the design on real pages
-straight away.
+straight away. Its pictures are fetched from GitHub while it installs, every size already made.
+They aren't covered by the Boxlet licence; each one's source and licence is in
+[CREDITS.md](https://github.com/BoxletCMS/boxlet-cms-dev/blob/main/demo_images/CREDITS.md).
 
 When it's done, the installer deletes itself. If it can't, it tells you, and you delete
 `public/install.php` by hand. Then log in at `/admin`.

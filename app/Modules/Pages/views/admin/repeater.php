@@ -14,7 +14,7 @@
  *
  * @var int|string $index the block's position; NOT part of any field name
  * @var string $key   what the block is called in field names and error keys (D-094)
- * @var array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string} $block
+ * @var array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string} $block
  * @var string $repeaterName
  * @var array<string, mixed> $repeaterField the validated repeater declaration
  * @var list<array<string, mixed>> $items the stored items, already normalized

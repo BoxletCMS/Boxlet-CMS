@@ -1,0 +1,325 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "commons",
+    "name": {
+        "en": "Commons",
+        "hr": "Commons"
+    },
+    "description": {
+        "en": "Warm and friendly, a lively grotesque and a big call to act. For associations, NGOs and communities.",
+        "hr": "Toplo i prijateljski, živahan grotesk i veliki poziv na akciju. Za udruge, nevladine organizacije i zajednice."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#9e3b17",
+        "secondary": "#24324a",
+        "surface_contrast": "30",
+        "heading_font": "bricolage-grotesque",
+        "body_font": "figtree",
+        "text_size": "17",
+        "scale": "1.28",
+        "nudge_h1": "6",
+        "spacing": "1.1",
+        "section_gap": "96",
+        "radius": "12",
+        "shadow": "soft",
+        "shadow_strength": "24",
+        "container": "66",
+        "button_radius": "12",
+        "button_height": "52"
+    },
+    "dark": {
+        "seed": "#f08a5d",
+        "secondary": "#2c3a52",
+        "surface_contrast": "30",
+        "shadow_strength": "50"
+    },
+    "look": {
+        "header_arrangement": "left",
+        "header_behaviour": "sticky",
+        "header_opacity": "100",
+        "header_blur": "0",
+        "header_surface": "plain",
+        "header_edge": "shadow",
+        "header_height": "76",
+        "logo_size": "32",
+        "brand": "both",
+        "nav_style": "pills",
+        "nav_ink": "ink",
+        "header_button": "filled",
+        "footer_layout": "three",
+        "footer_columns": "3",
+        "footer_links": "auto",
+        "small_print_row": "split",
+        "footer_surface": "contrast",
+        "footer_edge": "slant"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "normal",
+            "align": "left",
+            "divider": "none",
+            "animation": "up"
+        },
+        "surfaces": {
+            "stats": "tinted",
+            "cta": "contrast"
+        },
+        "dividers": {
+            "cta": "slant"
+        },
+        "layouts": {
+            "hero": "left",
+            "cards": "grid",
+            "stats": "three",
+            "quote": "big",
+            "cta": "banner",
+            "image_text": "image-left",
+            "accordion": "list"
+        },
+        "options": {
+            "hero": {
+                "height": "tall"
+            },
+            "cards": {
+                "image_shape": "wide"
+            }
+        }
+    },
+    "patterns": [
+        {
+            "id": "commons-welcome",
+            "name": {
+                "en": "Welcome",
+                "hr": "Dobrodošlica"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "tinted"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "left",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "A neighbourhood that looks after itself",
+                            "hr": "Kvart koji brine sam o sebi"
+                        },
+                        "subheading": {
+                            "en": "We run a food bank, a repair café and a Saturday school, all by volunteers.",
+                            "hr": "Vodimo banku hrane, kafić za popravke i subotnju školu, sve uz volontere."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "Join us",
+                                "hr": "Pridružite se"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "commons-offer",
+            "name": {
+                "en": "What we offer",
+                "hr": "Što nudimo"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {
+                        "per_row": "3"
+                    },
+                    "content": {
+                        "heading": {
+                            "en": "What we do",
+                            "hr": "Što radimo"
+                        },
+                        "intro": {
+                            "en": "Three things, every week.",
+                            "hr": "Tri stvari, svaki tjedan."
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "Food bank",
+                                    "hr": "Banka hrane"
+                                },
+                                "body": {
+                                    "en": "<p>Fresh food for 120 families each week.</p>",
+                                    "hr": "<p>Svježa hrana za 120 obitelji tjedno.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Repair café",
+                                    "hr": "Kafić za popravke"
+                                },
+                                "body": {
+                                    "en": "<p>Bring it broken, take it home working.</p>",
+                                    "hr": "<p>Donesite pokvareno, odnesite popravljeno.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Saturday school",
+                                    "hr": "Subotnja škola"
+                                },
+                                "body": {
+                                    "en": "<p>Homework help and reading for children.</p>",
+                                    "hr": "<p>Pomoć u zadaći i čitanje za djecu.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "commons-numbers",
+            "name": {
+                "en": "In numbers",
+                "hr": "U brojkama"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "tinted"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "stats",
+                    "layout": "three",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Last year",
+                            "hr": "Prošle godine"
+                        },
+                        "items": [
+                            {
+                                "value": {
+                                    "en": "6,200"
+                                },
+                                "label": {
+                                    "en": "meals",
+                                    "hr": "obroka"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "410"
+                                },
+                                "label": {
+                                    "en": "things repaired",
+                                    "hr": "popravljenih stvari"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "85"
+                                },
+                                "label": {
+                                    "en": "volunteers",
+                                    "hr": "volontera"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "commons-voice",
+            "name": {
+                "en": "A client's words",
+                "hr": "Riječi klijenta"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "quote",
+                    "layout": "big",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "I came for a coat and stayed to sort coats every Tuesday.",
+                            "hr": "Došla sam po kaput, a ostala slagati kapute svakog utorka."
+                        },
+                        "attribution": {
+                            "en": "Sanja",
+                            "hr": "Sanja"
+                        },
+                        "role": {
+                            "en": "Volunteer",
+                            "hr": "Volonterka"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "commons-call",
+            "name": {
+                "en": "Call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "banner",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Two hours a month makes a difference",
+                            "hr": "Dva sata mjesečno čine razliku"
+                        },
+                        "body": {
+                            "en": "Volunteer, donate or tell a neighbour.",
+                            "hr": "Volontirajte, donirajte ili recite susjedu."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Get involved",
+                                "hr": "Uključite se"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

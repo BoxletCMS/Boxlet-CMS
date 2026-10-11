@@ -1,0 +1,118 @@
+/* THE CONTRAST CHECK on the Appearance screen (PLAN.md D-058, D-160): the verdict in one line,
+ * and every pair measured in the list behind it. Split from admin-appearance-colour.css past
+ * 300 lines: that file is how a colour is shown and taken over, this one is the palette
+ * measured. The samples' two fills are the site's colours, as SVG attributes, never here. */
+
+/* ---- the contrast check in one line (D-160) ------------------------------------------- */
+
+.contrast-ok,
+.contrast-fails p {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  margin: 0;
+  font-size: var(--ui-text-sm);
+}
+
+.contrast-ok .icon {
+  color: var(--ui-success);
+}
+
+.contrast-tally {
+  margin-inline-start: auto;
+  color: var(--ui-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.contrast-fails {
+  display: grid;
+  justify-items: start;
+  gap: var(--ui-2);
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-danger-soft);
+  border-radius: var(--ui-radius-m);
+}
+
+.contrast-fails[hidden],
+.contrast-ok[hidden] {
+  display: none;
+}
+
+.contrast-fails .icon {
+  color: var(--ui-danger);
+}
+
+.role .field-error {
+  grid-column: 1 / -1;
+}
+
+/* ---- the contrast gauge (PLAN.md D-058) ---------------------------------------------- */
+
+/* The contrast gauge (PLAN.md D-058): every pair, what it looks like, what it measures.
+   The sample is an SVG whose two fills are the site's colours — the only site colour that
+   ever reaches this screen, and it reaches it as data, never as a stylesheet value. */
+
+.gauge-list {
+  display: grid;
+  gap: var(--ui-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 1.75rem of sample, not 2.5rem (PLAN.md D-078). D-075 shrank the SVG's viewBox from 40×24
+   to 28×18 and said the sample was smaller; it was not, because this rule still gave the box
+   40×24 and an SVG scales its contents to the box it is given. Sixteen rows share a 312px
+   column and the sample only has to show a pair of colours against each other, so the box
+   moves too and the name gets the twelve pixels. */
+.gauge-row {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+  gap: var(--ui-2);
+  align-items: center;
+  font-size: var(--ui-text-sm);
+}
+
+.gauge-sample {
+  inline-size: 1.75rem;
+  block-size: 1.125rem;
+  border-radius: var(--ui-radius-s);
+  border: var(--ui-border) solid var(--ui-line);
+}
+
+.gauge-ratio {
+  font-variant-numeric: tabular-nums;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  white-space: nowrap;
+}
+
+/* The verdict is a word, never a colour alone: a red dot says nothing to a reader who
+   cannot see red, and nothing at all to one reading it aloud. */
+.gauge-verdict {
+  color: var(--ui-success);
+}
+
+.gauge-fails .gauge-verdict {
+  color: var(--ui-danger);
+  font-weight: 600;
+}
+
+.gauge-more {
+  margin-block-start: var(--ui-2);
+  font-size: var(--ui-text-sm);
+}
+
+.gauge-more summary {
+  cursor: pointer;
+  color: var(--ui-ink-muted);
+  padding-block: var(--ui-1);
+}
+
+.gauge-more summary:hover {
+  color: var(--ui-ink);
+}
+
+.gauge-more .gauge-list {
+  margin-block-start: var(--ui-2);
+}

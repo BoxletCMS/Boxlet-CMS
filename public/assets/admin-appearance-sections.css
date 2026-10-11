@@ -1,0 +1,218 @@
+/* THE INSPECTOR'S VIEWS on the Appearance screen (PLAN.md D-157): the home and the six
+ * sections, one column without a script and one at a time with appearance-sections.js; a
+ * section's head with its way back and its reset; and the questions over them. Split from
+ * admin-appearance-inspector.css past 300 lines: that file is how a decision is made, this
+ * one is where it stands. Admin tokens only (--ui-*). */
+
+/* ---- the home and the sections (PLAN.md D-157) ----------------------------------------- */
+
+/* WITHOUT A SCRIPT the home and the six sections are one column, each section starting under
+   a rule of its own; appearance-sections.js shows one at a time by the `hidden` attribute,
+   which this display would otherwise overrule. */
+.inspector-view {
+  display: grid;
+  align-content: start;
+  min-inline-size: 0;
+}
+
+.inspector-view[hidden] {
+  display: none;
+}
+
+.inspector-section {
+  margin-block-start: var(--ui-5);
+  padding-block-start: var(--ui-3);
+  border-block-start: 2px solid var(--ui-line-strong);
+}
+
+.views-ready .inspector-section {
+  margin-block-start: 0;
+  padding-block-start: 0;
+  border-block-start: 0;
+}
+
+.section-head {
+  display: grid;
+  gap: var(--ui-1);
+  padding-block-end: var(--ui-2);
+  border-block-end: var(--ui-border) solid var(--ui-line);
+}
+
+.section-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-1);
+  justify-self: start;
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* The title and its reset share a line (D-161): the title takes the room, the reset sits at
+   the end, small, and takes none while the section holds no change. */
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  min-inline-size: 0;
+}
+
+.section-title {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--ui-2);
+  min-inline-size: 0;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 650;
+}
+
+.section-title .icon {
+  color: var(--ui-accent);
+}
+
+/* Offered only while the section holds a change, as a reset beside one control is. A ghost
+   button of the bar's quiet kind, at the size of a readout. */
+.section-reset {
+  display: none;
+  flex: 0 0 auto;
+  min-block-size: 0;
+  padding: var(--ui-1) var(--ui-2);
+  font-size: var(--ui-text-xs);
+  white-space: nowrap;
+}
+
+.inspector-section.has-changes .section-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-1);
+}
+
+/* HINTS AS AN ICON IN THE CORNER (D-161), not a row of their own: placed in the top right of
+   the inspector, where the first row of every view leaves room — the back link of a section
+   is short, and the home's first group keeps its count and toggle clear of it. It scrolls
+   with the content, which is the row it belongs to. */
+.appearance-inspector > .hints-icon {
+  position: absolute;
+  inset-block-start: var(--ui-3);
+  inset-inline-end: var(--ui-3);
+  z-index: 1;
+}
+
+.appearance-inspector > .hints-icon[hidden] {
+  display: none;
+}
+
+.hints-icon[aria-pressed="true"] {
+  border-color: var(--ui-accent);
+  color: var(--ui-ink);
+}
+
+/* THE ICON HAS THE TOP ROW TO ITSELF wherever its corner is taken. A question is a box, and
+   room kept for the icon inside it still left the icon on the box's corner (README 4.6,
+   D-171); Quick start's head kept room for it too, which put its − short of the right edge
+   where every other group has it (the owner's review of D-171). So the question, or else the
+   home's first group, starts below the icon. A section's first row is its back link, short,
+   and leaves the corner free. */
+.appearance-inspector:has(> .hints-icon:not([hidden])) .inspector-panels:has(> *),
+.appearance-inspector:has(> .hints-icon:not([hidden])):not(:has(.inspector-panels > *)) .inspector-home > .control-group:first-of-type {
+  margin-block-start: calc(1.5rem + var(--ui-2));
+}
+
+/* The questions and notices over the controls (parts/panels.php). */
+.inspector-panels {
+  display: grid;
+  gap: var(--ui-2);
+  margin-block-end: var(--ui-2);
+}
+
+.inspector-panels:empty {
+  display: none;
+}
+
+.inspector-panels .appearance-notice {
+  border-radius: var(--ui-radius-m);
+}
+
+/* The boxed page's own controls, and a moving header's, are rows like any other, with the
+   room a group gives them. */
+.control-group-body .when-moving,
+.control-group-body .when-boxed {
+  display: grid;
+  gap: var(--ui-4);
+}
+
+/* ---- search (appearance-search.js, D-181) --------------------------------------------- */
+
+/* At the top of every view, clear of the hints icon in the corner. */
+.appearance-search {
+  position: relative;
+  display: grid;
+  gap: var(--ui-2);
+  margin: var(--ui-3) calc(var(--ui-3) + 2.25rem) var(--ui-2) var(--ui-3);
+}
+
+.appearance-search[hidden] {
+  display: none;
+}
+
+.appearance-search > .icon {
+  position: absolute;
+  inset-block-start: 0.7rem;
+  inset-inline-start: var(--ui-3);
+  inline-size: 1rem;
+  block-size: 1rem;
+  color: var(--ui-ink-faint);
+  pointer-events: none;
+}
+
+.appearance-search input {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 2.25rem;
+  padding: var(--ui-2) var(--ui-3) var(--ui-2) calc(var(--ui-3) + 1.5rem);
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  background: var(--ui-panel-sunken);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+}
+
+.appearance-search input::placeholder {
+  color: var(--ui-ink-faint);
+}
+
+.appearance-search input:focus {
+  border-color: var(--ui-accent);
+  box-shadow: var(--ui-ring);
+  outline: none;
+}
+
+.appearance-search-none {
+  margin: 0;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+.appearance-search-none[hidden],
+.is-searching [data-search-miss] {
+  display: none;
+}
+
+/* Searching, each section is a heading over what matched in it: its title opens it, and its
+   way back and its reset wait until it is open. */
+.is-searching .section-back,
+.is-searching .section-reset {
+  display: none;
+}
+
+.is-searching .section-title {
+  cursor: pointer;
+}
+
+.is-searching .section-title:hover {
+  color: var(--ui-accent);
+}

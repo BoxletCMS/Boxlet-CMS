@@ -1,0 +1,80 @@
+/* The layout diagram in Layout & widths (PLAN.md D-157): the window, the sheet, the column
+ * the text runs in, the header and footer and what inside them lines up with what. Drawn by
+ * LayoutDiagram as SVG rectangles; their colours are the admin's, here, and never the site's
+ * — this is a picture of widths, not of the design. */
+
+.layout-figure {
+  display: grid;
+  gap: var(--ui-2);
+  margin: 0;
+}
+
+.layout-diagram {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  background: var(--ui-panel-sunken);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.diagram-window {
+  fill: var(--ui-panel-sunken);
+}
+
+.diagram-sheet {
+  fill: var(--ui-panel);
+  stroke: var(--ui-line-strong);
+  stroke-width: 1;
+}
+
+.diagram-header,
+.diagram-footer {
+  fill: var(--ui-line-strong);
+}
+
+.diagram-header-content,
+.diagram-footer-content {
+  fill: var(--ui-ink-muted);
+}
+
+/* The text's column is the one dashed thing on the picture, in the accent: it is the width
+   the eye reads at, and the one most worth seeing against the others. */
+.diagram-content {
+  fill: var(--ui-accent-soft);
+  stroke: var(--ui-accent);
+  stroke-width: 1;
+  stroke-dasharray: 3 2;
+}
+
+.layout-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-1) var(--ui-3);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+.layout-legend span::before {
+  content: "";
+  display: inline-block;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  margin-inline-end: var(--ui-1);
+  vertical-align: -0.05rem;
+  border-radius: 2px;
+}
+
+.legend-sheet::before {
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line-strong);
+}
+
+.legend-content::before {
+  background: var(--ui-accent-soft);
+  border: var(--ui-border) dashed var(--ui-accent);
+}
+
+.legend-chrome::before {
+  background: var(--ui-line-strong);
+}

@@ -12,8 +12,7 @@
 // draws what it is handed.
 //
 // Each column's words are RICH TEXT since D-113, with the footer's short whitelist
-// (RichText::INLINE): a line or two with a link in it. Text stored before D-113 is plain and
-// is handed over as one paragraph (ChromeWords::asHtml).
+// (RichText::INLINE): a line or two with a link in it.
 //
 // The layouts are the footer's arrangements (D-113).
 
@@ -34,6 +33,13 @@ return [
         ],
         'small_print' => ['type' => 'text', 'translatable' => true],
     ],
-    'layouts' => ['simple', 'centred', 'columns', 'menu_first', 'three'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'simple' => ['line' => [[4, 5, 20, 2], [4, 10, 14, 2], [4, 18, 10, 2]]],
+        'centred' => ['line' => [[14, 5, 20, 2], [17, 10, 14, 2], [19, 18, 10, 2]]],
+        'columns' => ['line' => [[4, 5, 16, 2], [4, 9, 12, 2], [28, 5, 10, 2], [28, 9, 8, 2], [28, 13, 9, 2], [4, 19, 40, 1]]],
+        'menu_first' => ['line' => [[4, 5, 7, 2], [13, 5, 7, 2], [22, 5, 7, 2], [4, 11, 22, 2], [4, 18, 10, 2]]],
+        'three' => ['line' => [[4, 5, 11, 2], [4, 9, 8, 2], [19, 5, 10, 2], [19, 9, 8, 2], [33, 5, 11, 2], [33, 9, 7, 2]]],
+    ],
     'defaults' => ['layout' => 'simple'],
 ];

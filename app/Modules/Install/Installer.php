@@ -6,16 +6,24 @@ use App\Core\Blocks;
 use App\Core\Db;
 use App\Core\Migrator;
 use App\Core\Settings;
+use App\Modules\Demo\DemoPictures;
 use App\Modules\Demo\DemoSite;
 use App\Modules\Design\Design;
-use App\Modules\Design\Presets;
+use App\Support\PageCache;
 use ErrorException;
 use RuntimeException;
 use Throwable;
 
 /**
- * The final installer step: migrate, seed, write .env, write install.lock. Earlier
- * steps only collect and check input; nothing touches disk or database before this.
+ * The installer's writing: migrate, seed, write .env, write install.lock. Earlier steps only
+ * collect and check input; nothing touches disk or database before this.
+ *
+ * In two halves since D-214: start() makes the database (tables, the admin, the language,
+ * the settings) and finish() puts the demo in, compiles the design and writes .env and the
+ * lock. Without the demo they run one after the other in the site step. With it, the demo's
+ * pictures are taken in between, a few to a request (InstallDemo): fifty pictures, every size
+ * of each, in one request ran past what a host or Cloudflare waits for (a 524 after 100
+ * seconds, the owner's first try).
  */
 final class Installer
 {
@@ -24,20 +32,37 @@ final class Installer
         private readonly string $storage,
         private readonly string $envPath,
         private readonly string $cacheDirectory,
+        // The web root the picture sizes are written under (m/): the folder install.php is in.
+        private readonly string $public,
     ) {
     }
 
     /**
+     * Both halves in one request: the install without the demo, or with its pictures made here
+     * (the tests and `php migrations/seed.php` have no request to keep short).
+     *
      * @param array<mixed> $env   DB_* values for .env
      * @param array<mixed> $admin email and password_hash
      * @param array{name: string, locale: string, timezone: string} $site
      */
     public function run(Db $db, array $env, array $admin, array $site, bool $demo = false): void
     {
+        $this->start($db, $admin, $site);
+        $this->finish($db, $env, $site, $demo, $demo ? DemoPictures::importer($db, $this->storage, $this->public) : null);
+    }
+
+    /**
+     * The database: its tables, the admin, the first language and the site's settings.
+     *
+     * @param array<mixed> $admin email and password_hash
+     * @param array{name: string, locale: string, timezone: string} $site
+     */
+    public function start(Db $db, array $admin, array $site): void
+    {
         (new Migrator($db, $this->root . '/migrations'))->migrate();
 
         $now = gmdate('Y-m-d H:i:s');
-        $languages = require $this->root . '/app/Modules/I18n/languages.php';
+        $languages = self::languages();
         $pdo = $db->pdo();
         $pdo->beginTransaction();
         try {
@@ -62,12 +87,33 @@ final class Installer
             $pdo->rollBack();
             throw $e;
         }
+    }
 
-        // A new site starts with the default character, compiled so its first page is styled.
-        Design::save($db, Presets::get(Presets::DEFAULT), $this->cacheDirectory);
+    /**
+     * The rest: the demo, the design, .env and the lock. The demo's pictures and documents are
+     * stored by $store, from $root (DemoPictures); without a $store its pages come without them.
+     *
+     * @param array<mixed> $env DB_* values for .env
+     * @param array{name: string, locale: string, timezone: string} $site
+     * @param \Closure(string, string): int|null $store what stores a demo file and gives its id
+     */
+    public function finish(Db $db, array $env, array $site, bool $demo, ?\Closure $store = null, string $root = ''): void
+    {
+        $now = gmdate('Y-m-d H:i:s');
+        // The demo is written for its own character (DemoSite::CHARACTER) and sets it, so it
+        // is seeded before the design is compiled.
         if ($demo) {
-            DemoSite::seed($db, Blocks::discover($this->root . '/app/Blocks'), $site['locale']);
+            DemoSite::seed($db, Blocks::discover($this->root . '/app/Blocks'), $site['locale'], $store, $root);
         }
+        // A new site starts with nothing of the owner's: its character, the default one
+        // without the demo, compiled so its first page is styled (D-164). The demo's own
+        // header (DemoSite::LOOK, D-216) is kept.
+        Design::save($db, $demo ? Design::load($db) : [], $this->cacheDirectory);
+        // A site installed where another stood must not answer with that one's kept pages:
+        // public/cache outlives a reinstall, and the browser copy served the old demo home
+        // after one, measured.
+        PageCache::use($this->cacheDirectory);
+        PageCache::clear();
 
         $values = ['APP_DEBUG' => 'false', 'APP_KEY' => bin2hex(random_bytes(32))];
         foreach ($env as $key => $value) {
@@ -80,6 +126,16 @@ final class Installer
         if (is_file($token)) {
             unlink($token);
         }
+    }
+
+    /**
+     * Every language a site may start in, as the site step offers them.
+     *
+     * @return array<string, string> ISO 639-1 code => native name
+     */
+    public static function languages(): array
+    {
+        return require dirname(__DIR__) . '/I18n/languages.php';
     }
 
     /**

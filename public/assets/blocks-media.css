@@ -1,8 +1,8 @@
-/* The picture blocks PLAN.md D-105 added: picture, gallery, logos, video or map. Split from
-   blocks.css when it passed the hard size limit (D-117), under exactly its rule: only custom properties from
-   tokens.css and the --section-* properties each section sets in sections.css. No literal
-   colours, pixel values, fonts or shadows. Linked after blocks.css and blocks-words.css,
-   the order these rules had. */
+/* The picture blocks PLAN.md D-105 added: picture, gallery, video or map (logos are
+   blocks-logos.css's, D-188). Split from blocks.css when it passed the hard size limit
+   (D-117), under exactly its rule: only custom properties from tokens.css and the --section-*
+   properties each section sets in sections.css. No literal colours, pixel values, fonts or
+   shadows. Linked after blocks.css and blocks-words.css, the order these rules had. */
 
 /* Picture (PLAN.md D-105)
 
@@ -127,84 +127,6 @@
   margin-block-start: var(--space-xs);
   color: var(--section-muted);
   font-size: var(--text-sm);
-}
-
-/* Logos (D-105)
-
-   NEVER CROPPED, which is the whole reason this is not a Gallery: one height, each mark's
-   own width, contained inside its box. A mark with no picture shows its name in the site's
-   own type, which is a legitimate way to run the block and not a fallback. */
-
-.logos-heading {
-  margin: 0 0 var(--space-l);
-}
-
-.logos-row {
-  display: flex;
-  flex-wrap: wrap;
-  /* Rows closer than the marks across (D-125): the spacing scale's largest step between
-     rows left a mark that wrapped standing alone a screen's worth further down. */
-  gap: var(--space-m) var(--space-xl);
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.layout-grid .logos-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: var(--space-l);
-}
-
-/* ONE HEIGHT FOR EVERY MARK, AND NOT THE SPACING SCALE'S (PLAN.md D-125). It was
-   --space-2xl, so a character with generous air drew its logos 120 pixels tall (Editorial,
-   7.5rem) — a size for space between things, not for a row of marks. A mark carrying only a
-   name is as tall as its words. */
-.logos-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  block-size: 3.5rem;
-  color: var(--section-muted);
-  text-decoration: none;
-}
-
-/* THE <picture> STEPS ASIDE (PLAN.md D-117). The img's height is a share of the mark's,
-   and a share needs a parent of known height; the picture element between them is an
-   inline box of no height at all, so the share came to nothing and every logo drew at its
-   natural size — measured, 107 and 160 pixels tall in a mark of 84, spilling over the block
-   above and below it. With the picture laid out as its contents, the img's parent IS the
-   mark. */
-.logos-mark:has(> .logos-name) {
-  block-size: auto;
-}
-
-.logos-mark picture {
-  display: contents;
-}
-
-.logos-mark img {
-  inline-size: auto;
-  max-inline-size: 10rem;
-  block-size: 100%;
-  object-fit: contain;
-}
-
-.logos-mark .media-placeholder {
-  inline-size: 8rem;
-  block-size: 100%;
-}
-
-.logos-name {
-  font-family: var(--font-heading);
-  font-weight: var(--heading-weight);
-}
-
-a.logos-mark:hover,
-a.logos-mark:focus-visible {
-  color: var(--section-link);
 }
 
 /* On a narrow screen a row of pictures becomes two columns. Four across at phone width is

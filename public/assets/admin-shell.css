@@ -140,8 +140,15 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Who is logged in, at the foot of the rail; it opens their login's settings. */
+/* Who is logged in, at the foot of the rail; it opens their login's settings.
+
+   WHO IS LOGGED IN STAYS IN VIEW (the owner, 2026-09-27; D-174): in a window shorter than
+   the rail's own list it was scrolled out of the rail's box, under the maintenance bar on a
+   640px-tall window, measured. It holds the rail's foot, over what scrolls past it. */
 .admin .rail-user {
+  position: sticky;
+  inset-block-end: 0;
+  background: var(--ui-bar);
   display: flex;
   flex: none;
   align-items: center;

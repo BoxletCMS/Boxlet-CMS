@@ -15,15 +15,16 @@
  */
 ?>
 <div class="stats">
-<?php if ($content['heading'] !== ''): ?>
-    <h2 class="stats-heading"><?= e($content['heading']) ?></h2>
+<?php if (edit_show($content['heading'] !== '')): ?>
+    <h2 class="stats-heading"<?= edit_attr('heading') ?>><?= e($content['heading']) ?></h2>
 <?php endif; ?>
     <dl class="stats-grid">
-<?php foreach ($content['items'] as $item): ?>
-        <div class="stats-item<?= $item['value'] === '' && $item['label'] === '' ? ' is-empty' : '' ?>">
-            <dt class="stats-value"><?= e($item['value']) ?></dt>
-            <dd class="stats-label"><?= e($item['label']) ?></dd>
+<?php foreach ($content['items'] as $at => $item): ?>
+        <div class="stats-item<?= $item['value'] === '' && $item['label'] === '' ? ' is-empty' : '' ?>"<?= edit_item('items', $at) ?>>
+            <dt class="stats-value"<?= edit_attr('items', $at, 'value') ?>><?= e($item['value']) ?></dt>
+            <dd class="stats-label"<?= edit_attr('items', $at, 'label') ?>><?= e($item['label']) ?></dd>
         </div>
 <?php endforeach; ?>
+<?= edit_add('items', 'stats-item') ?>
     </dl>
 </div>

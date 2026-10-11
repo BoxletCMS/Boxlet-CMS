@@ -60,10 +60,18 @@
      * rearranged to prevent, this time on the screen.
      *
      * A role the owner has taken over is never touched: that colour is theirs.
+     *
+     * The answer is the palette of the mode the screen is in, so it is written to that mode's
+     * rows only: a dark row (`dark_color_…`, D-187) in Dark, a light one in Light.
      */
+    var mode = form.querySelector('input[name="mode"]:checked');
+    var inDark = !!mode && mode.value === 'dark';
     form.querySelectorAll('[data-by-hand]').forEach(function (input) {
       var field = input.getAttribute('data-by-hand');
-      var role = field.replace(/^color_/, '');
+      if ((field.indexOf('dark_') === 0) !== inDark) {
+        return;
+      }
+      var role = field.replace(/^(dark_)?color_/, '');
       var mine = form.querySelector('[data-by-hand-switch="' + field + '"]');
       if (mine && !mine.checked && colors[role]) {
         input.value = colors[role];
@@ -159,15 +167,94 @@
         line.style.fontSize = Math.max(5, Math.round(sizes[at] * factor)) + 'px';
       }
     });
+    /*
+     * TWO LINES AT MOST FOR A HEADING (the stylesheet lets them wrap; the owner's review of
+     * D-171). One that needs a third — monospaced capitals do — gives way ALONE, a step at a
+     * time: shrinking every line with it put Brutalist's body text at 5px, measured, which
+     * shows nothing. Its real size is in the readout beside it. Not measured while the panel
+     * is hidden, when every height is 0.
+     */
+    lines.forEach(function (line) {
+      var words = line.querySelector('span');
+      if (!words || !/specimen-(4xl|2xl)/.test(line.className)) {
+        return;
+      }
+      for (var step = 0; step < 12; step++) {
+        var height = parseFloat(window.getComputedStyle(words).lineHeight) || 0;
+        if (height <= 0 || words.offsetHeight <= height * 2.5) {
+          break;
+        }
+        line.style.fontSize = Math.max(5, Math.round(parseFloat(line.style.fontSize) * 0.9)) + 'px';
+      }
+    });
   }
 
-  /** And in the face being chosen: a pairing is two faces, and the specimen shows both. */
+  /** And in the faces being chosen: two families, and the specimen shows both (D-185). */
   function showTypeface() {
     var specimen = document.querySelector('.specimen');
-    var chosen = form.querySelector('input[name="typography"]:checked');
-    if (specimen && chosen) {
-      specimen.setAttribute('data-typeface', chosen.value);
+    var heading = form.querySelector('input[name="heading_font"]:checked');
+    var body = form.querySelector('input[name="body_font"]:checked');
+    if (specimen && heading) { specimen.setAttribute('data-heading-font', heading.value); }
+    if (specimen && body) { specimen.setAttribute('data-body-font', body.value); }
+  }
+
+  /*
+   * THE LAYOUT DIAGRAM, MOVED (D-157). The rectangles are the server's, worked out by the one
+   * class that draws them (LayoutDiagram); this writes their numbers into the SVG's own
+   * attributes and does no geometry of its own.
+   */
+  function drawDiagram(diagram) {
+    Object.keys(diagram || {}).forEach(function (part) {
+      var rect = document.querySelector('[data-diagram="' + part.replace(/"/g, '') + '"]');
+      if (!rect) {
+        return;
+      }
+      ['x', 'y', 'width', 'height'].forEach(function (name) {
+        rect.setAttribute(name, String(diagram[part][name]));
+      });
+    });
+  }
+
+  /*
+   * THE CONTRAST CHECK IN ONE LINE (D-160): all readable, or how many are not, whether
+   * "Fix automatically" can reach them — a pair a colour by hand is blamed for — and whether
+   * some fail because of the main colour itself, which no button can fix.
+   */
+  var failsAtLoad = document.querySelector('[data-contrast-fails]');
+  var gaugeOpenedForFailure = !!failsAtLoad && !failsAtLoad.hidden;
+
+  function showContrast(pairs) {
+    var box = document.querySelector('[data-contrast]');
+    if (!box || pairs.length === 0) {
+      return;
     }
+    var failing = pairs.filter(function (pair) {
+      return !pair.passes;
+    });
+    var byHand = failing.filter(function (pair) {
+      return /^color_|_colour$/.test(pair.decision);
+    });
+    var ok = box.querySelector('[data-contrast-ok]');
+    var fails = box.querySelector('[data-contrast-fails]');
+    var count = box.querySelector('[data-contrast-count]');
+    var tally = box.querySelector('[data-contrast-tally]');
+    var fix = box.querySelector('[data-contrast-fix]');
+    var seed = box.querySelector('[data-contrast-seed]');
+    var list = box.querySelector('.gauge-more');
+    if (ok) ok.hidden = failing.length > 0;
+    if (fails) fails.hidden = failing.length === 0;
+    if (tally) tally.textContent = (pairs.length - failing.length) + '/' + pairs.length;
+    if (count) {
+      count.textContent = (count.getAttribute(failing.length === 1 ? 'data-one' : 'data-many') || '').replace(':count', String(failing.length));
+    }
+    if (fix) fix.hidden = byHand.length === 0;
+    if (seed) seed.hidden = failing.length === byHand.length;
+    // The list opens by itself when something starts failing, once: after that it is the
+    // owner's to close, and a list that keeps reopening under them is a list that fights back.
+    if (list && failing.length > 0 && !gaugeOpenedForFailure) {
+      list.open = true;
+    }
+    gaugeOpenedForFailure = failing.length > 0;
   }
 
   document.addEventListener('appearance:answer', function (event) {
@@ -175,7 +262,9 @@
     showErrors(answer.errors || {});
     showColors(answer.colors || {});
     showPairs(answer.pairs || []);
+    showContrast(answer.pairs || []);
     showReadouts(answer.readouts);
+    drawDiagram(answer.diagram);
     drawSpecimen();
   });
 
@@ -188,4 +277,14 @@
 
   // What the server already said, drawn: the readouts are in the markup before any change.
   drawSpecimen();
+  // And measured again where measuring means something: once the section is shown (hidden,
+  // every height is 0) and once its faces have loaded (a fallback face wraps differently).
+  document.addEventListener('appearance:section', function (event) {
+    if ((event.detail || {}).section === 'typography') {
+      drawSpecimen();
+    }
+  });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(drawSpecimen);
+  }
 })();

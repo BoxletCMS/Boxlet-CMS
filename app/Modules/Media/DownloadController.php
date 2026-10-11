@@ -51,6 +51,14 @@ final class DownloadController
         if ($media === null || !is_file($path)) {
             return (new PageController($this->container))->notFound($request, $locale, $params);
         }
+        // ONE ADDRESS PER FILE (O-54): the id finds the file, so any name reached it, and the
+        // same file answered at as many addresses as there are words. Another name — an old
+        // one after a rename, one with the extension — is sent to the file's own, and not
+        // counted: the browser asks again there.
+        $name = rawurldecode((string) ($params['name'] ?? ''));
+        if ($name !== (string) $media['filename']) {
+            return Response::redirect(self::url((int) $media['id'], (string) $media['filename']), 301);
+        }
 
         /* COUNTED FOR A VISITOR, the rule the page statistics follow (Tracker::wanted()): not
            the admin — told by the session cookie, without starting a session — and not a

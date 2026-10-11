@@ -1,0 +1,78 @@
+/* Browse library (PLAN.md D-195): the sets Boxlet ships beside its characters, as cards, each
+   added as a character by one press. In the admin's own design system (--ui-*), never a
+   site's: the three colours of a set are its picture, drawn from its own palette. */
+
+.library-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--ui-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A card: the colours, the name, what it is for, its typefaces, and the press at its foot, so
+   a row of cards keeps its buttons on one line however long each description is. */
+.library-card {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  gap: var(--ui-2);
+  padding: var(--ui-4);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-l);
+  box-shadow: var(--ui-shadow-s);
+}
+
+.library-chips {
+  display: flex;
+  gap: var(--ui-1);
+}
+
+.library-chips svg {
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-s);
+}
+
+.library-name {
+  margin: var(--ui-1) 0 0;
+  font-size: var(--ui-text-lg);
+}
+
+.library-text {
+  margin: 0;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+.library-shape {
+  margin: 0;
+  color: var(--ui-ink-muted);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+.library-add,
+.library-added {
+  margin: var(--ui-2) 0 0;
+}
+
+.library-added {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+/* "Added" as Appearance says "In use" on a character's tile (admin-appearance-tiles.css). */
+.library-tag {
+  display: inline-block;
+  padding: 0 var(--ui-1);
+  background: var(--ui-accent-soft);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink);
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

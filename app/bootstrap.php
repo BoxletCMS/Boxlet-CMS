@@ -28,6 +28,7 @@ use App\Modules\Forms\MessagesController;
 use App\Modules\Languages\LanguagesController;
 use App\Modules\Mailer\MailController;
 use App\Modules\Mailer\MailSettings;
+use App\Modules\Media\MediaBulkController;
 use App\Modules\Media\MediaController;
 use App\Modules\Media\MediaCropController;
 use App\Modules\Media\MediaPickController;
@@ -41,15 +42,21 @@ use App\Modules\Media\MediaUpload;
 use App\Modules\Media\MediaVariants;
 use App\Modules\Media\MediaWriter;
 use App\Modules\Menus\MenusController;
-use App\Modules\Pages\PageBlockController;
+use App\Modules\Menus\NavigationController;
+use App\Modules\Pages\PageBuilderApi;
 use App\Modules\Pages\PageBuilderController;
 use App\Modules\Pages\PageController;
+use App\Modules\Pages\PageDraftController;
 use App\Modules\Pages\PageEditorController;
 use App\Modules\Pages\PagePaths;
+use App\Modules\Pages\PagesBulkController;
 use App\Modules\Pages\PagesController;
+use App\Modules\Pages\PatternController;
 use App\Modules\Pages\Slug;
 use App\Modules\Pages\TranslationController;
 use App\Modules\Redirects\RedirectsController;
+use App\Modules\Snippets\Snippets;
+use App\Modules\Snippets\SnippetsController;
 use App\Modules\Settings\CacheController;
 use App\Modules\Settings\LogoController;
 use App\Modules\Settings\SettingsController;
@@ -96,6 +103,8 @@ Url::usePublicPath($root . '/public');
 PageCache::use($cache);
 
 $container = new Container();
+// Every character, wherever it comes from (D-152): read once a request, when first asked.
+\App\Modules\Design\Characters::use((string) $config->get('app.custom_designs_path'), fn (): Blocks => $blocks, fn (): Db => $container->get('db'));
 $container->set('config', fn () => $config);
 $container->set('request', fn () => $request);
 $container->set('blocks', fn () => $blocks);
@@ -141,6 +150,7 @@ $container->set('backup', fn (Container $c) => new Backup(
     (string) ($app['public_path'] ?? '') . '/m',
     (string) ($app['env_path'] ?? ''),
     (string) ($app['key'] ?? ''),
+    (string) ($app['custom_designs_path'] ?? ''),
 ));
 $container->set('restore', fn (Container $c) => new Restore(
     $c->get('db'),
@@ -153,11 +163,20 @@ $container->set('restore', fn (Container $c) => new Restore(
     $storage,
     $cache,
     (string) ($app['public_path'] ?? ''),
+    (string) ($app['custom_designs_path'] ?? ''),
 ));
 // Updating to a new version (D-140): which version this is, where releases come from, and
 // the update itself, which puts the new code where the running code is.
 $container->set('version', fn () => Version::current($root));
 $container->set('releases', fn () => new Releases());
+// Whether the files beside public/ can be downloaded, asked of the site over HTTP as the
+// installer asks it (D-138), for Overview to ask again now and then (O-38). Tests replace it.
+$container->set('private_hidden', fn () => static fn (): bool => \App\Modules\Install\PrivateCheck::hidden(
+    $root,
+    rtrim(Url::withOrigin(Url::asset('')), '/'),
+    $request->basePath,
+    3.0,
+));
 $container->set('upgrade', fn (Container $c) => new Upgrade(
     $c->get('db'),
     $root,
@@ -249,12 +268,20 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // fallback for a browser without JavaScript or a canvas that will not load.
     $router->get('/admin/pages/{id:\d+}', [PageBuilderController::class, 'edit'], $requireAdmin);
     $router->get('/admin/pages/{id:\d+}/canvas', [PageBuilderController::class, 'canvas'], $requireAdmin);
-    // One block, drawn for the canvas and the panel. Its own controller since 4c: the
-    // builder renders the editor, this answers for a single block and writes nothing.
-    $router->post('/admin/pages/{id:\d+}/block', [PageBlockController::class, 'insert'], $requireAdmin);
-    // And one band, for the choices a block cannot show: the number of columns is the
-    // markup AROUND the blocks, so redrawing one of them can never put a column there.
-    $router->post('/admin/pages/{id:\d+}/section', [PageBlockController::class, 'band'], $requireAdmin);
+    // The page's draft as one JSON document: what the builder autosaves and reads (D-173).
+    $router->get('/admin/pages/{id:\d+}/draft', [PageDraftController::class, 'show'], $requireAdmin);
+    $router->post('/admin/pages/{id:\d+}/draft', [PageDraftController::class, 'save'], $requireAdmin);
+    // The builder's own (D-175): publish, discard and restore as JSON, the draft as a page,
+    // and what the server draws and cleans for the document the browser holds.
+    $router->post('/admin/pages/{id:\d+}/publish', [PageDraftController::class, 'publish'], $requireAdmin);
+    $router->post('/admin/pages/{id:\d+}/discard', [PageDraftController::class, 'discard'], $requireAdmin);
+    $router->post('/admin/pages/{id:\d+}/restore', [PageDraftController::class, 'restore'], $requireAdmin);
+    $router->get('/admin/pages/{id:\d+}/preview', [PageDraftController::class, 'preview'], $requireAdmin);
+    $router->post('/admin/pages/{id:\d+}/render', [PageBuilderApi::class, 'render'], $requireAdmin);
+    $router->post('/admin/pages/{id:\d+}/inspect', [PageBuilderApi::class, 'inspect'], $requireAdmin);
+    $router->post('/admin/pages/{id:\d+}/fields', [PageBuilderApi::class, 'fields'], $requireAdmin);
+    $router->get('/admin/patterns', [PatternController::class, 'show'], $requireAdmin);
+    $router->post('/admin/patterns', [PatternController::class, 'store'], $requireAdmin);
     $router->get('/admin/pages/{id:\d+}/form', [PageEditorController::class, 'edit'], $requireAdmin);
     $router->post('/admin/pages/{id:\d+}', [PageEditorController::class, 'update'], $requireAdmin);
     $router->post('/admin/pages/order', [PagesController::class, 'reorder'], $requireAdmin);
@@ -265,6 +292,8 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->post('/admin/pages/{id:\d+}/translate', [TranslationController::class, 'create'], $requireAdmin);
     $router->post('/admin/pages/{id:\d+}/blocks/{block:\d+}/current', [TranslationController::class, 'current'], $requireAdmin);
     $router->post('/admin/pages/{id:\d+}/delete', [PagesController::class, 'delete'], $requireAdmin);
+    // The pages ticked in the list, deleted together (D-218).
+    $router->post('/admin/pages/delete', [PagesBulkController::class, 'delete'], $requireAdmin);
 
     // Pictures (SPEC §5.5). The generated variants live under /m/ and are served from
     // disk by the web server; no route here ever answers for one.
@@ -286,10 +315,14 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->post('/admin/media/{id:\d+}/focal', [MediaItemController::class, 'focal'], $requireAdmin);
     $router->post('/admin/media/{id:\d+}/replace', [MediaItemController::class, 'replace'], $requireAdmin);
     $router->post('/admin/media/{id:\d+}/delete', [MediaItemController::class, 'delete'], $requireAdmin);
+    // The pictures and files ticked in the list, deleted together (D-218).
+    $router->post('/admin/media/delete', [MediaBulkController::class, 'delete'], $requireAdmin);
     $router->post('/admin/media/{id:\d+}/finish', [MediaController::class, 'finish'], $requireAdmin);
 
     // Menus (D-028, resolving O-7). One ordering route takes both paths, D-011: a drag
     // posts a whole sibling order, a button posts one move.
+    $router->get('/admin/navigation', [NavigationController::class, 'show'], $requireAdmin);
+    $router->post('/admin/navigation', [NavigationController::class, 'save'], $requireAdmin);
     $router->get('/admin/menus', [MenusController::class, 'index'], $requireAdmin);
     $router->post('/admin/menus', [MenusController::class, 'store'], $requireAdmin);
     $router->get('/admin/menus/{id:\d+}', [MenusController::class, 'edit'], $requireAdmin);
@@ -304,6 +337,13 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->get('/admin/redirects', [RedirectsController::class, 'index'], $requireAdmin);
     $router->post('/admin/redirects', [RedirectsController::class, 'store'], $requireAdmin);
     $router->post('/admin/redirects/{id:\d+}/delete', [RedirectsController::class, 'delete'], $requireAdmin);
+
+    // Snippets (D-201): a few words per language, placed in rich text as {{snippet:name}}.
+    $snippetName = '{name:' . Snippets::NAME . '}';
+    $router->get('/admin/snippets', [SnippetsController::class, 'index'], $requireAdmin);
+    $router->post('/admin/snippets', [SnippetsController::class, 'store'], $requireAdmin);
+    $router->post('/admin/snippets/' . $snippetName, [SnippetsController::class, 'update'], $requireAdmin);
+    $router->post('/admin/snippets/' . $snippetName . '/delete', [SnippetsController::class, 'delete'], $requireAdmin);
 
     // Backups (D-139): made and restored in steps, downloaded, deleted. The name is a
     // backup's own (Backups::validName), checked again by everything it reaches.
@@ -339,6 +379,7 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->post('/admin/settings', [SettingsController::class, 'save'], $requireAdmin);
     $router->post('/admin/settings/maintenance-message', [SettingsController::class, 'saveMessage'], $requireAdmin);
     $router->post('/admin/settings/cache', [CacheController::class, 'save'], $requireAdmin);
+    $router->post('/admin/settings/llms', [\App\Modules\Settings\LlmsController::class, 'save'], $requireAdmin);
     // An SVG logo, cleaned on upload (D-142).
     $router->post('/admin/settings/logo-svg', [LogoController::class, 'save'], $requireAdmin);
     // Mail (D-045): how the site sends, and a test message to prove it does.
@@ -381,6 +422,16 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->get('/admin/appearance/preview', [AppearancePreview::class, 'page'], $requireAdmin);
     $router->get('/admin/appearance/stylesheet', [AppearancePreview::class, 'stylesheet'], $requireAdmin);
     $router->get('/admin/appearance/check', [AppearancePreview::class, 'check'], $requireAdmin);
+    // The design set format's schema (D-152): JSON, at an address without an extension.
+    $router->get('/admin/appearance/schema', [\App\Modules\Appearance\DesignTransferController::class, 'schema'], $requireAdmin);
+    // A design as a file, out and in (D-152); every address without an extension.
+    $router->get('/admin/appearance/export/character/{id:[a-z0-9][a-z0-9-]{0,31}}', [\App\Modules\Appearance\DesignTransferController::class, 'exportCharacter'], $requireAdmin);
+    $router->get('/admin/appearance/export/library/{id:\d+}', [\App\Modules\Appearance\DesignTransferController::class, 'exportLibrary'], $requireAdmin);
+    $router->post('/admin/appearance/import', [\App\Modules\Appearance\DesignTransferController::class, 'import'], $requireAdmin);
+    $router->post('/admin/appearance/import/add', [\App\Modules\Appearance\DesignTransferController::class, 'add'], $requireAdmin);
+    // The sets Boxlet ships to add as characters (D-195), each one by its file's id.
+    $router->get('/admin/appearance/browse', [\App\Modules\Appearance\SetLibraryController::class, 'browse'], $requireAdmin);
+    $router->post('/admin/appearance/browse/{id:' . \App\Modules\Design\SetLibrary::ID . '}', [\App\Modules\Appearance\SetLibraryController::class, 'add'], $requireAdmin);
     // The six typefaces, for the cards that choose between them (D-065).
     $router->get('/admin/appearance/typefaces', [AppearancePreview::class, 'typefaces'], $requireAdmin);
 

@@ -1,0 +1,272 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "couture",
+    "name": {
+        "en": "Couture",
+        "hr": "Couture"
+    },
+    "description": {
+        "en": "High fashion: a sharp Didone in capitals, extreme size contrast, black on white. For fashion, jewellery and luxury studios.",
+        "hr": "Visoka moda: oštri Didone verzalom, ekstreman kontrast veličina, crno na bijelom. Za modu, nakit i luksuzne studije."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#111111",
+        "surface_contrast": "8",
+        "heading_font": "bodoni-moda",
+        "body_font": "hanken-grotesk",
+        "text_size": "15",
+        "scale": "1.6",
+        "heading_weight": "500",
+        "tracking": "0.02",
+        "caps": "yes",
+        "nudge_h1": "40",
+        "nudge_h2": "8",
+        "spacing": "1.3",
+        "section_gap": "140",
+        "radius": "0",
+        "container": "80",
+        "button_style": "outline",
+        "button_radius": "0",
+        "button_height": "46",
+        "button_caps": "yes"
+    },
+    "dark": {
+        "seed": "#f2f2f2",
+        "surface_contrast": "10",
+        "shadow_strength": "40"
+    },
+    "look": {
+        "header_arrangement": "masthead",
+        "header_behaviour": "static",
+        "header_opacity": "100",
+        "header_blur": "0",
+        "header_surface": "plain",
+        "header_edge": "line",
+        "header_height": "110",
+        "logo_size": "32",
+        "brand": "name",
+        "nav_style": "caps",
+        "nav_ink": "ink",
+        "header_button": "none",
+        "footer_layout": "centred",
+        "footer_columns": "3",
+        "footer_links": "auto",
+        "small_print_row": "centred",
+        "footer_surface": "plain",
+        "footer_edge": "line"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "wide",
+            "align": "center",
+            "divider": "none",
+            "animation": "fade"
+        },
+        "surfaces": {
+            "cta": "plain"
+        },
+        "dividers": {
+            "cta": "line"
+        },
+        "layouts": {
+            "hero": "cover-center",
+            "cards": "grid",
+            "gallery": "two",
+            "picture": "full",
+            "quote": "big",
+            "cta": "banner",
+            "image_text": "image-left"
+        },
+        "options": {
+            "hero": {
+                "height": "screen",
+                "veil": "light"
+            },
+            "cards": {
+                "image_shape": "wide"
+            },
+            "gallery": {
+                "shape": "natural"
+            }
+        }
+    },
+    "patterns": [
+        {
+            "id": "couture-welcome",
+            "name": {
+                "en": "Welcome",
+                "hr": "Dobrodošlica"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "center",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Autumn",
+                            "hr": "Jesen"
+                        },
+                        "subheading": {
+                            "en": "A collection of twelve pieces, cut and sewn in Zagreb.",
+                            "hr": "Kolekcija od dvanaest komada, krojenih i šivanih u Zagrebu."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "View the collection",
+                                "hr": "Pogledajte kolekciju"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "couture-offer",
+            "name": {
+                "en": "What we offer",
+                "hr": "Što nudimo"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {
+                        "per_row": "3"
+                    },
+                    "content": {
+                        "heading": {
+                            "en": "The atelier",
+                            "hr": "Atelijer"
+                        },
+                        "intro": {
+                            "en": "By appointment only.",
+                            "hr": "Isključivo uz dogovor."
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "Made to measure",
+                                    "hr": "Po mjeri"
+                                },
+                                "body": {
+                                    "en": "<p>Three fittings, eight weeks.</p>",
+                                    "hr": "<p>Tri probe, osam tjedana.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Bridal",
+                                    "hr": "Vjenčanice"
+                                },
+                                "body": {
+                                    "en": "<p>One bride a month.</p>",
+                                    "hr": "<p>Jedna mlada mjesečno.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Archive",
+                                    "hr": "Arhiva"
+                                },
+                                "body": {
+                                    "en": "<p>Earlier pieces, altered for you.</p>",
+                                    "hr": "<p>Raniji komadi, prilagođeni vama.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "couture-voice",
+            "name": {
+                "en": "A client's words",
+                "hr": "Riječi klijenta"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "quote",
+                    "layout": "big",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "Quiet clothes for loud rooms.",
+                            "hr": "Tiha odjeća za glasne prostorije."
+                        },
+                        "attribution": {
+                            "en": "Vogue Adria",
+                            "hr": "Vogue Adria"
+                        },
+                        "role": {
+                            "en": "Review",
+                            "hr": "Recenzija"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "couture-call",
+            "name": {
+                "en": "Call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "banner",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Visit the atelier",
+                            "hr": "Posjetite atelijer"
+                        },
+                        "body": {
+                            "en": "Tuesday to Saturday, by appointment.",
+                            "hr": "Od utorka do subote, uz dogovor."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Make an appointment",
+                                "hr": "Dogovorite termin"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

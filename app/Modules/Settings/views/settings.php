@@ -64,10 +64,10 @@ $vector = static function (string $slot) use ($logoSvg): string {
     }
     /* The browser's own file control speaks the browser's language and cannot be styled, so
        it is hidden and a label in the admin's words opens it, as the media library does
-       (D-038). Choosing a file sends it (logo-svg.js); without a script, Upload does. */
+       (D-038). Choosing a file sends it (file-sends.js); without a script, Upload does. */
     $input = 'logo-svg-file-' . $slot;
     $html .= '<span class="logo-svg-upload">'
-        . '<input type="file" id="' . e($input) . '" name="svg" accept=".svg,image/svg+xml" form="' . e($form) . '" class="visually-hidden" data-logo-svg>'
+        . '<input type="file" id="' . e($input) . '" name="svg" accept=".svg,image/svg+xml" form="' . e($form) . '" class="visually-hidden" data-file-sends>'
         . '<label for="' . e($input) . '" class="button button-secondary">' . icon('cloud-upload') . ' ' . e(t($current === null ? 'svg.upload' : 'svg.replace')) . '</label>'
         . '<button type="submit" form="' . e($form) . '" name="action" value="upload" class="button no-js-only">' . e(t('svg.send')) . '</button>'
         . '</span>';
@@ -88,7 +88,7 @@ $vector = static function (string $slot) use ($logoSvg): string {
                  the part wanted. Plain anchors; settings-nav.js only marks where you are. */ ?>
         <div class="settings-layout">
         <nav class="settings-nav" aria-label="<?= e(t('settings.sections')) ?>" data-settings-nav>
-<?php foreach (['general' => 'settings.general', 'branding' => 'settings.branding', 'maintenance' => 'maintenance.title', 'cache' => 'cache.title', 'languages' => 'languages.title', 'mail' => 'mail.title', 'account' => 'account.title', 'statistics' => 'stats.title'] as $anchor => $key): ?>
+<?php foreach (['general' => 'settings.general', 'branding' => 'settings.branding', 'maintenance' => 'maintenance.title', 'cache' => 'cache.title', 'llms' => 'llms.title', 'languages' => 'languages.title', 'mail' => 'mail.title', 'account' => 'account.title', 'statistics' => 'stats.title'] as $anchor => $key): ?>
             <a href="#<?= e($anchor) ?>"><?= e(t($key)) ?></a>
 <?php endforeach; ?>
         </nav>
@@ -216,6 +216,8 @@ $vector = static function (string $slot) use ($logoSvg): string {
         </div>
 
 <?php require __DIR__ . '/cache-panel.php'; ?>
+
+<?php require __DIR__ . '/llms-panel.php'; ?>
 
 <?php require dirname(__DIR__, 2) . '/Languages/views/panel.php'; ?>
 

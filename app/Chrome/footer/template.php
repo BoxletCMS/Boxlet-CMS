@@ -48,7 +48,7 @@ foreach (array_slice($columns, 0, $shown) as $i => $column) {
          is for (D-067, D-113). `own-colour` when the footer takes a colour of the owner's
          (D-076): the class is what lets chrome.css set the section's tokens with no
          fallback, because a fallback naming the token itself is a cycle (D-110). */ ?>
-<div class="site-footer density-<?= e($look['density'] ?? 'normal') ?> footer-cols-<?= e($look['footer_columns'] ?? '2') ?> links-<?= e($look['footer_links'] ?? 'auto') ?> foot-<?= e($look['small_print_row'] ?? 'left') ?> drawn-<?= e((string) count($drawn)) ?><?= ($resolved['own'] ?? false) === true ? ' own-colour' : '' ?>">
+<div class="site-footer footer-cols-<?= e($look['footer_columns'] ?? '2') ?> links-<?= e($look['footer_links'] ?? 'auto') ?> foot-<?= e($look['small_print_row'] ?? 'left') ?> drawn-<?= e((string) count($drawn)) ?><?= ($resolved['own'] ?? false) === true ? ' own-colour' : '' ?>">
 <?php foreach ($drawn as $column): ?>
     <div class="site-footer-col">
 <?php if ($column['title'] !== ''): ?>
@@ -85,7 +85,8 @@ foreach (array_slice($columns, 0, $shown) as $i => $column) {
 <?php require __DIR__ . '/../../Modules/Pages/views/partials/locale-switcher.php'; ?>
 <?php if ($content['small_print'] !== '' || $credit !== ''): ?>
     <p class="site-small-print">
-<?= $content['small_print'] !== '' ? e($content['small_print']) : '' ?>
+<?php /* Escaped, its tags then drawn (D-201), by PageLayoutData. */ ?>
+<?= $content['small_print'] !== '' ? (is_string($resolved['small_print'] ?? null) ? $resolved['small_print'] : e($content['small_print'])) : '' ?>
 <?php if ($credit !== ''): ?>
         <?php /* One line, the last thing on the page, in the small print where a credit
                  belongs — not a badge and not an image. rel="noopener" because it leaves

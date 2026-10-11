@@ -61,6 +61,13 @@ $fieldLabel = t($fieldKey) . ($fieldSpec['required'] ? ' ' . t('pages.required_m
                                 <button type="button" class="rt-button" data-rt="bullet" aria-pressed="false" title="<?= e(t('richtext.bullets')) ?>"><span aria-hidden="true">&#8226;</span><span class="visually-hidden"><?= e(t('richtext.bullets')) ?></span></button>
                                 <button type="button" class="rt-button" data-rt="ordered" aria-pressed="false" title="<?= e(t('richtext.numbers')) ?>"><span aria-hidden="true">1.</span><span class="visually-hidden"><?= e(t('richtext.numbers')) ?></span></button>
                             </div>
+                            <?= App\Modules\Admin\RichInline::alignment() ?>
+                            <?php /* THE REPLACEMENT TAGS (D-201): the year, the language switcher and the
+                                     snippets, put where the caret is as chips (richtext-tags.js).
+                                     Words, not a glyph: a {{ }} says nothing to the owner. */ ?>
+                            <div class="rt-group rt-insert">
+                                <button type="button" class="rt-button rt-button-words" data-rt="tag" aria-haspopup="menu" aria-expanded="false" title="<?= e(t('tags.insert_title')) ?>"><?= e(t('tags.insert')) ?></button>
+                            </div>
                             <div class="rt-group rt-history">
                                 <button type="button" class="rt-button" data-rt="undo" title="<?= e(t('richtext.undo')) ?>"><span aria-hidden="true">&#8630;</span><span class="visually-hidden"><?= e(t('richtext.undo')) ?></span></button>
                                 <button type="button" class="rt-button" data-rt="redo" title="<?= e(t('richtext.redo')) ?>"><span aria-hidden="true">&#8631;</span><span class="visually-hidden"><?= e(t('richtext.redo')) ?></span></button>
@@ -79,13 +86,20 @@ $fieldLabel = t($fieldKey) . ($fieldSpec['required'] ? ' ' . t('pages.required_m
                                      is INVALID to the browser — which then refuses to submit
                                      the whole form, silently. Measured: Publish did nothing
                                      after an address had been typed here. */ ?>
-                            <select class="rt-link-page" aria-label="<?= e(t('richtext.page')) ?>">
+                            <?php /* The words the link is on (D-182): the selection's, typed
+                                     afresh, or a chosen page's title when there are none. */ ?>
+                            <?php /* Each named above it, as in the canvas's popover (D-183). */ ?>
+                            <label class="rt-link-field"><span class="rt-link-label"><?= e(t('richtext.link_text')) ?></span>
+                            <input type="text" class="rt-link-text"></label>
+                            <label class="rt-link-field"><span class="rt-link-label"><?= e(t('richtext.page')) ?></span>
+                            <select class="rt-link-page">
                                 <option value=""><?= e(t('pages.field.link_address')) ?></option>
 <?php foreach ($linkPages as $group => $choice): ?>
-                                <option value="<?= e(\App\Modules\Pages\PageLinks::to($group)) ?>"><?= e(str_repeat('— ', $choice['depth']) . $choice['title'] . ($choice['published'] ? '' : ' ' . t('pages.field.link_page_draft'))) ?></option>
+                                <option value="<?= e(\App\Modules\Pages\PageLinks::to($group)) ?>" data-title="<?= e($choice['title']) ?>"><?= e(str_repeat('— ', $choice['depth']) . $choice['title'] . ($choice['published'] ? '' : ' ' . t('pages.field.link_page_draft'))) ?></option>
 <?php endforeach; ?>
-                            </select>
-                            <input type="text" inputmode="url" class="rt-link-input" placeholder="<?= e(t('richtext.url_placeholder')) ?>" aria-label="<?= e(t('richtext.url')) ?>">
+                            </select></label>
+                            <label class="rt-link-field rt-link-address"><span class="rt-link-label"><?= e(t('richtext.url')) ?></span>
+                            <input type="text" inputmode="url" class="rt-link-input" placeholder="<?= e(t('richtext.url_placeholder')) ?>"></label>
                             <button type="button" class="button button-secondary" data-rt-link="apply"><?= e(t('richtext.link')) ?></button>
                             <button type="button" class="button button-ghost" data-rt-link="remove"><?= e(t('richtext.unlink')) ?></button>
                         </div>

@@ -1,0 +1,90 @@
+/* The hero's split arrangement: words beside a picture (README 1.6, PLAN.md D-177). Split
+   from blocks-hero.css when the arrangement learnt to measure its heading by its own column;
+   under the same rule: only custom properties from tokens.css and the --section-* properties
+   sections.css sets. Linked straight after blocks-hero.css. Which section width it stands in
+   is SectionRender::composed()'s: the wide measure, where the character would draw it
+   narrower. */
+
+.layout-split .hero {
+  /* The words a little wider than the picture (README 1.6). */
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: var(--space-columns);
+  /* The picture as tall as the words beside it (the owner, D-177), never a thumbnail
+     floating at their middle. */
+  align-items: stretch;
+}
+
+/* WIDENED, THE WORDS STAY ON THE PAGE'S EDGE (D-193, the owner): a split hero stands in the
+   wide measure (SectionRender::composed) where the character's sections are narrower, and its
+   words began left of the header's logo — Soft's by 80 pixels at 1440. They start where the
+   page's content does; only the picture reaches out. Nothing where the section is no wider
+   than the page. */
+.layout-split .hero:not(.is-alone) {
+  padding-inline-start: max(0rem, calc((100% - var(--page-content-width, var(--container-width))) / 2));
+}
+
+/* THE HEADING MEASURED BY ITS OWN COLUMN (D-177). Beside a picture, the words have about half
+   the section, and a heading sized by the window stood six lines tall in Editorial's narrow
+   measure. Sized by the column instead, a twelfth and a half of it, it keeps to three or four
+   lines in every character; the character's display size is still the ceiling, and the
+   window's rule still holds on a phone. */
+.layout-split .hero-text {
+  container-type: inline-size;
+  align-content: center;
+}
+
+.layout-split .hero-heading {
+  --hero-size: min(var(--text-4xl), calc(1rem + 4.6vw), 12.5cqi);
+}
+
+.layout-split .hero-media {
+  position: relative;
+  min-block-size: 22.5rem;
+}
+
+/* Cover, never letterboxed: the picture fills the box the row gives it — as tall as the words,
+   and never shorter than a picture worth looking at — cropped to it. Laid over the box rather
+   than sized in it: a height in percent inside <picture> stood short of the words in Bold and
+   Brutalist, measured (372 against 395, 397 against 472). */
+.layout-split .hero-media picture,
+.layout-split .hero-media img,
+.layout-split .hero-media .media-placeholder {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* WITH NO PICTURE, WORDS ALONE (D-182): on a visitor's page a split hero that has none draws
+   no column for it, and its words take the column as Left's do, at Left's display size. */
+.layout-split .hero.is-alone {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.layout-split .is-alone .hero-text {
+  container-type: normal;
+}
+
+.layout-split .is-alone .hero-heading {
+  --hero-size: min(var(--text-4xl), calc(1rem + 4.6vw));
+}
+
+/* With a picture, or in the canvas, a split hero always has its media element, so the old
+   rules that re-flowed one WITHOUT it are gone. What they did — heading in one column,
+   subheading and button in the other — avoided an empty half but still left the lower part
+   of the section dead. */
+
+/* Stacked on a phone, the picture takes its own proportions again. */
+@media (max-width: 40rem) {
+  .layout-split .hero-media {
+    min-block-size: 0;
+  }
+
+  .layout-split .hero-media picture,
+  .layout-split .hero-media img,
+  .layout-split .hero-media .media-placeholder {
+    position: static;
+    block-size: auto;
+  }
+}

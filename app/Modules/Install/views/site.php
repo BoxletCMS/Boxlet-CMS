@@ -15,7 +15,7 @@ $selectedLocale = $value('locale', 'en');
 $selectedTimezone = $value('timezone', date_default_timezone_get());
 ?>
         <h1><?= e(t('install.site.title')) ?></h1>
-        <form method="post" action="<?= e(Url::asset('install.php')) ?>" class="stack">
+        <form method="post" action="<?= e(Url::asset('install.php')) ?>" class="stack" data-install-busy>
             <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
             <label class="field">
                 <span><?= e(t('install.site.name')) ?></span>
@@ -42,5 +42,9 @@ $selectedTimezone = $value('timezone', date_default_timezone_get());
                 <input type="checkbox" name="demo" value="1"<?= $old === [] || $value('demo') === '1' ? ' checked' : '' ?>>
                 <span><?= e(t('install.site.demo')) ?></span>
             </label>
-            <button type="submit" class="button"><?= e(t('install.site.submit')) ?></button>
+            <button type="submit" class="button" data-busy-label="<?= e(t('install.site.working')) ?>"><?= e(t('install.site.submit')) ?></button>
+            <div class="install-busy" role="status" hidden>
+                <div class="install-busy-bar"></div>
+                <p class="hint"><?= e(t('install.site.busy')) ?></p>
+            </div>
         </form>

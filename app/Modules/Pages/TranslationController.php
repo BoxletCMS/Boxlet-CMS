@@ -39,6 +39,8 @@ final class TranslationController
             return Response::redirect(Url::admin('pages', $pageId));
         }
         if (!isset($before[$target])) {
+            // A page never published is translated from its draft (D-163 point 6).
+            Translations::carryDraft($db, $this->container->get('blocks'), $pageId, $result);
             $label = (string) ($db->one('SELECT label FROM locales WHERE code = ?', [$target])['label'] ?? $target);
             $title = (string) ($db->one('SELECT title FROM pages WHERE id = ?', [$result])['title'] ?? '');
             Activity::record($db, 'page', 'translated', $result, $title . ' · ' . $label);

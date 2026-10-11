@@ -42,6 +42,20 @@ final class PageTree
     }
 
     /**
+     * What a page may be put under in the editor and on Publish: parentOptions() without the
+     * home pages (O-55, the owner: nothing stands under a home page, as the page list's move
+     * already said). Link choices keep them: a link may lead home.
+     *
+     * @return list<array{id: int, title: string, depth: int}>
+     */
+    public static function parents(Db $db, string $locale, ?int $pageId): array
+    {
+        $homes = array_map('intval', array_column($db->all("SELECT id FROM pages WHERE locale = ? AND slug = ''", [$locale]), 'id'));
+
+        return array_values(array_filter(self::parentOptions($db, $locale, $pageId), static fn (array $option): bool => !in_array($option['id'], $homes, true)));
+    }
+
+    /**
      * The admin page list: every page, in tree order, with the depth it sits at and
      * whether it is the first or last of its siblings — the Up and Down buttons are
      * disabled at the ends rather than silently doing nothing.

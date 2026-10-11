@@ -27,6 +27,13 @@ return [
         'logo_dark' => ['type' => 'media'],
         'button' => ['type' => 'link', 'translatable' => true],
     ],
-    'layouts' => ['left', 'inline', 'centred', 'split', 'masthead'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'left' => ['logo' => [[4, 9, 8, 6]], 'line' => [[24, 11, 14, 2], [40, 10, 5, 4]]],
+        'inline' => ['logo' => [[4, 9, 8, 6]], 'line' => [[15, 11, 14, 2], [39, 10, 5, 4]]],
+        'centred' => ['logo' => [[19, 4, 10, 6]], 'line' => [[13, 15, 22, 2]]],
+        'split' => ['logo' => [[20, 9, 8, 6]], 'line' => [[5, 11, 12, 2], [31, 11, 12, 2]]],
+        'masthead' => ['logo' => [[4, 4, 12, 7]], 'line' => [[4, 15, 24, 2]]],
+    ],
     'defaults' => ['layout' => 'left'],
 ];

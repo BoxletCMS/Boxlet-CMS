@@ -9,7 +9,7 @@ use App\Support\Url;
  * @var list<array{label: string, value: string, note: string, href: string, word: bool}> $metrics
  * @var list<array{id: int, at: string, kind: string, action: string, subjectId: int|null, subject: string}> $rows
  * @var string $zone
- * @var list<array{title: string, where: string, href: string}> $issues
+ * @var list<array{title: string, where: string, href: string|null}> $issues
  * @var list<array{path: string, views: int, share: float}> $mostRead empty while statistics are off
  * @var int|null $homeId the home page's id, null before there is one
  * @var bool $maintenance
@@ -61,13 +61,14 @@ use App\Support\Url;
 <?php else: ?>
                     <ul class="issues" role="list">
 <?php foreach ($issues as $issue): ?>
-                        <li><a class="issue" href="<?= e($issue['href']) ?>">
+<?php $tag = $issue['href'] === null ? 'div' : 'a'; ?>
+                        <li><<?= $tag ?> class="issue"<?= $issue['href'] === null ? '' : ' href="' . e($issue['href']) . '"' ?>>
                             <?= icon('circle-alert') ?>
                             <span>
                                 <span class="issue-title"><?= e($issue['title']) ?></span>
                                 <span class="issue-where"><?= e($issue['where']) ?></span>
                             </span>
-                        </a></li>
+                        </<?= $tag ?>></li>
 <?php endforeach; ?>
                     </ul>
 <?php endif; ?>

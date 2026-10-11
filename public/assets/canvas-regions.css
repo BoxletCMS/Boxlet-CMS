@@ -1,0 +1,26 @@
+/* THE PARTS OF APPEARANCE'S PICTURE THAT OPEN SETTINGS (PLAN.md D-181, README 5.7): the
+ * header, each band and the footer, marked in the preview only (AppearancePreview), outlined dashed
+ * under the pointer and solid while their section of settings is open (appearance-regions.js).
+ *
+ * canvas.css's rule holds: this loads into a document full of the SITE's tokens, so its
+ * colours are its own --bx- values and literals, in two tones so one edge shows on any page. */
+
+.bx-design-preview {
+  --bx-region: #6d5dd3;
+  --bx-region-edge: #ffffff;
+}
+
+.bx-design-preview [data-bx-region] {
+  cursor: pointer;
+}
+
+.bx-design-preview [data-bx-region]:hover {
+  outline: 2px dashed var(--bx-region);
+  outline-offset: -2px;
+}
+
+.bx-design-preview [data-bx-region][data-bx-open] {
+  outline: 2px solid var(--bx-region);
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 3px var(--bx-region-edge);
+}

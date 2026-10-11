@@ -1,0 +1,278 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "zine",
+    "name": {
+        "en": "Zine",
+        "hr": "Zine"
+    },
+    "description": {
+        "en": "A deliberately uneven rhythm: an odd display face, typewriter text, loud bands. For artists, collectives and small magazines.",
+        "hr": "Namjerno neujednačen ritam: neobično pismo, tekst kao s pisaćeg stroja, glasne trake. Za umjetnike, kolektive i male časopise."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#5a2ca0",
+        "secondary": "#e0b100",
+        "surface_contrast": "36",
+        "heading_font": "syne",
+        "body_font": "space-mono",
+        "text_size": "15",
+        "scale": "1.5",
+        "heading_weight": "800",
+        "tracking": "-0.02",
+        "nudge_h1": "6",
+        "spacing": "0.9",
+        "section_gap": "64",
+        "radius": "0",
+        "border_width": "3",
+        "shadow": "hard",
+        "shadow_strength": "90",
+        "container": "62",
+        "button_radius": "0",
+        "button_height": "46",
+        "button_caps": "yes"
+    },
+    "dark": {
+        "seed": "#b794ff",
+        "secondary": "#e0b100",
+        "surface_contrast": "30",
+        "shadow_strength": "90"
+    },
+    "look": {
+        "header_arrangement": "split",
+        "header_behaviour": "static",
+        "header_opacity": "100",
+        "header_blur": "0",
+        "header_surface": "plain",
+        "header_edge": "line",
+        "header_height": "64",
+        "logo_size": "32",
+        "brand": "name",
+        "nav_style": "caps",
+        "nav_ink": "accent",
+        "header_button": "none",
+        "footer_layout": "three",
+        "footer_columns": "3",
+        "footer_links": "auto",
+        "small_print_row": "left",
+        "footer_surface": "contrast",
+        "footer_edge": "slant"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "wide",
+            "align": "left",
+            "divider": "none",
+            "animation": "up"
+        },
+        "surfaces": {
+            "quote": "contrast",
+            "stats": "tinted",
+            "cta": "gradient"
+        },
+        "dividers": {
+            "quote": "line",
+            "cta": "line"
+        },
+        "layouts": {
+            "hero": "left",
+            "cards": "grid",
+            "stats": "four",
+            "quote": "big",
+            "cta": "banner",
+            "gallery": "three",
+            "image_text": "image-left",
+            "text": "single"
+        },
+        "options": {
+            "cards": {
+                "per_row": "3",
+                "image_shape": "square"
+            },
+            "gallery": {
+                "shape": "natural"
+            }
+        }
+    },
+    "patterns": [
+        {
+            "id": "zine-welcome",
+            "name": {
+                "en": "Welcome",
+                "hr": "Dobrodošlica"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "pad_top": "160",
+                    "pad_bottom": "48"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "left",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Issue 14: the noise issue",
+                            "hr": "Broj 14: broj o buci"
+                        },
+                        "subheading": {
+                            "en": "A magazine about sound, made by twelve people and one photocopier.",
+                            "hr": "Časopis o zvuku, koji rade dvanaestero ljudi i jedan fotokopirni stroj."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "Buy the issue",
+                                "hr": "Kupite broj"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "zine-offer",
+            "name": {
+                "en": "What we offer",
+                "hr": "Što nudimo"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {
+                        "per_row": "3"
+                    },
+                    "content": {
+                        "heading": {
+                            "en": "Inside",
+                            "hr": "Unutra"
+                        },
+                        "intro": {
+                            "en": "Forty pages, no ads.",
+                            "hr": "Četrdeset stranica, bez reklama."
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "Field recordings",
+                                    "hr": "Terenske snimke"
+                                },
+                                "body": {
+                                    "en": "<p>A year of listening to one street.</p>",
+                                    "hr": "<p>Godina slušanja jedne ulice.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Interview",
+                                    "hr": "Intervju"
+                                },
+                                "body": {
+                                    "en": "<p>A sound engineer on silence.</p>",
+                                    "hr": "<p>Tonac o tišini.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Scores",
+                                    "hr": "Partiture"
+                                },
+                                "body": {
+                                    "en": "<p>Pieces you can play on anything.</p>",
+                                    "hr": "<p>Skladbe koje možete svirati na bilo čemu.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "zine-voice",
+            "name": {
+                "en": "A client's words",
+                "hr": "Riječi klijenta"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "quote",
+                    "layout": "big",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "Loud, cheap, necessary.",
+                            "hr": "Glasno, jeftino, nužno."
+                        },
+                        "attribution": {
+                            "en": "A reader",
+                            "hr": "Čitatelj"
+                        },
+                        "role": {
+                            "en": "Letter to the editor",
+                            "hr": "Pismo uredništvu"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "zine-call",
+            "name": {
+                "en": "Call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "banner",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Subscribe for a year",
+                            "hr": "Pretplatite se na godinu"
+                        },
+                        "body": {
+                            "en": "Four issues, posted in an envelope you will keep.",
+                            "hr": "Četiri broja, poslana u kuverti koju ćete čuvati."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Subscribe",
+                                "hr": "Pretplatite se"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

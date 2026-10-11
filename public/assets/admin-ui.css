@@ -1,4 +1,4 @@
-/* Admin buttons, feedback and the installer's progress parts. Admin tokens only
+/* Admin buttons, feedback and the steps of the installer and the update. Admin tokens only
  * (--ui-*), defined in admin-tokens.css: no value from the site's tokens.css reaches the
  * admin. Loaded by the admin, the login screen and the installer. */
 
@@ -191,11 +191,7 @@
   background: var(--ui-danger-soft);
 }
 
-.restart {
-  margin-top: var(--ui-6);
-}
-
-/* Installer steps and requirement checks */
+/* Installer and update steps; the installer's own parts are in admin-install.css (D-212) */
 
 .steps {
   display: flex;
@@ -211,52 +207,6 @@
 .steps [aria-current] {
   color: var(--ui-ink);
   font-weight: 600;
-}
-
-.checks {
-  display: grid;
-  gap: var(--ui-2);
-  margin: 0 0 var(--ui-5);
-  padding: 0;
-  list-style: none;
-}
-
-/* ONE ROW, TWO COLUMNS: the verdict in its own, the words in theirs. Reported by the owner
-   from a real install, and it is the rows that print a path that show it — the label wraps,
-   and without a column of its own the second line goes back under the word "OK". Measured
-   on the installer's own screen: three of eighteen rows at 1200px, eight of eighteen on a
-   phone. "Missing" and "Optional" are wider than "OK", so the column is sized to its
-   content rather than to a guess. */
-.check {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--ui-1) var(--ui-3);
-  align-items: baseline;
-}
-
-/* A hint, or the rewrite rules under a failed check, line up with the words rather than
-   with the verdict. */
-.check > :not(.check-status) {
-  grid-column: 2;
-  /* A path is one long word with no spaces. Where it cannot fit, it breaks inside itself
-     rather than pushing the card wider than the window. */
-  overflow-wrap: anywhere;
-}
-
-.check-status {
-  font-weight: 700;
-}
-
-.check-fail .check-status {
-  color: var(--ui-danger);
-}
-
-.check-warn .check-status {
-  color: var(--ui-warning);
-}
-
-.check-ok .check-status {
-  color: var(--ui-success);
 }
 
 /* A script-only button keeps the button's own layout: .js-only would otherwise make it
@@ -289,9 +239,15 @@
 /* A ghost button that is unavailable, such as Move up on the first of a list: fainter, and
    still legible — a control nobody can read is not explained by being unavailable, and the
    3:1 rule covers disabled controls too (PLAN.md D-012). Here rather than on the pages
-   list alone, where it began, so every list of movable things says the same. */
+   list alone, where it began, so every list of movable things says the same. A quiet one
+   too: the installer's "Start over" while it installs (D-212). And a danger one: a list's
+   "Delete selected" while nothing is ticked (D-218, the owner: red read as ready). */
 .button-ghost[disabled],
-.button-ghost[disabled]:hover {
+.button-ghost[disabled]:hover,
+.button-quiet[disabled],
+.button-quiet[disabled]:hover,
+.button-danger[disabled],
+.button-danger[disabled]:hover {
   background: transparent;
   color: var(--ui-ink-faint);
   cursor: default;

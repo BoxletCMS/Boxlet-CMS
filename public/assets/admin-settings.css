@@ -198,3 +198,69 @@
   padding-block-start: var(--ui-5);
   border-block-start: var(--ui-border) solid var(--ui-line);
 }
+
+/* THE LANGUAGES TABLE ON A PHONE (O-43): six columns were wider than the screen, the switch cut
+   at its edge and the delete button past it, reached only by scrolling the table sideways. Each
+   language is a row of its own instead: the order, the name, the switch and delete on one line,
+   the code and then the page count under the name, each with its name, as the column heads are
+   not shown. */
+@media (max-width: 40rem) {
+  .languages-table,
+  .languages-table tbody {
+    display: block;
+  }
+
+  .languages-table thead {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .languages-table tr {
+    display: grid;
+    /* The order and delete columns of a fixed width, each row being a grid of its own: so the
+       names stand in one line down the list, and so do the switches. */
+    grid-template-columns: 2.75rem auto minmax(0, 1fr) auto 2.75rem;
+    grid-template-areas:
+      "order name name status actions"
+      "order code pages pages pages";
+    align-items: center;
+    column-gap: var(--ui-2);
+    padding-block: var(--ui-2);
+    border-block-end: var(--ui-border) solid var(--ui-line);
+  }
+
+  .languages-table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .languages-table .page-order {
+    grid-area: order;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .languages-table .language-name { grid-area: name; }
+  .languages-table .language-status { grid-area: status; }
+  .languages-table .row-actions { grid-area: actions; }
+
+  .languages-table .language-code { grid-area: code; }
+  .languages-table .language-pages { grid-area: pages; }
+
+  .languages-table .language-code,
+  .languages-table .language-pages {
+    color: var(--ui-ink-muted);
+    font-size: var(--ui-text-sm);
+  }
+
+  .languages-table .language-code::before,
+  .languages-table .language-pages::before {
+    content: attr(data-label) " ";
+  }
+}
+

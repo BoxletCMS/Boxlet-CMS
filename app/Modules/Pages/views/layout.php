@@ -12,6 +12,12 @@ use App\Support\Url;
  * @var list<array{hreflang: string, href: string}> $hreflang this page's alternates in other languages
  * @var string $breadcrumbs BreadcrumbList JSON-LD for a page under a parent, '' otherwise (D-129)
  * @var string $description meta description; empty when the page gives none (D-004)
+ * @var bool $noindex keep this page out of search engines: the owner's choice, and always
+ *                   for a preview (D-170)
+ * @var list<string> $fontPreloads the two families' first files, preloaded (D-185)
+ * @var string $siteStyles the nineteen visitor stylesheets as one file, '' when it could not be written (D-204)
+ * @var bool $designPreview drawn inside the Appearance preview, where the editor-only marks
+ *                         show (D-170)
  * @var array{url: string, type: string}|null $icon the site's tab icon (D-028)
  * @var string|null $shareImage absolute URL of the default sharing picture (D-028)
  * @var string $headerHtml the site header, already rendered, or '' when there is none (5c)
@@ -33,6 +39,9 @@ use App\Support\Url;
          than none, which is why this field does not fall back to it (D-004). */ ?>
 <?php if ($description !== ''): ?>
     <meta name="description" content="<?= e($description) ?>">
+<?php endif; ?>
+<?php if ($noindex): ?>
+    <meta name="robots" content="noindex">
 <?php endif; ?>
 <?php if ($canonical !== null): ?>
     <link rel="canonical" href="<?= e($canonical) ?>">
@@ -57,17 +66,20 @@ use App\Support\Url;
 <?php if ($shareImage !== null): ?>
     <meta property="og:image" content="<?= e($shareImage) ?>">
 <?php endif; ?>
+<?php /* The two families' first files at once (D-185): drawn in their own face the first time. */ ?>
+<?php foreach ($fontPreloads as $font): ?>
+    <link rel="preload" href="<?= e($font) ?>" as="font" type="font/woff2" crossorigin>
+<?php endforeach; ?>
     <link rel="stylesheet" href="<?= e(Url::stylesheet()) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/site.css')) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-hero.css')) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks.css')) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-words.css')) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-media.css')) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-embed.css')) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/blocks-downloads.css')) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/chrome.css')) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/chrome-header.css')) ?>">
-    <link rel="stylesheet" href="<?= e(Url::versioned('assets/sections.css')) ?>">
+<?php /* The nineteen sheets as one file (D-204): one request a first visit waits for, not
+         nineteen. Linked one by one only where the bundle could not be written. */ ?>
+<?php if ($siteStyles !== ''): ?>
+    <link rel="stylesheet" href="<?= e($siteStyles) ?>">
+<?php else: ?>
+<?php foreach (\App\Support\SiteStyles::FILES as $sheet): ?>
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/' . $sheet)) ?>">
+<?php endforeach; ?>
+<?php endif; ?>
 <?php /* A script a visitor's page loads only when the header has a menu for it to fold: the
          mobile menu and submenu buttons (D-036). Without it nothing breaks. */ ?>
 <?php if (str_contains($headerHtml, 'data-site-nav-toggle')): ?>
@@ -78,8 +90,18 @@ use App\Support\Url;
 <?php if (str_contains($content, 'data-embed-src')): ?>
     <script src="<?= e(Url::versioned('assets/site-embed.js')) ?>" defer></script>
 <?php endif; ?>
+<?php /* And a third, only where a section arrives as it is scrolled to (D-165). Without it
+         every section is simply there. */ ?>
+<?php if (str_contains($content, 'data-anim=')): ?>
+    <script src="<?= e(Url::versioned('assets/anim.js')) ?>" defer></script>
+<?php endif; ?>
+<?php if ($designPreview): ?>
+    <?php /* PRESSING A PART OF THE PICTURE OPENS ITS SETTINGS (D-181, README 5.7): the parts
+             the preview marks (AppearancePreview::region()) and their outlines. */ ?>
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/canvas-regions.css')) ?>">
+<?php endif; ?>
 </head>
-<body>
+<body<?= $designPreview ? ' class="bx-design-preview"' : '' ?>>
 <?php /* THE SHEET (PLAN.md D-031). A boxed page needs something to be a page: <body> holds
          the colour around it and this element is the page itself. Without a wrapper there
          was nothing to inset, because body carried both the background and the content.

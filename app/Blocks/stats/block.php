@@ -22,13 +22,19 @@ return [
             'type' => 'repeater',
             'required' => true,
             'max' => 8,
-            'per_layout' => ['three' => 3, 'four' => 4],
             'fields' => [
                 'value' => ['type' => 'text', 'required' => true, 'translatable' => true, 'sample' => 'preview.stats.value'],
                 'label' => ['type' => 'text', 'translatable' => true, 'sample' => 'preview.stats.label'],
             ],
         ],
     ],
-    'layouts' => ['three', 'four'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'three' => ['logo' => [[6, 7, 8, 4], [20, 7, 8, 4], [34, 7, 8, 4]], 'line' => [[6, 13, 10, 1], [20, 13, 10, 1], [34, 13, 10, 1]]],
+        'four' => ['logo' => [[4, 7, 7, 4], [15, 7, 7, 4], [26, 7, 7, 4], [37, 7, 7, 4]], 'line' => [[4, 13, 8, 1], [15, 13, 8, 1], [26, 13, 8, 1], [37, 13, 8, 1]]],
+    ],
     'defaults' => ['layout' => 'three'],
+    // How many stand side by side in each layout (D-189): the inspector says when the items
+    // leave one alone in the last row.
+    'across' => ['three' => 3, 'four' => 4],
 ];

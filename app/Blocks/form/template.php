@@ -20,13 +20,13 @@ $formId = is_array($drawn) ? (int) $drawn['form']['id'] : 0;
 $anchor = 'form-' . $formId;
 ?>
 <div class="form-block"<?= $formId > 0 ? ' id="' . e($anchor) . '"' : '' ?>>
-<?php if ($content['heading'] !== '' || $content['intro'] !== ''): ?>
+<?php if (edit_show($content['heading'] !== '' || $content['intro'] !== '')): ?>
     <div class="form-block-head">
-<?php if ($content['heading'] !== ''): ?>
-        <h2 class="form-block-heading"><?= e($content['heading']) ?></h2>
+<?php if (edit_show($content['heading'] !== '')): ?>
+        <h2 class="form-block-heading"<?= edit_attr('heading') ?>><?= e($content['heading']) ?></h2>
 <?php endif; ?>
-<?php if ($content['intro'] !== ''): ?>
-        <p class="form-block-intro"><?= e($content['intro']) ?></p>
+<?php if (edit_show($content['intro'] !== '')): ?>
+        <p class="form-block-intro"<?= edit_attr('intro') ?>><?= e($content['intro']) ?></p>
 <?php endif; ?>
     </div>
 <?php endif; ?>

@@ -110,6 +110,31 @@ final class DatabaseSetup
         ]);
     }
 
+    /**
+     * The database this install made in its first half (D-214), connected again for the demo's
+     * pictures and the finish: checked once already, and no longer empty, which is exactly
+     * what fromEnv() refuses.
+     *
+     * @param array<mixed> $env
+     */
+    public static function resume(string $root, array $env): Db
+    {
+        if (($env['DB_DRIVER'] ?? '') === 'sqlite') {
+            $path = (string) ($env['DB_PATH'] ?? '');
+
+            return new Db('sqlite', 'sqlite:' . (str_starts_with($path, '/') ? $path : $root . '/' . $path));
+        }
+
+        return Db::fromConfig([
+            'driver' => 'mysql',
+            'host' => (string) ($env['DB_HOST'] ?? ''),
+            'port' => (int) ($env['DB_PORT'] ?? 3306),
+            'database' => (string) ($env['DB_DATABASE'] ?? ''),
+            'username' => (string) ($env['DB_USERNAME'] ?? ''),
+            'password' => (string) ($env['DB_PASSWORD'] ?? ''),
+        ]);
+    }
+
     private static function charset(Db $db): string
     {
         return (string) ($db->one('SELECT @@character_set_database AS charset')['charset'] ?? '');

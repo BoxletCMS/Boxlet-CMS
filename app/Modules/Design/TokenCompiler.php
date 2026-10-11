@@ -18,11 +18,13 @@ final class TokenCompiler
      *
      * @param array<mixed> $tokens  group => name => scalar value, emitted as --group-name
      * @param string       $prelude CSS placed before the properties, such as @font-face rules
+     * @param string       $code    the version of the code that compiled it (Design::code()):
+     *                              part of the name, so new code is a new file (D-189, O-53)
      */
-    public function compile(array $tokens, string $directory, string $prelude = ''): string
+    public function compile(array $tokens, string $directory, string $prelude = '', string $code = ''): string
     {
         $css = $this->css($tokens, $prelude);
-        $file = 'tokens.' . substr(hash('sha256', $css), 0, 12) . '.css';
+        $file = 'tokens.' . substr(hash('sha256', $code . "\n" . $css), 0, 12) . '.css';
         $target = $directory . '/' . $file;
 
         if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {

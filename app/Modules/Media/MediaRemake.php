@@ -24,8 +24,6 @@ use Throwable;
  */
 final class MediaRemake
 {
-    private const RESERVE_SECONDS = 2.0;
-
     public function __construct(
         private readonly Db $db,
         private readonly MediaEncoder $encoder,
@@ -88,7 +86,9 @@ final class MediaRemake
         $this->db->query('UPDATE media SET remake = ? WHERE id = ?', [implode(',', $whole), $id]);
         $media['remake'] = implode(',', $whole);
 
-        return $this->one($media, microtime(true), $budgetSeconds);
+        $slowest = 0.0;
+
+        return $this->one($media, microtime(true), $budgetSeconds, $slowest);
     }
 
     /**
@@ -100,9 +100,10 @@ final class MediaRemake
     public function step(?float $budgetSeconds): array
     {
         $started = microtime(true);
+        $slowest = 0.0;
         $done = 0;
         foreach ($this->db->all('SELECT * FROM media WHERE remake IS NOT NULL ORDER BY id') as $media) {
-            if (!$this->one($media, $started, $budgetSeconds)) {
+            if (!$this->one($media, $started, $budgetSeconds, $slowest)) {
                 break;
             }
             $done++;
@@ -116,8 +117,9 @@ final class MediaRemake
      * the picture is finished, false when the time ran out first.
      *
      * @param array<string, mixed> $media
+     * @param float $slowest the longest one encode has taken in this request, kept up to date
      */
-    private function one(array $media, float $started, ?float $budgetSeconds): bool
+    private function one(array $media, float $started, ?float $budgetSeconds, float &$slowest): bool
     {
         $id = (int) $media['id'];
         $source = $this->storagePath . '/' . (string) $media['path'];
@@ -141,9 +143,11 @@ final class MediaRemake
                 if (in_array($name, $done, true)) {
                     continue;
                 }
-                if ($budgetSeconds !== null && (microtime(true) - $started) + self::RESERVE_SECONDS > $budgetSeconds) {
+                if (!MediaVariants::roomFor($started, $slowest, $budgetSeconds)) {
                     return false;
                 }
+                $encoding = microtime(true);
+                MediaVariants::breathe();
                 $crop = MediaPresets::crop($preset, (int) $media['width'], (int) $media['height'], (int) $media['focal_x'], (int) $media['focal_y']);
                 $relative = MediaPresets::file($preset, $id, (string) $media['filename'], $format);
                 $working = $relative . '.remake';
@@ -160,6 +164,7 @@ final class MediaRemake
                     // The old file stays where it was, serving; only the working copy goes.
                     @unlink($this->publicPath . '/' . $working);
                 }
+                $slowest = max($slowest, microtime(true) - $encoding);
                 $done[] = $name;
                 $this->db->query(
                     'UPDATE media SET remake = ?, variants_json = ? WHERE id = ?',

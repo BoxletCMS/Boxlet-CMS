@@ -8,7 +8,7 @@
 
    What the chrome LOOKS like lives here; what it measures lives in sections.css, next to
    the .block rule that sets those properties. Two rules of mine sat here setting
-   --section-rhythm and --section-width and neither ever applied: .block sets both, the
+   the section padding and --section-width and neither ever applied: .block sets both, the
    selectors weigh the same, and sections.css is linked second. The header's height did
    fall when I wrote the first one, so I believed it — but it fell because a bar holds less
    than a band of content. Measured afterwards: the header was still taking --space-xl. */
@@ -43,12 +43,13 @@
   font-family: var(--font-heading);
   font-weight: var(--heading-weight);
   letter-spacing: var(--heading-tracking);
-  font-size: var(--text-lg);
+  /* The name grows with the logo's size (D-164): half of it, between the body's size and
+     the xl step. Worked out in a property of its own, so font-size reads a token like every
+     other front-end size (blocks_test). */
+  --site-name-size: clamp(var(--text-base), calc(var(--chrome-logo-size, 2.75rem) * 0.5), var(--text-xl));
+  font-size: var(--site-name-size);
   line-height: 1;
 }
-
-.logo-small .site-name { font-size: var(--text-base); }
-.logo-large .site-name { font-size: var(--text-xl); }
 
 .site-nav ul,
 .site-footer-nav ul {
@@ -81,27 +82,6 @@
 
 .site-header-action {
   margin: 0;
-}
-
-.site-footer {
-  display: grid;
-  gap: var(--space-s);
-}
-
-.site-footer-text {
-  color: var(--section-muted);
-}
-
-/* The switcher sits in the footer now, so it no longer carries the standalone padding it
-   had when the layout drew it on its own. */
-.site-footer .locale-switcher {
-  padding-block: 0;
-}
-
-.site-small-print {
-  margin: 0;
-  color: var(--section-muted);
-  font-size: var(--text-sm);
 }
 
 /* A COLOUR OF ITS OWN (PLAN.md D-076, corrected by D-110).
@@ -168,17 +148,23 @@ footer.block {
   --section-border: var(--chrome-footer-muted);
 }
 
-/* THE CHROME'S LOOK (PLAN.md D-032, D-036). Every value is a closed-set class drawn from
-   the tokens: density, a rule under the header, logo size, and the header's and footer's
-   arrangements. Surfaces are the sections' own (sections.css), so contrast is the
-   palette's guarantee here as everywhere. */
+/* THE CHROME'S LOOK (PLAN.md D-032, D-036, D-164). The bar's height is a number, a token
+   with a fallback; the closed sets — a rule under the header, the arrangements — are
+   classes. Surfaces are the sections' own (sections.css), so contrast is the palette's
+   guarantee here as everywhere. */
 
-.site-header.density-compact { padding-block: var(--space-s); }
-.site-header.density-normal { padding-block: var(--space-m); }
-.site-header.density-roomy { padding-block: var(--space-l); }
-.site-footer.density-compact { padding-block: var(--space-m); }
-.site-footer.density-normal { padding-block: var(--space-l); }
-.site-footer.density-roomy { padding-block: var(--space-xl); }
+.site-header {
+  min-block-size: var(--chrome-header-height, 4.5rem);
+  /* Room above and below whatever the bar holds, the same on both sides: an arrangement of
+     two rows is taller than the bar's own height, and with no room it sat against the top
+     (owner's review of phase 1). */
+  padding-block: var(--space-s);
+  box-sizing: border-box;
+}
+
+.site-footer {
+  padding-block: var(--space-xl);
+}
 
 /* THE HEADER'S EDGE (D-112): nothing, a hairline, or a shadow. On the HEADER element,
    because the bar inside it has no edge of its own to draw. */
@@ -192,31 +178,24 @@ footer.block {
 .block-header:has(.edge-shadow) {
   position: relative;
   z-index: 2;
-  box-shadow: var(--shadow-m);
+  /* Straight down: a band's shadow has no side to fall on (Derived::shadows). */
+  box-shadow: var(--shadow-edge);
 }
 
-.logo-small .site-logo img { block-size: 2em; }
-.logo-medium .site-logo img { block-size: 2.75em; }
-.logo-large .site-logo img { block-size: 3.75em; }
+.site-logo img { block-size: var(--chrome-logo-size, 2.75rem); }
 
 /* On a phone the logo shares its line with the menu button, so it is capped (D-114): a large
    logo at 3.75em pushed the button onto a second line under it. Its shape stays; only its
    height is held, and its width is kept off the button. */
 @media (max-width: 40rem) {
-  .site-logo img,
-  .logo-medium .site-logo img,
-  .logo-large .site-logo img {
-    block-size: 2.25em;
+  .site-logo img {
+    block-size: min(var(--chrome-logo-size, 2.75rem), 2.25em);
     max-inline-size: 60vw;
     object-fit: contain;
   }
 
   .site-name {
-    font-size: var(--text-lg);
-  }
-
-  .logo-large .site-name {
-    font-size: var(--text-lg);
+    --site-name-size: min(var(--text-lg), calc(var(--chrome-logo-size, 2.75rem) * 0.5));
   }
 }
 
@@ -310,149 +289,3 @@ footer.block {
   text-decoration-thickness: 0.12em;
   text-underline-offset: 0.35em;
 }
-
-/* THE FOOTER'S ARRANGEMENTS (D-113). `simple` is the grid above: one column, the words,
-   the menu, the last row. */
-
-/* Centred: everything on one axis. */
-.layout-centred .site-footer {
-  justify-items: center;
-  text-align: center;
-}
-
-.layout-centred .site-footer-nav ul {
-  justify-content: center;
-}
-
-/* A COLUMN OF CONTENT (D-115): a title, words and a menu, each drawn only when there is
-   one. The title is the last heading on the page, set a step above the words. */
-.site-footer-col {
-  display: grid;
-  gap: var(--space-s);
-  align-content: start;
-}
-
-.site-footer-title {
-  margin: 0;
-  font-size: var(--text-base);
-  font-weight: var(--heading-weight);
-  letter-spacing: var(--heading-tracking);
-  text-transform: var(--heading-transform);
-}
-
-/* Two columns side by side; three side by side. Equal columns, because each holds what its
-   owner put in it (D-115) — the old two-thirds-and-a-third was for words beside a menu. */
-.layout-columns .site-footer {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--space-xl);
-  align-items: start;
-}
-
-.layout-three .site-footer {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: var(--space-xl);
-  align-items: start;
-}
-
-/* Fewer columns with something in them than the arrangement allows: they take the room
-   there is rather than leaving a gap where the empty one would stand. */
-.layout-columns .site-footer.drawn-1,
-.layout-three .site-footer.drawn-1 {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.layout-three .site-footer.drawn-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-/* Menu first: the column's navigation in a row above its words, as a site map's first line. */
-.layout-menu_first .site-footer-nav {
-  order: -1;
-}
-
-/* THE LAST ROW (D-113): the languages and the small print. Side by side with the space
-   between, centred, or one under the other on the left. */
-.site-footer-foot {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-s) var(--space-l);
-  align-items: baseline;
-}
-
-.foot-split .site-footer-foot {
-  justify-content: space-between;
-}
-
-.foot-centred .site-footer-foot {
-  justify-content: center;
-  text-align: center;
-}
-
-.foot-left .site-footer-foot {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-/* The last row spans every column, whatever the arrangement. */
-.site-footer-foot {
-  grid-column: 1 / -1;
-}
-
-/* Centred: each column's words and menu centred too. */
-.layout-centred .site-footer-col {
-  justify-items: center;
-}
-
-/* Words with a link in them (D-113): the link takes the section's link colour like any
-   other, and paragraphs inside keep the footer's rhythm rather than a page's. */
-.site-footer-text p {
-  margin: 0;
-}
-
-.site-footer-text p + p {
-  margin-block-start: var(--space-xs);
-}
-
-/* In columns the menu is a list down the side, and a long one may run in two or three of
-   them — which is the thing more columns actually help with (D-067). */
-.layout-columns .site-footer-nav ul {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: var(--space-xs) var(--space-l);
-}
-
-/* One link under another in every arrangement, when the owner asks (D-143): the columns
-   arrangement's list, offered to the others. Centred stays centred. */
-.links-list .site-footer-nav ul {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-xs) var(--space-l);
-}
-
-.layout-centred .links-list .site-footer-nav ul {
-  justify-items: center;
-}
-
-/* A long menu in two or three lists, in the columns arrangement. The layout class is on the
-   <footer> and the footer-cols one on the .site-footer inside it: written as one compound
-   selector until 2026-09-29, these rules matched nothing, and "Long menu" never split a menu
-   (D-143). Not for menus one under another in the other arrangements: a character's own
-   "Long menu" would split a list the owner only asked to stand upright. */
-.layout-columns .footer-cols-3 .site-footer-nav ul {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.layout-columns .footer-cols-4 .site-footer-nav ul {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-/* One list on a phone, whatever was asked: written as specific as the rules above, which
-   would win over a plainer one. */
-@media (max-width: 40rem) {
-  .layout-columns .site-footer-nav ul,
-  .layout-columns .footer-cols-3 .site-footer-nav ul,
-  .layout-columns .footer-cols-4 .site-footer-nav ul {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-

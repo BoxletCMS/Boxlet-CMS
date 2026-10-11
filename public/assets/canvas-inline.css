@@ -1,0 +1,59 @@
+/* What typing on the page draws in the canvas's layer (PLAN.md D-178): an error's words and
+ * the rich text toolbar. The link popover is the admin's (builder-inspector.css). canvas.css's
+ * rule holds here: literals and --bx- values, never a site token; every size in em of the
+ * layer's, which keeps it its size on screen at any scale. Dark faces in a white edge, as
+ * every control in there. */
+
+.bx-rich-tools {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 0.5em;
+  background: var(--bx-ink);
+  color: var(--bx-paper);
+  box-shadow: 0 0 0 1px var(--bx-paper), 0 6px 18px rgb(0 0 0 / 0.22);
+}
+
+.bx-rich-tools .bx-tool[aria-pressed="true"] {
+  background: var(--bx-select);
+}
+
+/* An error's words, in the page's flow just under the element (builder-inline-errors.js,
+   D-179): what follows moves down rather than being covered. Not in the layer, so its size is
+   the layer's by --bx-z rather than by inheritance. */
+.bx-canvas .bx-error {
+  display: block;
+  margin: 0.5em 0 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The words as a tag, standing where the element's own words do (start, centred). */
+.bx-canvas .bx-error-words {
+  display: inline-block;
+  max-inline-size: 100%;
+  padding: 0.35em 0.7em;
+  border-radius: 0.375em;
+  background: #c62828;
+  color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff;
+  font: 500 calc(0.8125rem * var(--bx-z, 1))/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* A replacement tag on the page (D-201): the words a visitor will see, in the page's own
+   letters, marked as one piece that is not typed into. Drawn by the server around the value
+   (Tags::draw) and by the editor while the words are written (richtext-tags.js). */
+.bx-canvas .bx-tag {
+  padding: 0 0.15em;
+  border-radius: 0.2em;
+  background: var(--bx-select-soft);
+  box-shadow: inset 0 0 0 1px var(--bx-hover);
+  white-space: nowrap;
+}
+
+.bx-canvas .bx-tag.ProseMirror-selectednode {
+  outline: 2px solid var(--bx-select);
+  outline-offset: 1px;
+}

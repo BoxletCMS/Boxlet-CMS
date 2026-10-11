@@ -111,6 +111,10 @@ final class Db
      * is why it lives here rather than in the model that happened to need it first.
      * Design, Installer and Migrator still open theirs by hand and could use this.
      *
+     * ONE ALREADY OPEN IS JOINED, not nested: publishing a draft writes the page and deletes
+     * the draft as one change, and the page's own write opens a transaction of its own
+     * (PLAN.md D-173). PDO refuses a second begin; the outer one commits or rolls back all.
+     *
      * @template T
      * @param Closure(): T $work
      * @return T
@@ -118,6 +122,9 @@ final class Db
     public function transaction(Closure $work): mixed
     {
         $pdo = $this->pdo();
+        if ($pdo->inTransaction()) {
+            return $work();
+        }
         $pdo->beginTransaction();
         try {
             $result = $work();

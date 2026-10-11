@@ -1,0 +1,188 @@
+/* THE CHARACTERS AS TILES on the Appearance screen's home (PLAN.md D-157): three to a row, each
+ * a button you can read with a ⋯ menu above it, and Quick start's mirrors under them. Split
+ * from admin-appearance-home.css past 300 lines, along the seam the home already had: these
+ * are where a design starts from, the rest of the home is what was made of it. Admin tokens
+ * only (--ui-*). */
+
+/* ---- the characters, three to a row ----------------------------------------------------- */
+
+.character-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ui-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A tile is a button you can read: the whole of it loads the character, and its menu sits
+   above that button rather than inside it. */
+.character-tile {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "chips menu" "name name" "tags tags";
+  align-items: center;
+  gap: var(--ui-1);
+  min-inline-size: 0;
+  padding: var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.character-tile:hover {
+  border-color: var(--ui-accent);
+}
+
+.character-tile.is-current {
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 1px var(--ui-accent);
+}
+
+.character-tile .design-chips {
+  grid-area: chips;
+}
+
+/* One line, cut with an ellipsis, whole in its title: a long imported name never widens a
+   tile past its column (measured once at 304px in a rail of 195). */
+.tile-name {
+  grid-area: name;
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tile-tags {
+  grid-area: tags;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-1);
+  min-block-size: 0;
+}
+
+.tile-tags:empty {
+  display: none;
+}
+
+/* "In use" is a fact about the site, "Custom" about where the character came from: the
+   first in the accent's ground, the second in the quiet ink, both words rather than glyphs. */
+.tile-live,
+.tile-custom {
+  display: inline-block;
+  padding: 0 var(--ui-1);
+  border-radius: var(--ui-radius-s);
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tile-live {
+  background: var(--ui-accent-soft);
+  color: var(--ui-ink);
+}
+
+.tile-custom {
+  border: var(--ui-border) solid var(--ui-control-line);
+  color: var(--ui-ink-muted);
+}
+
+.tile-use {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-radius: var(--ui-radius-m);
+  cursor: pointer;
+}
+
+.tile-use:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+/* ⋯ — a <details>, so it opens without a script. Above the tile's button. */
+.tile-menu {
+  grid-area: menu;
+  position: relative;
+  z-index: 1;
+}
+
+.tile-menu > summary {
+  list-style: none;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  min-block-size: 0;
+  padding: 0;
+}
+
+.tile-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tile-menu-items {
+  position: absolute;
+  inset-block-start: calc(100% + var(--ui-1));
+  inset-inline-end: 0;
+  z-index: 3;
+  display: grid;
+  min-inline-size: 9rem;
+  padding: var(--ui-1);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  box-shadow: var(--ui-shadow-m);
+}
+
+.tile-menu-items a,
+.tile-menu-items button {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  padding: var(--ui-1) var(--ui-2);
+  background: transparent;
+  border: 0;
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tile-menu-items a:hover,
+.tile-menu-items button:hover {
+  background: var(--ui-panel-sunken);
+}
+
+/* Three colours of a design, wherever one is shown small. */
+.design-chips {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 2px;
+}
+
+.design-chips svg {
+  inline-size: 0.85rem;
+  block-size: 0.85rem;
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: 2px;
+}
+
+/* Quick start's mirrors stand under the tiles with the room the group gives every row. */
+.quick-mirrors {
+  display: grid;
+  gap: var(--ui-4);
+}
+
+.quick-mirrors[hidden] {
+  display: none;
+}

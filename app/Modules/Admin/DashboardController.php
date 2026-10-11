@@ -47,7 +47,7 @@ final class DashboardController
             'metrics' => Overview::metrics($db, $zone),
             'rows' => Activity::recent($db, 6),
             'zone' => $zone,
-            'issues' => Overview::attention($db, $this->container->get('blocks')),
+            'issues' => Overview::attention($db, $this->container->get('blocks'), Exposure::exposed($db, $this->container->get('private_hidden'))),
             'mostRead' => Overview::mostRead($db, $zone),
             'homeId' => $home === null ? null : (int) $home['id'],
             'maintenance' => $this->container->get('maintenance')->isOn(),

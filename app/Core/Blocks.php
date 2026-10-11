@@ -106,6 +106,16 @@ final class Blocks
     }
 
     /**
+     * The layout as it is STORED (PLAN.md D-191, the owner): '' follows the character, and is
+     * drawn in the layout its composition names (PageRender); any other is the owner's own,
+     * kept through Apply, and a name the block no longer declares is its default.
+     */
+    public function own(string $type, mixed $layout): string
+    {
+        return $layout === '' || $layout === null ? '' : $this->layout($type, $layout);
+    }
+
+    /**
      * Every field of the block present, with stored values of the wrong shape replaced by
      * the field's empty value, so templates never check whether a key exists.
      *
@@ -140,6 +150,39 @@ final class Blocks
         foreach ($this->get($type)['fields'] as $name => $field) {
             if ($field['type'] === 'repeater') {
                 $content[$name] = array_fill(0, min(3, $field['max']), self::emptyItem($field));
+            }
+        }
+
+        return $content;
+    }
+
+    /**
+     * The content a block starts with when it is added in the builder (D-176): fresh(), with
+     * every word field that declares a sample holding it — in the words $say gives for a
+     * sample key, which is the page's language. Rich text gets it as one paragraph; a link
+     * and a picture stay empty, since a link's words without an address are an error.
+     *
+     * @param \Closure(string): string $say
+     * @return array<string, mixed>
+     */
+    public function sampled(string $type, \Closure $say): array
+    {
+        $fill = static function (array $fields, array $content) use ($say): array {
+            foreach ($fields as $name => $field) {
+                $sample = $field['sample'] ?? null;
+                if (!is_string($sample) || !in_array($field['type'], ['text', 'textarea', 'richtext'], true)) {
+                    continue;
+                }
+                $words = $say($sample);
+                $content[$name] = $field['type'] === 'richtext' ? '<p>' . htmlspecialchars($words, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</p>' : $words;
+            }
+
+            return $content;
+        };
+        $content = $fill($this->get($type)['fields'], $this->fresh($type));
+        foreach ($this->get($type)['fields'] as $name => $field) {
+            if ($field['type'] === 'repeater' && is_array($content[$name] ?? null)) {
+                $content[$name] = array_map(static fn (array $item): array => $fill($field['fields'], $item), $content[$name]);
             }
         }
 
@@ -236,7 +279,7 @@ final class Blocks
      *                              footer (PLAN.md D-030), and a page block inside a section
      *                              that holds more than one is `none` — a plain div carrying
      *                              only its own layer 3, because the section around it has
-     *                              already drawn the surface, the rhythm and the container
+     *                              already drawn the surface, the spacing and the container
      *                              (D-093 step 3). `section` remains for the case a section
      *                              holds exactly one block, where the two are the same
      *                              element and every existing page is drawn unchanged.
@@ -250,8 +293,10 @@ final class Blocks
      * @param array<int, array<string, mixed>> $locales enabled locales, for the footer's
      *                        language switcher; empty for a page block, which has no use
      *                        for them yet
+     * @param array<mixed> $options the block's options as they are to be drawn — the owner's
+     *                        over the character's (D-166); each one missing is its default
      */
-    public function render(string $type, array $content, array $style = [], string $layout = '', array $media = [], bool $eager = false, string $wrapper = 'section', array $resolved = [], string $locale = '', array $locales = []): string
+    public function render(string $type, array $content, array $style = [], string $layout = '', array $media = [], bool $eager = false, string $wrapper = 'section', array $resolved = [], string $locale = '', array $locales = [], array $options = []): string
     {
         // An allowlist, not the caller's word for it: this string is written straight into
         // the markup, and "whatever you pass" is how a tag name becomes an injection point.
@@ -264,14 +309,19 @@ final class Blocks
 
         $layout = $this->layout($type, $layout);
         $template = $this->directory . '/' . $type . '/template.php';
-        $include = static function (string $__template, array $content, array $style, string $layout, array $media, bool $eager, array $resolved, string $locale, array $locales): void {
+        $include = static function (string $__template, array $content, array $style, string $layout, array $media, bool $eager, array $resolved, string $locale, array $locales, array $options): void {
             require $__template;
         };
+        // Every option answered (D-166): what the caller gives, each default where it gives
+        // none. The caller composes the character's answer in; a template never asks.
+        $specs = $this->get($type)['options'];
+        $options = BlockOptions::effective($specs, BlockOptions::normalize($specs, $options), []);
 
         $style = SectionStyle::normalize($style);
         ob_start();
         try {
-            $include($template, $this->normalize($type, $content), $style, $layout, $media, $eager, $resolved, $locale, $locales);
+            // Whose field labels the canvas's placeholders read (D-178).
+            \App\Support\Editing::block($type, fn () => $include($template, $this->normalize($type, $content), $style, $layout, $media, $eager, $resolved, $locale, $locales, $options));
         } catch (Throwable $e) {
             ob_end_clean();
             throw $e;
@@ -281,7 +331,7 @@ final class Blocks
         /*
          * A BLOCK INSIDE A SECTION THAT HOLDS OTHERS carries its layer 3 and nothing else.
          *
-         * Not `.block`: that class is section language — it sets --section-rhythm and
+         * Not `.block`: that class is section language — it sets the section padding and
          * --section-width, the block padding and position: relative, and it is what
          * `main > .block:first-child` and `.block:has(+ .divider-slant)` mean by a section.
          * Wearing it here would give every block in a column a second band of padding and
@@ -298,7 +348,8 @@ final class Blocks
 
         $classes = implode(' ', array_merge(['block', 'block-' . $type, 'layout-' . $layout], SectionStyle::classes($style)));
 
-        return '<' . $wrapper . ' class="' . e($classes) . "\">\n"
+        // The anchor and the animation only on a page's section: the chrome has neither.
+        return '<' . $wrapper . ' class="' . e($classes) . '"' . ($wrapper === 'section' ? SectionStyle::attributes($style) : '') . ">\n"
             . self::sectionPicture($style, $media, $eager)
             . "<div class=\"container\">\n" . $inner . "</div>\n</" . $wrapper . ">\n";
     }

@@ -4,6 +4,7 @@ $storage = (string) env('STORAGE_PATH', 'storage');
 $cache = (string) env('CACHE_PATH', 'public/cache');
 $public = (string) env('PUBLIC_PATH', 'public');
 $envFile = (string) env('ENV_PATH', '.env');
+$customDesigns = (string) env('CUSTOM_DESIGNS_PATH', 'designs/custom');
 $fromRoot = static fn (string $path): string => str_starts_with($path, '/') ? $path : dirname(__DIR__) . '/' . $path;
 
 return [
@@ -22,4 +23,7 @@ return [
     // into (PLAN.md D-139); .env beside the code unless a test moves it, so no test ever
     // rewrites a real site's.
     'env_path' => $fromRoot($envFile),
+    // Design sets an owner drops in over FTP (PLAN.md D-155), read and never written;
+    // designs/custom unless a test moves it. The five Boxlet ships are in designs/core.
+    'custom_designs_path' => $fromRoot($customDesigns),
 ];

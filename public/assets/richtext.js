@@ -34,7 +34,11 @@
    *     whitelist does not allow. Nulling them there works; setting target/rel at the top
    *     level does not.
    */
-  function extensions(tiptap) {
+  function extensions(tiptap, locale) {
+    // The replacement tags' chip (richtext-tags.js, D-201), where the page loads it.
+    var tags = window.boxletRichTextTags ? window.boxletRichTextTags.node(tiptap, locale) : null;
+    // A paragraph's or heading's alignment (richtext-align.js, D-217), where the page loads it.
+    var align = window.boxletRichTextAlign ? window.boxletRichTextAlign.extension(tiptap) : null;
     return [
       tiptap.StarterKit.configure({
         code: false,
@@ -54,7 +58,28 @@
         // link extension refuses the scheme and drops the mark when the field loads.
         protocols: ['page'],
       }),
-    ];
+    ].concat(tags ? [tags] : [], align ? [align] : []);
+  }
+
+  /** The stored words with their tags as chips, and back: identity where tags are not loaded. */
+  var T = {
+    to: function (html, locale) { return window.boxletRichTextTags ? window.boxletRichTextTags.toChips(html, locale) : html; },
+    from: function (html) { return window.boxletRichTextTags ? window.boxletRichTextTags.fromChips(html) : html; },
+  };
+
+  function aligned(editor, value) {
+    return window.boxletRichTextAlign ? window.boxletRichTextAlign.active(editor, value) : false;
+  }
+
+  /**
+   * Whether a button is lit: a mark or node by name, a name with its attributes, or a test of
+   * the editor's own (an alignment, D-217).
+   */
+  function isOn(editor, active) {
+    if (typeof active === 'function') {
+      return active(editor);
+    }
+    return Array.isArray(active) ? editor.isActive(active[0], active[1]) : editor.isActive(active);
   }
 
   /** What each toolbar button does, and when it shows as active. */
@@ -67,9 +92,22 @@
     quote: { run: function (c) { return c.toggleBlockquote(); }, active: 'blockquote' },
     bullet: { run: function (c) { return c.toggleBulletList(); }, active: 'bulletList' },
     ordered: { run: function (c) { return c.toggleOrderedList(); }, active: 'orderedList' },
+    // Left is the block's own alignment: the paragraph's taken away (D-217).
+    alignLeft: { run: function (c) { return c.setAlign('left'); }, active: function (e) { return aligned(e, 'left'); } },
+    alignCenter: { run: function (c) { return c.setAlign('center'); }, active: function (e) { return aligned(e, 'center'); } },
+    alignRight: { run: function (c) { return c.setAlign('right'); }, active: function (e) { return aligned(e, 'right'); } },
     undo: { run: function (c) { return c.undo(); } },
     redo: { run: function (c) { return c.redo(); } },
   };
+
+  /** What the editor is called: the label the textarea had, its words, as a multi-line box. */
+  function named(textarea) {
+    var label = textarea.id ? document.querySelector('label[for="' + textarea.id + '"]') : null;
+    var words = (label ? label.textContent : textarea.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim();
+    var attributes = { role: 'textbox', 'aria-multiline': 'true' };
+    if (words) { attributes['aria-label'] = words; }
+    return attributes;
+  }
 
   function setup(textarea) {
     var tiptap = window.BoxletTipTap;
@@ -94,13 +132,17 @@
     host.setAttribute('data-richtext-editor', '');
     hidden.insertAdjacentElement('afterend', host);
 
+    var locale = window.boxletRichTextTags ? window.boxletRichTextTags.localeOf(textarea) : '';
     var editor = new tiptap.Editor({
       element: host,
-      extensions: extensions(tiptap),
+      extensions: extensions(tiptap, locale),
       injectCSS: false,
-      content: textarea.value,
+      content: T.to(textarea.value, locale),
+      // Read by the field's own label, as the textarea it stands for was (D-181): the
+      // editable element is the control a screen reader meets, and it had no name.
+      editorProps: { attributes: named(textarea) },
       onUpdate: function () {
-        hidden.value = editor.getHTML();
+        hidden.value = T.from(editor.getHTML());
         // Say so out loud. The builder redraws the canvas from an `input` event on the
         // field groups, and the unsaved-changes warning listens for the same thing —
         // but assigning .value in script fires nothing, so an edit made here was
@@ -109,6 +151,14 @@
         hidden.dispatchEvent(new Event('input', { bubbles: true }));
       },
     });
+
+    // The words put in from outside, as the document has them (O-61: written on the page, they
+    // reach All content's open editor), without saying so: they are the document's already.
+    hidden.boxletSetValue = function (html) {
+      hidden.value = html;
+      editor.commands.setContent(T.to(html, locale), { emitUpdate: false });
+    };
+    hidden.boxletIsFocused = function () { return editor.isFocused; };
 
     var toolbar = field.querySelector('[data-richtext-toolbar]');
     var link = field.querySelector('[data-richtext-link]');
@@ -128,8 +178,7 @@
         if (!button || !active) {
           return;
         }
-        var on = Array.isArray(active) ? editor.isActive(active[0], active[1]) : editor.isActive(active);
-        button.setAttribute('aria-pressed', String(on));
+        button.setAttribute('aria-pressed', String(isOn(editor, active)));
       });
       var linkButton = toolbar.querySelector('[data-rt="link"]');
       if (linkButton) {
@@ -151,6 +200,10 @@
           openLink();
           return;
         }
+        if (name === 'tag' && window.boxletRichTextTags) {
+          window.boxletRichTextTags.menu(editor, button);
+          return;
+        }
         if (COMMANDS[name]) {
           COMMANDS[name].run(editor.chain().focus()).run();
           refresh();
@@ -158,86 +211,9 @@
       });
     }
 
-    /*
-     * Editing a link without stealing the selection.
-     *
-     * The selection lives in the editor's state, not in the browser, so moving focus to a
-     * text input does not disturb it: ProseMirror simply stops rendering the cursor. When
-     * the address is applied, extendMarkRange('link') widens the stored selection to the
-     * whole link so editing one applies to all of it, and .focus() hands the caret back.
-     * Nothing has to be saved and restored by hand, which is what an editor that manages
-     * the browser's own selection forces on you.
-     */
-    function openLink() {
-      if (!link) {
-        return;
-      }
-      var input = link.querySelector('input');
-      var page = link.querySelector('select');
-      link.hidden = false;
-      // The address of the link the cursor is in, so editing one starts from what it is.
-      // extendMarkRange first: with only part of a link selected, getAttributes returns
-      // nothing and the field came back empty when reopening on an existing link.
-      editor.chain().extendMarkRange('link').run();
-      var href = editor.getAttributes('link').href || '';
-      // A link to a page opens on that page; anything else opens on its address. A page
-      // that is no longer offered falls back to the address, so it is seen rather than lost.
-      var offered = page && Array.prototype.some.call(page.options, function (option) {
-        return option.value !== '' && option.value === href;
-      });
-      if (page) {
-        page.value = offered ? href : '';
-      }
-      input.value = offered ? '' : href;
-      if (offered) {
-        page.focus();
-      } else {
-        input.focus();
-        input.select();
-      }
-    }
-
-    function closeLink(refocus) {
-      if (!link) {
-        return;
-      }
-      link.hidden = true;
-      if (refocus) {
-        editor.chain().focus().run();
-      }
-    }
-
-    if (link) {
-      link.addEventListener('click', function (event) {
-        var action = event.target.closest('[data-rt-link]');
-        if (!action) {
-          return;
-        }
-        event.preventDefault();
-        var page = link.querySelector('select');
-        var href = page && page.value !== '' ? page.value : link.querySelector('input').value.trim();
-        var chain = editor.chain().focus().extendMarkRange('link');
-        if (action.getAttribute('data-rt-link') === 'apply' && href !== '') {
-          chain.setLink({ href: href }).run();
-        } else {
-          chain.unsetLink().run();
-        }
-        // The address is in the mark now; the box is emptied so it holds nothing the form
-        // could stumble on, and opens clean next time (D-113).
-        link.querySelector('input').value = '';
-        closeLink(true);
-        refresh();
-      });
-      link.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-          event.preventDefault();
-          closeLink(true);
-        } else if (event.key === 'Enter') {
-          event.preventDefault();
-          link.querySelector('[data-rt-link="apply"]').click();
-        }
-      });
-    }
+    // The link panel is richtext-link.js's (D-182): the words, a page or an address.
+    var panel = link && window.boxletRichTextLink ? window.boxletRichTextLink(editor, link, refresh) : null;
+    function openLink() { if (panel) { panel.open(); } }
 
     // Ctrl+K opens it from the keyboard, and clicking back into the text puts it away:
     // the panel belongs to the selection, so returning to the writing ends it.
@@ -248,8 +224,8 @@
       }
     });
     host.addEventListener('mousedown', function () {
-      if (link && !link.hidden) {
-        closeLink(false);
+      if (panel && panel.isOpen()) {
+        panel.close(false);
       }
     });
 
@@ -263,8 +239,8 @@
           textarea.focus();
           toggle.textContent = toggle.getAttribute('data-label-rich');
         } else {
-          editor.commands.setContent(textarea.value, { emitUpdate: false });
-          hidden.value = editor.getHTML();
+          editor.commands.setContent(T.to(textarea.value, locale), { emitUpdate: false });
+          hidden.value = T.from(editor.getHTML());
           toggle.textContent = toggle.getAttribute('data-label-plain');
         }
       });
@@ -286,8 +262,10 @@
   }
 
   // Blocks added to the canvas arrive as HTML from the server and need the same
-  // treatment; builder-blocks.js calls this after inserting one.
-  window.boxletRichText = { scan: scan };
+  // treatment; builder-inspector.js calls this after drawing a block's fields. The schema and
+  // the commands go with it: typing on the page (builder-inline-rich.js, D-178) is the same
+  // editor on the same whitelist, never a second one.
+  window.boxletRichText = { scan: scan, extensions: extensions, commands: COMMANDS, tags: T, isOn: isOn };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () { scan(document); });

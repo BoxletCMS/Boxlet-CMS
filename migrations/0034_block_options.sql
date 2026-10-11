@@ -1,0 +1,11 @@
+-- A block's OPTIONS (PLAN.md D-166): how it is presented — a hero's height, cards in a row,
+-- a gallery's shapes — apart from what it says. '' or a missing key is the character's
+-- answer, so a block nobody styled stores `{}` and follows whichever character the site has.
+--
+-- APART FROM content_json, because the two are treated differently: content is the owner's
+-- words, translated, and never touched by a character; applying a character's composition
+-- hands every option back (D-163 point 5) and must be able to do so without reading words.
+--
+-- NULL rather than a default: MySQL gives a TEXT column none, and a portable migration does
+-- not depend on one. The code reads NULL as `{}`.
+ALTER TABLE page_blocks ADD COLUMN options_json TEXT NULL;

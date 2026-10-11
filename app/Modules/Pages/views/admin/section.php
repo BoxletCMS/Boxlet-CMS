@@ -22,8 +22,8 @@
  * it is a radio group rather than a listbox.
  *
  * @var array{key: string, id: int|null, layout: string|null, stack: string|null, style: array<string, string|int|null>|null} $sectionOf
- * @var array<string, string|int|null> $composed what the character would compose for this
- *      section, so a hand-tuned one announces itself by being open
+ * @var array<string, string> $composed what the character composes for this section: what
+ *      each "Auto" stands for; the band is open when the owner has set anything over it
  * @var list<array{id: int, name: string, thumb: string|null}> $pictures
  */
 $sectionPrefix = 'sections[' . $sectionOf['key'] . ']';
@@ -35,7 +35,7 @@ $style = \App\Modules\Design\SectionStyle::normalize($sectionOf['style']);
 $pickerAttributes = static fn (): string => \App\Modules\Media\MediaReference::pickerAttributes();
 $layout = $sectionOf['layout'] ?? \App\Modules\Pages\SectionLayout::ONE;
 ?>
-                <details class="block-style" data-panel-part="section"<?= $style !== $composed ? ' open' : '' ?>>
+                <details class="block-style" data-panel-part="section"<?= \App\Modules\Design\SectionStyle::overridden($style) ? ' open' : '' ?>>
                     <summary><?= e(t('style.title')) ?></summary>
 <?php if (($sectionOf['id'] ?? null) !== null): ?>
                     <input type="hidden" name="<?= e($sectionPrefix) ?>[id]" value="<?= e((string) $sectionOf['id']) ?>">
@@ -80,8 +80,14 @@ $layout = $sectionOf['layout'] ?? \App\Modules\Pages\SectionLayout::ONE;
                         </div>
                         <?php
                         /* AND THE REST, EACH A ROW OF BUTTONS. `stack` is an arrangement and
-                           the five style keys are a colouring, but to the person choosing
-                           they are one kind of question, so they wear one kind of control. */
+                           the style keys are a colouring, but to the person choosing they are
+                           one kind of question, so they wear one kind of control.
+
+                           AUTO FIRST, AND IT SAYS WHAT IT IS (D-165). Every style key is ''
+                           until the owner sets it, and '' is the character's answer — so the
+                           first button is that answer by name, and pressing it hands the key
+                           back. `stack` has no Auto: it is the owner's arrangement, which a
+                           character has no opinion on. */
                         $groups = ['stack' => \App\Modules\Pages\SectionLayout::STACKS];
                         foreach (\App\Modules\Design\SectionStyle::OPTIONS as $styleKey => $styleValues) {
                             $groups[$styleKey] = $styleValues;
@@ -91,6 +97,9 @@ $layout = $sectionOf['layout'] ?? \App\Modules\Pages\SectionLayout::ONE;
                             $name = $sectionPrefix . ($isStyle ? '[style][' . $groupKey . ']' : '[' . $groupKey . ']');
                             $current = (string) ($isStyle ? ($style[$groupKey] ?? '') : ($sectionOf[$groupKey] ?? ''));
                             $labels = [];
+                            if ($isStyle) {
+                                $labels[''] = t('style.auto', ['value' => short_label('style.' . $groupKey, (string) ($composed[$groupKey] ?? \App\Modules\Design\SectionStyle::DEFAULTS[$groupKey]))]);
+                            }
                             foreach ($groupValues as $groupValue) {
                                 $labels[$groupValue] = short_label('style.' . $groupKey, $groupValue);
                             }
@@ -100,10 +109,44 @@ $layout = $sectionOf['layout'] ?? \App\Modules\Pages\SectionLayout::ONE;
                             <div class="choice-head">
                                 <span class="choice-name" id="<?= e($labelId) ?>"><?= e(t('style.' . $groupKey)) ?></span>
                             </div>
-                            <?= segmented_group($name, $labels, $current, $labelId, $sectionIdPrefix . $groupKey . '-') ?>
+                            <?= segmented_group($name, $labels, $current, $labelId, $sectionIdPrefix . $groupKey . '-', '', 'auto') ?>
                             <?= field_hint('hint.style.' . $groupKey) ?>
                         </div>
 <?php endforeach; ?>
+                        <?php /* THE SPACING AND THE HEIGHT, as numbers on a step (D-165). Empty is
+                                 Auto, and the placeholder says what Auto comes to. Not sliders
+                                 yet: a slider cannot be empty, and the builder's own controls
+                                 arrive with its rebuild. */ ?>
+<?php foreach (\App\Modules\Design\SectionStyle::NUMBERS as $numberKey => $range):
+    $composedNumber = (string) ($composed[$numberKey] ?? '');
+    $autoWords = $composedNumber === '' ? t('style.pad.gap') : ($numberKey === 'min_height' && $composedNumber === '0' ? t('style.min_height.auto') : $composedNumber);
+?>
+                        <div class="field">
+                            <label for="<?= e($sectionIdPrefix . 'style-' . $numberKey) ?>"><?= e(t('style.' . $numberKey)) ?></label>
+                            <input type="number" id="<?= e($sectionIdPrefix . 'style-' . $numberKey) ?>" name="<?= e($sectionPrefix) ?>[style][<?= e($numberKey) ?>]" value="<?= e((string) ($style[$numberKey] ?? '')) ?>" min="<?= e((string) $range['min']) ?>" max="<?= e((string) $range['max']) ?>" step="<?= e((string) $range['step']) ?>" placeholder="<?= e(t('style.auto', ['value' => $autoWords])) ?>" inputmode="numeric">
+                            <?= field_hint('hint.style.' . $numberKey) ?>
+                        </div>
+<?php endforeach; ?>
+                        <fieldset class="field">
+                            <legend><?= e(t('style.hide')) ?></legend>
+<?php foreach (\App\Modules\Design\SectionStyle::HIDDEN as $hiddenKey): ?>
+                            <label class="checkbox"><input type="checkbox" name="<?= e($sectionPrefix) ?>[style][<?= e($hiddenKey) ?>]" value="yes"<?= ($style[$hiddenKey] ?? '') === 'yes' ? ' checked' : '' ?>> <?= e(t('style.' . $hiddenKey)) ?></label>
+<?php endforeach; ?>
+<?php if (($style['hide_desktop'] ?? '') === 'yes' && ($style['hide_tablet'] ?? '') === 'yes' && ($style['hide_mobile'] ?? '') === 'yes'): ?>
+                            <p class="hint hint-warning"><?= e(t('style.hidden_everywhere')) ?></p>
+<?php endif; ?>
+                            <?= field_hint('hint.style.hide') ?>
+                        </fieldset>
+                        <div class="field">
+                            <label for="<?= e($sectionIdPrefix . 'style-anchor') ?>"><?= e(t('style.anchor')) ?></label>
+                            <input type="text" id="<?= e($sectionIdPrefix . 'style-anchor') ?>" name="<?= e($sectionPrefix) ?>[style][anchor]" value="<?= e((string) ($style['anchor'] ?? '')) ?>" maxlength="<?= e((string) \App\Modules\Design\SectionStyle::ANCHOR_LENGTH) ?>" spellcheck="false" autocapitalize="off">
+                            <?= field_hint('hint.style.anchor') ?>
+                        </div>
+                        <div class="field">
+                            <label for="<?= e($sectionIdPrefix . 'style-name') ?>"><?= e(t('style.name')) ?></label>
+                            <input type="text" id="<?= e($sectionIdPrefix . 'style-name') ?>" name="<?= e($sectionPrefix) ?>[style][name]" value="<?= e((string) ($style['name'] ?? '')) ?>" maxlength="<?= e((string) \App\Modules\Design\SectionStyle::NAME_LENGTH) ?>">
+                            <?= field_hint('hint.style.name') ?>
+                        </div>
                         <?php /* D-024's sixth key. Not part of OPTIONS, because OPTIONS is
                                  what becomes class names on the wrapper and a picture is
                                  rendered, not painted. A <select> and not a row of buttons:

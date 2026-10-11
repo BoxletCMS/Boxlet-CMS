@@ -1,0 +1,79 @@
+/* THE BUILDER IN A NARROWER WINDOW (PLAN.md D-175): what gives first as the window narrows.
+   builder.css is the shell at full width; this is the same shell with less room. */
+
+.pb-small-note {
+  display: none;
+  margin: var(--ui-2) 0 0;
+  font-size: var(--ui-text-sm);
+}
+
+.pb-small-note a {
+  color: var(--ui-accent);
+}
+
+/* Narrow windows: the inspector narrows before anything else gives. */
+@media (max-width: 75rem) {
+  .pb-body {
+    grid-template-columns: 3rem 15rem minmax(0, 1fr) 18rem;
+  }
+
+  .pb-body.pb-folded {
+    grid-template-columns: 3rem 0 minmax(0, 1fr) 18rem;
+  }
+
+  .pb-stage-hint {
+    display: none;
+  }
+}
+
+/* A NARROW WINDOW (under 800px; README 4 draws none): the canvas takes the width, the inspector
+   sits under it, and the rail, when opened, lies over the canvas rather than squeezing it.
+   PLAN.md D-175 records this as the owner's to judge. */
+@media (max-width: 50rem) {
+  .pb-body,
+  .pb-body.pb-folded {
+    position: relative;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 45vh);
+  }
+
+  .pb-tabs {
+    grid-row: 1 / 3;
+  }
+
+  .pb-body > .pb-stage {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .pb-body > .pb-inspector {
+    grid-column: 2;
+    grid-row: 2;
+    border-inline-start: 0;
+    border-block-start: var(--ui-border) solid var(--ui-line);
+  }
+
+  .pb-rail {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 3rem;
+    z-index: 5;
+    inline-size: min(18rem, calc(100% - 3rem));
+    box-shadow: var(--ui-shadow-m);
+  }
+
+  .pb-bar {
+    flex-wrap: wrap;
+  }
+
+  /* The way to the plain editor, said once at the top of the stage (the owner, D-176). */
+  .pb-small-note {
+    display: block;
+  }
+
+  /* Its own row above the trail, the canvas still taking what is left. */
+  .pb-stage {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+}
+

@@ -1,0 +1,69 @@
+/* A MENU'S ITEMS ON A PHONE (O-43). The list is the page list's table (admin-pages.css), whose
+   phone rules hide a page's address; here that left "Goes to" an empty column, and Edit and
+   Delete in words stood past the window's edge, reached only by scrolling the table sideways.
+   Each item is a row of its own instead: the order, its words and, under them, where it goes,
+   with Edit and Delete one above the other at the end. */
+@media (max-width: 47.5rem) {
+  .menu-items,
+  .menu-items tbody {
+    display: block;
+  }
+
+  .menu-items thead {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .menu-items tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "order label actions"
+      "order target actions";
+    align-items: center;
+    column-gap: var(--ui-2);
+    padding-block: var(--ui-2);
+    border-block-end: var(--ui-border) solid var(--ui-line);
+  }
+
+  .menu-items td {
+    padding: 0;
+    border: 0;
+  }
+
+  .menu-items .page-order { grid-area: order; }
+  .menu-items .menu-item-label { grid-area: label; }
+
+  .menu-items .menu-item-target {
+    grid-area: target;
+    color: var(--ui-ink-muted);
+    font-size: var(--ui-text-sm);
+    overflow-wrap: anywhere;
+  }
+
+  /* Where it goes is what this row has to say under the words: shown again. */
+  .menu-items .menu-item-target .address {
+    display: inline;
+  }
+
+  .table.menu-items td.row-actions {
+    grid-area: actions;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--ui-1);
+  }
+
+  .table.menu-items td.row-actions > * {
+    margin-inline-end: 0;
+  }
+
+  .table.menu-items td.row-actions .button {
+    inline-size: 100%;
+    justify-content: flex-start;
+  }
+}

@@ -1,0 +1,165 @@
+/* THE TWO FAMILIES AND THE PAIRINGS (PLAN.md D-185): the pickers that choose a heading and a
+ * text family from the library, and the pairings that set both. Admin tokens only (--ui-*), as
+ * everywhere in the admin; the samples are set in the site's faces, the one exception, named
+ * by /admin/appearance/typefaces. Split from admin-appearance-inspector.css. */
+
+/* A family's picker: the one chosen, in its own face, and opened the library under it. */
+.font-picker {
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  background: var(--ui-panel);
+}
+
+.font-picker > summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ui-2);
+  padding: var(--ui-2) var(--ui-3);
+  cursor: pointer;
+}
+
+.font-picker > summary .font-sample {
+  font-size: 1.15rem;
+}
+
+.font-category {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+.font-panel {
+  display: grid;
+  gap: var(--ui-2);
+  padding: 0 var(--ui-2) var(--ui-2);
+}
+
+.font-search {
+  box-sizing: border-box;
+  inline-size: 100%;
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+}
+
+.font-groups {
+  display: grid;
+  gap: var(--ui-2);
+  max-block-size: 22rem;
+  overflow-y: auto;
+}
+
+.font-group {
+  display: grid;
+  gap: 2px;
+}
+
+.font-group[hidden],
+.font-option[hidden] {
+  display: none;
+}
+
+.font-group-name {
+  margin: 0;
+  padding: var(--ui-1) var(--ui-2) 0;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.font-option {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  padding: var(--ui-1) var(--ui-2);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink);
+  cursor: pointer;
+}
+
+.font-option:hover {
+  background: var(--ui-panel-sunken);
+}
+
+.font-option:has(input:checked) {
+  background: var(--ui-accent-soft);
+}
+
+.font-option:has(input:focus-visible) {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: -2px;
+}
+
+/* The one place the admin shows the SITE's typefaces: they are what is being chosen, and a
+   list of names is not a choice anybody can make. The faces are the same files the site
+   serves, declared by /admin/appearance/typefaces. */
+.font-option .font-sample {
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+/* The pairings: shortcuts that set both families, three to a row. `.js .pairings` and never
+   the bare class: .js-only makes what it marks inline-block, and the bare class would lose to
+   it (as .focal-samples does, admin-focal.css). */
+.js .pairings.js-only,
+.pairings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ui-1);
+}
+
+.pairing-tile {
+  display: grid;
+  justify-items: start;
+  gap: var(--ui-1);
+  min-inline-size: 0;
+  padding: var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.pairing-tile[aria-pressed="true"] {
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 1px var(--ui-accent);
+}
+
+.pairing-tile:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+.pairing-sample {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.pairing-name {
+  display: grid;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+}
+
+.pairing-name span {
+  overflow: hidden;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+

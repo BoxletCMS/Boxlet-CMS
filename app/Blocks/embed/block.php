@@ -19,7 +19,8 @@ return [
     'group' => 'embed',
     'version' => 1,
     'fields' => [
-        'url' => ['type' => 'text', 'required' => true, 'sample' => 'preview.embed.url'],
+        // The address: set in the panel, never shown as words (README 1.4, D-178).
+        'url' => ['type' => 'text', 'required' => true, 'inline' => false],
         // What stands in the frame until a visitor presses Play (D-147): the site's own
         // picture, fetched once from the video by the admin (EmbedPoster) or chosen by hand.
         // Nothing of the provider's is loaded before the press, so this is all a visitor sees.
@@ -29,6 +30,10 @@ return [
         // is usually squarer, and neither knows what it is being put next to.
         'ratio' => ['type' => 'select', 'options' => ['wide', 'square', 'tall']],
     ],
-    'layouts' => ['full', 'inset'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'full' => ['image' => [[2, 3, 44, 18]], 'button' => [[20, 9, 8, 6]]],
+        'inset' => ['image' => [[10, 4, 28, 16]], 'button' => [[20, 9, 8, 6]]],
+    ],
     'defaults' => ['layout' => 'full'],
 ];

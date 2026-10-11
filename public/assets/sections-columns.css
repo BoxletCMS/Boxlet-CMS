@@ -1,0 +1,96 @@
+/* NO COLUMN OF WORDS UNDER 16REM (PLAN.md D-182, D-184, the owner). Linked after
+   sections-steps.css, under sections.css's rule: only custom properties from tokens.css and
+   the --section-* properties.
+
+   In order of preference, as the owner set it:
+   1. A section of two or more columns whose width is the character's is drawn at the wide
+      measure when the content width cannot give every column 16rem (SectionRender::composed,
+      as a split hero is), and the wide measure grows to the least that does (below).
+   2. Only where even that cannot — a window narrower than the content, or a width the owner
+      set — the columns stack into one, all at once, never two and one.
+   3. Inside a block, words beside something stack the same way when their share would fall
+      under 16rem: Image and text, Text in two columns, a split hero, Form beside. */
+
+/* ---- what each arrangement needs: every column 16rem, and the gaps between them ---------- */
+
+.block:has(> .container > .cols-halves) {
+  --columns-need: calc(32rem + var(--space-l));
+}
+
+.block:has(> .container > .cols-thirds) {
+  --columns-need: calc(48rem + 2 * var(--space-l));
+}
+
+.block:has(> .container > .cols-quarters) {
+  --columns-need: calc(64rem + 3 * var(--space-l));
+}
+
+/* Two to one: the narrow column is a third. */
+.block:has(> .container > :is(.cols-wide-left, .cols-wide-right)) {
+  --columns-need: calc(48rem + var(--space-l));
+}
+
+/* Three to one: the narrow column is a quarter. */
+.block:has(> .container > .cols-sidebar) {
+  --columns-need: calc(64rem + var(--space-l));
+}
+
+/* The wide measure, never narrower than its columns need: Editorial's content is 42rem, its
+   wide 49rem, and a wide-left section's narrow column there was 15.5rem; it is 16 now, at
+   50.5rem, rather than stacked. */
+.width-wide:has(> .container > .section-cols) {
+  --section-width: max(var(--container-wide), var(--columns-need, 0rem));
+}
+
+/* ---- the last resort: all side by side, or all stacked ------------------------------------
+
+   Above the width where sections.css stacks every arrangement anyway, the columns are a
+   wrapping flex row whose basis is negative while the row holds what it needs (each column
+   its share, as the grid's fr gave it) and enormous once it does not (each column a row of
+   its own). Exact, with the design's own gap, which a container query cannot name. */
+@media (min-width: 64.0625rem) {
+  .section-cols:not(.cols-one) {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .section-cols:not(.cols-one) > .section-column {
+    flex: var(--column-weight, 1) 1 calc((var(--columns-need, 0rem) - 100%) * 999);
+    min-inline-size: 0;
+  }
+}
+
+.cols-wide-left > .section-column:first-child,
+.cols-wide-right > .section-column:last-child {
+  --column-weight: 2;
+}
+
+.cols-sidebar > .section-column:first-child {
+  --column-weight: 3;
+}
+
+/* ---- inside a block ---------------------------------------------------------------------- */
+
+/* Text in two columns and Image and text keep their 16rem in blocks.css: `columns: 16rem 2`,
+   and two auto-fit tracks no narrower than 16rem. */
+
+/* A split hero and Form beside share their width unequally, so they ask their own box. The
+   widths are the least at which the words keep 16rem with the widest gap a design can have
+   (spacing 1.75): 16 × 2.1 / 1.1 + 2.5 × 1.75 for the hero, 16 × 5 / 2 + 4 × 1.75 for the
+   form. */
+:is(.layout-split, .layout-beside):has(> .hero, > .form-block),
+:is(.layout-split, .layout-beside) :has(> .hero, > .form-block) {
+  container: words-beside / inline-size;
+}
+
+@container words-beside (max-width: 35rem) {
+  .layout-split .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container words-beside (max-width: 47rem) {
+  .layout-beside .form-block {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

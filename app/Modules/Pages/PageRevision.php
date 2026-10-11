@@ -4,7 +4,6 @@ namespace App\Modules\Pages;
 
 use App\Core\Blocks;
 use App\Core\Db;
-use JsonException;
 
 /**
  * What a page was before the last few saves (PLAN.md D-088).
@@ -18,9 +17,11 @@ use JsonException;
  * install does not want four pages of history nobody made.
  *
  * WHAT IT HOLDS is the page as the editor reads it — its settings and every block in the
- * shape Page::editable() returns — so restoring is an ordinary save. Not a shortcut past
+ * shape PageBlocks::editable() returns — so restoring is an ordinary save. Not a shortcut past
  * validation, media resolution and the sitemap: a restore that skipped those would be the
  * one code path nobody exercises until the day it matters.
+ *
+ * @phpstan-import-type Document from PageDocument
  */
 final class PageRevision
 {
@@ -40,31 +41,15 @@ final class PageRevision
      */
     public static function record(Db $db, Blocks $registry, int $pageId): void
     {
-        $page = Page::find($db, $pageId);
-        if ($page === null) {
-            return;
-        }
-
-        $data = [
-            'title' => (string) $page['title'],
-            'slug' => (string) $page['slug'],
-            'parent_id' => $page['parent_id'] === null ? null : (int) $page['parent_id'],
-            'status' => (string) $page['status'],
-            'seo_json' => (string) ($page['seo_json'] ?? '{}'),
-            'blocks' => Page::editable($db, $registry, $pageId),
-            // AND HOW THEY STOOD (PLAN.md D-098). Without this, restoring a page that had
-            // two columns when it was recorded would put its blocks back into whatever
-            // arrangement the page has NOW — the content of last Tuesday in this week's
-            // bands, which is neither one page nor the other. A revision written before
-            // this has no sections and says so by their absence.
-            'sections' => Page::editableSections($db, $pageId),
-        ];
-
-        try {
-            $json = json_encode($data, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            // A page that cannot be written down is not a reason to refuse the save the
-            // owner asked for. They lose the safety net for this one save, not their work.
+        // The page's settings, its blocks AND HOW THEY STOOD (PLAN.md D-098): without the
+        // bands, restoring a page that had two columns when it was recorded would put its
+        // blocks into whatever arrangement the page has NOW. One document, the shape a draft
+        // has (D-173), so a revision restores into the draft as it is.
+        $document = PageDocument::stored($db, $registry, $pageId);
+        // A page that cannot be written down is not a reason to refuse the save the owner
+        // asked for. They lose the safety net for this one save, not their work.
+        $json = $document === null ? null : PageDocument::encode($document);
+        if ($json === null) {
             return;
         }
 
@@ -102,7 +87,7 @@ final class PageRevision
      * this one. The shape is checked too — a row written by an older version of this file,
      * or edited by hand, is refused rather than half-applied.
      *
-     * @return array{title: string, slug: string, parent_id: int|null, status: string, seo_json: string, blocks: list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string, section: string, column: int}>, sections: list<array{key: string, id: int|null, layout: string|null, stack: string|null, style: array<string, string|int|null>|null}>|null}|null
+     * @return Document|null
      */
     public static function find(Db $db, Blocks $registry, int $pageId, int $revisionId): ?array
     {
@@ -110,85 +95,11 @@ final class PageRevision
             'SELECT data_json FROM page_revisions WHERE id = ? AND page_id = ?',
             [$revisionId, $pageId],
         );
-        if ($row === null) {
-            return null;
-        }
 
-        try {
-            $data = json_decode((string) $row['data_json'], true, 32, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            return null;
-        }
-        if (!is_array($data) || !is_array($data['blocks'] ?? null)) {
-            return null;
-        }
-
-        /*
-         * THE BANDS, when the revision has them.
-         *
-         * A revision recorded before D-098 has none, and null says "leave the arrangement
-         * as it is" all the way down to Sections::save() — which is the only honest answer:
-         * that revision does not know what the bands were, and guessing "one column each"
-         * would flatten a page whose columns were never what the restore was about.
-         */
-        $sections = null;
-        if (is_array($data['sections'] ?? null)) {
-            $sections = [];
-            foreach ($data['sections'] as $section) {
-                if (!is_array($section) || !is_string($section['key'] ?? null)) {
-                    continue;
-                }
-                $sections[] = [
-                    'key' => $section['key'],
-                    // Kept for the same reason a block's is: a band that still exists is
-                    // written to rather than replaced, so its translations and its
-                    // background picture stay attached to it.
-                    'id' => isset($section['id']) && is_int($section['id']) ? $section['id'] : null,
-                    'layout' => SectionLayout::normalize($section['layout'] ?? null),
-                    'stack' => SectionLayout::normalizeStack($section['stack'] ?? null),
-                    'style' => \App\Modules\Design\SectionStyle::normalize($section['style'] ?? null),
-                ];
-            }
-        }
-
-        $blocks = [];
-        $ordinal = 0;
-        foreach ($data['blocks'] as $block) {
-            if (!is_array($block) || !is_string($block['type'] ?? null) || !$registry->has($block['type'])) {
-                // A block whose type has gone since is left out rather than restored as a
-                // hole: normalize() cannot give it a shape and render() cannot draw it.
-                continue;
-            }
-            $id = isset($block['id']) && is_int($block['id']) ? $block['id'] : null;
-            $blocks[] = [
-                // Derived here rather than read from the row: a key is what the editor
-                // calls a block for one visit (D-094), not something a revision records.
-                'key' => BlockForm::key($id, $ordinal++),
-                // The id is kept so a block that still exists is UPDATED rather than
-                // duplicated; one that has since been removed has no row to match and
-                // Page::update() inserts it, which is exactly what restoring it means.
-                'id' => $id,
-                'type' => $block['type'],
-                'content' => $registry->normalize($block['type'], is_array($block['content'] ?? null) ? $block['content'] : []),
-                'style' => \App\Modules\Design\SectionStyle::normalize($block['style'] ?? null),
-                'layout' => $registry->layout($block['type'], $block['layout'] ?? null),
-                // Which band it stood in and which of its columns. A revision from before
-                // D-098 carries neither, and a block with no band named is given one of its
-                // own on the way in — the shape every page had when that revision was made.
-                'section' => is_string($block['section'] ?? null) ? $block['section'] : SectionForm::key(null, $ordinal),
-                'column' => isset($block['column']) && is_int($block['column']) ? $block['column'] : 0,
-            ];
-        }
-
-        return [
-            'title' => is_string($data['title'] ?? null) ? $data['title'] : '',
-            'slug' => is_string($data['slug'] ?? null) ? $data['slug'] : '',
-            'parent_id' => isset($data['parent_id']) && is_int($data['parent_id']) ? $data['parent_id'] : null,
-            'status' => ($data['status'] ?? '') === 'published' ? 'published' : 'draft',
-            'seo_json' => is_string($data['seo_json'] ?? null) ? $data['seo_json'] : '{}',
-            'blocks' => $blocks,
-            'sections' => $sections,
-        ];
+        // Read as any document is (PageDocument::read): rebuilt against the registry, and a
+        // row of another shape — one written before D-098, or edited by hand — refused
+        // rather than half-applied.
+        return $row === null ? null : PageDocument::decode($registry, (string) $row['data_json']);
     }
 
     /**

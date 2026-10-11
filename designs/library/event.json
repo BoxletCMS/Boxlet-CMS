@@ -1,0 +1,332 @@
+{
+  "$schema": "https://boxlet.dev/schema/design-set-v2.json",
+  "format": "boxlet-design-set",
+  "version": 2,
+  "id": "event",
+  "name": {
+    "en": "Event",
+    "hr": "Event"
+  },
+  "description": {
+    "en": "Hard contrast, a wide round display face, loud and confident. For festivals, conferences and concerts.",
+    "hr": "Jak kontrast, široko zaobljeno pismo, glasno i samouvjereno. Za festivale, konferencije i koncerte."
+  },
+  "author": "Boxlet",
+  "tags": [
+    "bold",
+    "contrast",
+    "event",
+    "display"
+  ],
+  "decisions": {
+    "mode": "light",
+    "seed": "#b80f4d",
+    "secondary": "#111111",
+    "heading_font": "unbounded",
+    "body_font": "manrope",
+    "text_size": 17,
+    "scale": 1.45,
+    "nudge_h1": 12,
+    "spacing": 1.05,
+    "section_gap": 96,
+    "radius": 6,
+    "border_width": 2,
+    "shadow": "hard",
+    "shadow_strength": 80,
+    "container": 72,
+    "button_style": "filled",
+    "button_radius": 6,
+    "button_height": 54,
+    "button_caps": "yes",
+    "surface_contrast": 40
+  },
+  "dark": {
+    "seed": "#ff6b9a",
+    "secondary": "#000000",
+    "surface_contrast": 30,
+    "shadow_strength": 80
+  },
+  "look": {
+    "header_opacity": 100,
+    "header_blur": 0,
+    "logo_size": 32,
+    "footer_columns": "3",
+    "footer_links": "auto",
+    "header_arrangement": "inline",
+    "header_behaviour": "sticky",
+    "header_surface": "contrast",
+    "header_edge": "none",
+    "header_height": 72,
+    "brand": "name",
+    "nav_style": "caps",
+    "nav_ink": "ink",
+    "header_button": "filled",
+    "footer_layout": "columns",
+    "small_print_row": "split",
+    "footer_surface": "contrast",
+    "footer_edge": "slant"
+  },
+  "composition": {
+    "section": {
+      "surface": "plain",
+      "width": "normal",
+      "align": "left",
+      "divider": "none",
+      "v_align": "top",
+      "animation": "zoom",
+      "pad_top": "",
+      "pad_bottom": "",
+      "min_height": 0
+    },
+    "surfaces": {
+      "stats": "contrast",
+      "cta": "gradient"
+    },
+    "dividers": {
+      "stats": "slant",
+      "cta": "slant"
+    },
+    "layouts": {
+      "hero": "cover-low",
+      "cards": "grid",
+      "stats": "three",
+      "quote": "big",
+      "cta": "banner",
+      "logos": "row",
+      "gallery": "four"
+    },
+    "options": {
+      "hero": {
+        "height": "screen",
+        "veil": "strong"
+      },
+      "cards": {
+        "image_shape": "square"
+      }
+    }
+  },
+  "patterns": [
+    {
+      "id": "event-welcome",
+      "name": {
+        "en": "Welcome",
+        "hr": "Dobrodošlica"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "contrast"
+        }
+      },
+      "blocks": [
+        {
+          "type": "hero",
+          "layout": "left",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Three days, two stages, one river",
+              "hr": "Tri dana, dvije bine, jedna rijeka"
+            },
+            "subheading": {
+              "en": "12 to 14 July, on the island in the middle of the town.",
+              "hr": "12. do 14. srpnja, na otoku usred grada."
+            },
+            "cta": {
+              "label": {
+                "en": "Get tickets",
+                "hr": "Kupite ulaznice"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-offer",
+      "name": {
+        "en": "What we offer",
+        "hr": "Što nudimo"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "cards",
+          "layout": "grid",
+          "column": 0,
+          "options": {
+            "per_row": 3
+          },
+          "content": {
+            "heading": {
+              "en": "The programme",
+              "hr": "Program"
+            },
+            "intro": {
+              "en": "Gates open at four.",
+              "hr": "Vrata se otvaraju u četiri."
+            },
+            "items": [
+              {
+                "heading": {
+                  "en": "Friday",
+                  "hr": "Petak"
+                },
+                "body": {
+                  "en": "<p>Local bands and a late DJ set.</p>",
+                  "hr": "<p>Domaći bendovi i kasni DJ set.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Saturday",
+                  "hr": "Subota"
+                },
+                "body": {
+                  "en": "<p>The main stage, from sunset.</p>",
+                  "hr": "<p>Glavna bina, od zalaska sunca.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Sunday",
+                  "hr": "Nedjelja"
+                },
+                "body": {
+                  "en": "<p>Acoustic by the water, free entry.</p>",
+                  "hr": "<p>Akustika uz vodu, ulaz slobodan.</p>"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-numbers",
+      "name": {
+        "en": "In numbers",
+        "hr": "U brojkama"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "tinted"
+        }
+      },
+      "blocks": [
+        {
+          "type": "stats",
+          "layout": "three",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Last summer",
+              "hr": "Prošlog ljeta"
+            },
+            "items": [
+              {
+                "value": "18,000",
+                "label": {
+                  "en": "people",
+                  "hr": "ljudi"
+                }
+              },
+              {
+                "value": "42",
+                "label": {
+                  "en": "acts",
+                  "hr": "izvođača"
+                }
+              },
+              {
+                "value": "0",
+                "label": {
+                  "en": "plastic cups",
+                  "hr": "plastičnih čaša"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-voice",
+      "name": {
+        "en": "A client's words",
+        "hr": "Riječi klijenta"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "quote",
+          "layout": "big",
+          "column": 0,
+          "options": {},
+          "content": {
+            "quote": {
+              "en": "The best weekend of the summer, every summer.",
+              "hr": "Najbolji vikend ljeta, svakog ljeta."
+            },
+            "attribution": {
+              "en": "Radio 101",
+              "hr": "Radio 101"
+            },
+            "role": {
+              "en": "Review",
+              "hr": "Recenzija"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "event-call",
+      "name": {
+        "en": "Call to action",
+        "hr": "Poziv na akciju"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "contrast"
+        }
+      },
+      "blocks": [
+        {
+          "type": "cta",
+          "layout": "banner",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Early tickets end Friday",
+              "hr": "Rane ulaznice do petka"
+            },
+            "body": {
+              "en": "Three-day pass at half price.",
+              "hr": "Trodnevna ulaznica upola cijene."
+            },
+            "action": {
+              "label": {
+                "en": "Get tickets",
+                "hr": "Kupite ulaznice"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

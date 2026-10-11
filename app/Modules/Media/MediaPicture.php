@@ -16,10 +16,10 @@ use App\Modules\Design\SectionStyle;
  * made, and every caller that renders a block without a database at all (the block
  * library's previews, the design specimen).
  *
- * The <source> order is not decided here. MediaEncoder::FORMATS is 'best first, the
- * original format always last', and MediaVariants records them in that order, so the
- * stored list is already what <picture> needs: every format but the last becomes a
- * <source>, and the last is the <img> every browser understands.
+ * The <source> order is not decided here. MediaEncoder::formatsFor() lists the best formats
+ * first and the original's own last, unless it is one of them already (an AVIF upload ends on
+ * WebP), and MediaVariants records them in that order, so the stored list is already what
+ * <picture> needs: every format but the last becomes a <source>, and the last is the <img>.
  *
  * @phpstan-type Variant array{width: int, height: int, formats: list<string>}
  * @phpstan-type Picture array{id: int, filename: string, width: int, height: int, focalX: int, focalY: int, variants: array<string, Variant>, alt: string, version: string}

@@ -8,7 +8,7 @@
  * field, so the server validates one thing.
  *
  * CHOOSING DISPATCHES A BUBBLING `change`. Assigning .value fires nothing by itself, and
- * builder-blocks.js redraws the canvas on `change` from the field groups — so without the
+ * builder-inspector.js redraws the canvas on `change` from a block's fields — so without the
  * event the picture would be stored on save but the canvas would not follow, which is the
  * defect richtext.js already had to fix once.
  */
@@ -20,8 +20,8 @@
    *
    * A ROOT, NOT THE DOCUMENT, because markup arrives after load: a block inserted into the
    * canvas, and an item added to a repeater, both come from the server as HTML whose
-   * picture field is a plain select until this runs over it. builder-blocks.js calls it
-   * when it inserts a block.
+   * picture field is a plain select until this runs over it. builder-inspector.js calls it
+   * when it draws a block's fields.
    */
   function scan(root) {
     Array.prototype.forEach.call((root || document).querySelectorAll('select[data-media-field]'), upgrade);
@@ -39,8 +39,7 @@
     var url = select.getAttribute('data-picker-url');
     // Marked, not counted: scan() runs over a subtree that may already hold upgraded
     // pickers — a duplicated block carries them in its clone — and upgrading one twice
-    // would leave two buttons in front of one field. builder-blocks.js clears the mark
-    // when it strips a clone.
+    // would leave two buttons in front of one field.
     if (!url || select.hasAttribute('data-picker-ready')) {
       return;
     }

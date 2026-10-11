@@ -11,22 +11,23 @@
  */
 $links = [];
 foreach (['action' => 'button', 'second' => 'cta-quiet'] as $field => $class) {
-    if ($content[$field]['url'] !== '' && $content[$field]['label'] !== '') {
-        $links[] = ['class' => $class, 'link' => $content[$field]];
+    // In the canvas both are there to be filled in (D-178), an empty one as its placeholder.
+    if (edit_show($content[$field]['url'] !== '' && $content[$field]['label'] !== '')) {
+        $links[] = ['class' => $class, 'link' => $content[$field], 'field' => $field];
     }
 }
 ?>
 <div class="cta">
     <div class="cta-words">
-        <h2 class="cta-heading"><?= e($content['heading']) ?></h2>
-<?php if ($content['body'] !== ''): ?>
-        <p class="cta-body"><?= nl2br(e($content['body'])) ?></p>
+        <h2 class="cta-heading"<?= edit_attr('heading') ?>><?= e($content['heading']) ?></h2>
+<?php if (edit_show($content['body'] !== '')): ?>
+        <p class="cta-body"<?= edit_attr('body') ?>><?= nl2br(e($content['body'])) ?></p>
 <?php endif; ?>
     </div>
 <?php if ($links !== []): ?>
     <p class="cta-links">
 <?php foreach ($links as $each): ?>
-        <a class="<?= $each['class'] ?>" href="<?= e($each['link']['url']) ?>"><?= e($each['link']['label']) ?></a>
+        <a class="<?= $each['class'] ?>" href="<?= e($each['link']['url']) ?>"<?= edit_attr($each['field']) ?>><?= e($each['link']['label']) ?></a>
 <?php endforeach; ?>
     </p>
 <?php endif; ?>

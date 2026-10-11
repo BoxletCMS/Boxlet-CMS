@@ -19,10 +19,11 @@ final class MenuTree
      * What the ADMIN sees: every item, parents then their children, each with what it
      * resolves to and whether that is broken.
      *
-     * A broken item is shown rather than hidden. Its page was deleted (0015 sets page_id
-     * to NULL) or its address was refused, and the owner is the only one who can repoint
-     * it — an item that vanished from the admin as well would leave them looking for
-     * something that is not there.
+     * A broken item is shown rather than hidden. Its address was refused, or its page went
+     * some way other than Page::delete, which takes the page's items with it since D-218
+     * (0015 sets page_id to NULL), and the owner is the only one who can repoint it — an
+     * item that vanished from the admin as well would leave them looking for something that
+     * is not there.
      *
      * @return list<array{id: int, parent_id: int|null, depth: int, label: string, target: string,
      *                    page_id: int|null, page_title: string|null, published: bool, broken: bool,

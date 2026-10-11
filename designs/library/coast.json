@@ -1,0 +1,282 @@
+{
+  "$schema": "https://boxlet.dev/schema/design-set-v2.json",
+  "format": "boxlet-design-set",
+  "version": 2,
+  "id": "coast",
+  "name": {
+    "en": "Coast",
+    "hr": "Coast"
+  },
+  "description": {
+    "en": "Light and airy, sea blue and big pictures. For apartments, tourism and seaside restaurants.",
+    "hr": "Svijetlo i prozračno, morsko plava i velike slike. Za apartmane, turizam i restorane uz more."
+  },
+  "author": "Boxlet",
+  "tags": [
+    "light",
+    "sea",
+    "tourism",
+    "photography"
+  ],
+  "decisions": {
+    "mode": "light",
+    "seed": "#0b5c8a",
+    "heading_font": "young-serif",
+    "body_font": "outfit",
+    "text_size": 17,
+    "scale": 1.28,
+    "nudge_h1": 6,
+    "spacing": 1.15,
+    "section_gap": 104,
+    "radius": 14,
+    "shadow": "soft",
+    "shadow_strength": 22,
+    "container": 70,
+    "color_background": "#f4f8fa",
+    "button_style": "filled",
+    "button_radius": 28,
+    "button_height": 50,
+    "surface_contrast": 22
+  },
+  "dark": {
+    "seed": "#6cb8e6",
+    "color_background": "#0d1a22",
+    "surface_contrast": 26,
+    "shadow_strength": 50
+  },
+  "look": {
+    "header_opacity": 0,
+    "header_blur": 0,
+    "logo_size": 32,
+    "footer_columns": "3",
+    "footer_links": "auto",
+    "header_arrangement": "inline",
+    "header_behaviour": "over",
+    "header_surface": "plain",
+    "header_edge": "none",
+    "header_height": 80,
+    "brand": "both",
+    "nav_style": "plain",
+    "nav_ink": "ink",
+    "header_button": "filled",
+    "footer_layout": "columns",
+    "small_print_row": "split",
+    "footer_surface": "contrast",
+    "footer_edge": "curve"
+  },
+  "composition": {
+    "section": {
+      "surface": "plain",
+      "width": "normal",
+      "align": "left",
+      "divider": "none",
+      "v_align": "top",
+      "animation": "up",
+      "pad_top": "",
+      "pad_bottom": "",
+      "min_height": 0
+    },
+    "surfaces": {
+      "quote": "tinted",
+      "cta": "contrast"
+    },
+    "dividers": {
+      "cta": "curve"
+    },
+    "layouts": {
+      "hero": "cover-center",
+      "cards": "grid",
+      "gallery": "three",
+      "picture": "full",
+      "quote": "big",
+      "cta": "banner",
+      "image_text": "image-left"
+    },
+    "options": {
+      "hero": {
+        "height": "screen",
+        "veil": "light"
+      },
+      "cards": {
+        "image_shape": "wide"
+      },
+      "gallery": {
+        "shape": "wide"
+      }
+    }
+  },
+  "patterns": [
+    {
+      "id": "coast-welcome",
+      "name": {
+        "en": "Welcome",
+        "hr": "Dobrodošlica"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "tinted"
+        }
+      },
+      "blocks": [
+        {
+          "type": "hero",
+          "layout": "center",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Wake up to the sea",
+              "hr": "Probudite se uz more"
+            },
+            "subheading": {
+              "en": "Four apartments in an old stone house, thirty steps from the beach.",
+              "hr": "Četiri apartmana u staroj kamenoj kući, trideset koraka od plaže."
+            },
+            "cta": {
+              "label": {
+                "en": "Check availability",
+                "hr": "Provjerite slobodne termine"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "coast-offer",
+      "name": {
+        "en": "What we offer",
+        "hr": "Što nudimo"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "cards",
+          "layout": "grid",
+          "column": 0,
+          "options": {
+            "per_row": 3
+          },
+          "content": {
+            "heading": {
+              "en": "The apartments",
+              "hr": "Apartmani"
+            },
+            "intro": {
+              "en": "Each with its own terrace.",
+              "hr": "Svaki sa svojom terasom."
+            },
+            "items": [
+              {
+                "heading": {
+                  "en": "Lavanda",
+                  "hr": "Lavanda"
+                },
+                "body": {
+                  "en": "<p>For two, with a view over the bay.</p>",
+                  "hr": "<p>Za dvoje, s pogledom na uvalu.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Ružmarin",
+                  "hr": "Ružmarin"
+                },
+                "body": {
+                  "en": "<p>For a family of four, garden level.</p>",
+                  "hr": "<p>Za četveročlanu obitelj, uz vrt.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Kamen",
+                  "hr": "Kamen"
+                },
+                "body": {
+                  "en": "<p>The whole top floor, for six.</p>",
+                  "hr": "<p>Cijeli gornji kat, za šestero.</p>"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "coast-voice",
+      "name": {
+        "en": "A client's words",
+        "hr": "Riječi klijenta"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "quote",
+          "layout": "big",
+          "column": 0,
+          "options": {},
+          "content": {
+            "quote": {
+              "en": "We have come back every June for eight years.",
+              "hr": "Vraćamo se svakog lipnja već osam godina."
+            },
+            "attribution": {
+              "en": "The Müller family",
+              "hr": "Obitelj Müller"
+            },
+            "role": {
+              "en": "Munich",
+              "hr": "München"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "coast-call",
+      "name": {
+        "en": "Call to action",
+        "hr": "Poziv na akciju"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "contrast"
+        }
+      },
+      "blocks": [
+        {
+          "type": "cta",
+          "layout": "banner",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Summer fills early",
+              "hr": "Ljeto se brzo popuni"
+            },
+            "body": {
+              "en": "Book directly and save the agency fee.",
+              "hr": "Rezervirajte izravno i uštedite proviziju."
+            },
+            "action": {
+              "label": {
+                "en": "Check availability",
+                "hr": "Provjerite termine"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

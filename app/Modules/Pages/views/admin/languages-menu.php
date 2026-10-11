@@ -15,6 +15,8 @@ use App\Support\Url;
  *
  * @var list<array{code: string, label: string, page: int|null, current: bool}> $languages
  * @var array<string, mixed> $page
+ * @var string $state published, changes or draft (D-173): a published page is translated as it
+ *      is published, and with changes not yet published the menu says they stay behind
  */
 $here = (string) $page['locale'];
 ?>
@@ -26,6 +28,9 @@ $here = (string) $page['locale'];
                         <?= icon('languages') ?> <?= e(strtoupper($here)) ?><span class="visually-hidden"> — <?= e(t('translations.menu')) ?></span>
                     </summary>
                     <ul class="menu-popover-list">
+<?php if ($state === 'changes'): ?>
+                        <li class="menu-popover-note"><?= e(t('translations.unpublished_stay')) ?></li>
+<?php endif; ?>
 <?php foreach ($languages as $language): ?>
                         <li lang="<?= e($language['code']) ?>">
 <?php if ($language['current']): ?>

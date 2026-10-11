@@ -25,8 +25,8 @@
    * CHOOSING A PAGE FILLS IN THE REST (PLAN.md D-038). Anywhere a link can point at one of
    * the site's pages — a block's link field, the header's button, a menu item — choosing the
    * page shows its address, read-only because the page decides it, and offers its title as
-   * the text. The text is only filled when it is empty or still holds the title this script
-   * put there, so nothing the owner typed is ever overwritten.
+   * the text. The text is only filled when it is empty (D-183): whatever it holds, typed or
+   * filled in by an earlier choice, is never written over.
    *
    * Delegated from the document, so blocks inserted after load are covered too. Without a
    * script the server ignores the address whenever a page is chosen.
@@ -55,10 +55,8 @@
         address.value = '';
       }
     }
-    if (label && title !== null
-      && (label.value.trim() === '' || label.value === label.getAttribute('data-filled'))) {
+    if (label && title !== null && label.value.trim() === '') {
       label.value = title;
-      label.setAttribute('data-filled', title);
       // A real control fires its own input event; this one did not, and the canvas and the
       // unsaved-changes warning listen for it.
       label.dispatchEvent(new Event('input', { bubbles: true }));

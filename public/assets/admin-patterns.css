@@ -1,0 +1,32 @@
+/* Patterns in the plain editor (PLAN.md D-173): a folded panel under "Add a block" — put one
+   in, keep a section as one, let one of yours go. The admin's own tokens only. */
+
+.editor-patterns {
+  display: grid;
+  gap: var(--ui-3);
+  margin-block-start: var(--ui-4);
+}
+
+.editor-patterns > summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.editor-patterns > .button {
+  justify-self: start;
+}
+
+.editor-patterns-mine {
+  display: grid;
+  gap: var(--ui-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editor-patterns-mine li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-2);
+}

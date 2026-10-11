@@ -1,0 +1,321 @@
+{
+  "$schema": "https://boxlet.dev/schema/design-set-v2.json",
+  "format": "boxlet-design-set",
+  "version": 2,
+  "id": "mono",
+  "name": {
+    "en": "Mono",
+    "hr": "Mono"
+  },
+  "description": {
+    "en": "Typewriter headings over a clear sans, plain and exact. For developers, documentation and technical studios.",
+    "hr": "Naslovi kao s pisaćeg stroja nad jasnim sansom, jednostavno i točno. Za developere, dokumentaciju i tehničke studije."
+  },
+  "author": "Boxlet",
+  "tags": [
+    "mono",
+    "technical",
+    "plain",
+    "developer"
+  ],
+  "decisions": {
+    "mode": "light",
+    "seed": "#2a5d34",
+    "heading_font": "ibm-plex-mono",
+    "body_font": "ibm-plex-sans",
+    "text_size": 16,
+    "scale": 1.2,
+    "spacing": 1,
+    "section_gap": 72,
+    "radius": 2,
+    "border_width": 1,
+    "shadow": "none",
+    "container": 64,
+    "button_style": "outline",
+    "button_radius": 2,
+    "button_height": 40,
+    "surface_contrast": 14
+  },
+  "dark": {
+    "seed": "#7fd18b",
+    "surface_contrast": 18,
+    "shadow_strength": 40
+  },
+  "look": {
+    "header_opacity": 100,
+    "header_blur": 0,
+    "logo_size": 32,
+    "footer_columns": "3",
+    "footer_links": "auto",
+    "header_arrangement": "left",
+    "header_behaviour": "static",
+    "header_surface": "plain",
+    "header_edge": "line",
+    "header_height": 56,
+    "brand": "name",
+    "nav_style": "plain",
+    "nav_ink": "accent",
+    "header_button": "none",
+    "footer_layout": "simple",
+    "small_print_row": "left",
+    "footer_surface": "plain",
+    "footer_edge": "line"
+  },
+  "composition": {
+    "section": {
+      "surface": "plain",
+      "width": "normal",
+      "align": "left",
+      "divider": "line",
+      "v_align": "top",
+      "animation": "none",
+      "pad_top": "",
+      "pad_bottom": "",
+      "min_height": 0
+    },
+    "surfaces": {
+      "stats": "tinted"
+    },
+    "dividers": {},
+    "layouts": {
+      "hero": "left",
+      "cards": "list",
+      "stats": "three",
+      "quote": "plain",
+      "cta": "beside",
+      "accordion": "list",
+      "text": "single",
+      "downloads": "list"
+    },
+    "options": {
+      "cards": {
+        "image_shape": "none"
+      },
+      "text": {
+        "measure": "comfortable"
+      }
+    }
+  },
+  "patterns": [
+    {
+      "id": "mono-welcome",
+      "name": {
+        "en": "Welcome",
+        "hr": "Dobrodošlica"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "hero",
+          "layout": "left",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Small tools, well documented",
+              "hr": "Mali alati, dobro dokumentirani"
+            },
+            "subheading": {
+              "en": "Open-source libraries for parsing, testing and shipping PHP.",
+              "hr": "Open-source biblioteke za parsiranje, testiranje i isporuku PHP-a."
+            },
+            "cta": {
+              "label": {
+                "en": "Read the docs",
+                "hr": "Pročitajte dokumentaciju"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "mono-offer",
+      "name": {
+        "en": "What we offer",
+        "hr": "Što nudimo"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "cards",
+          "layout": "grid",
+          "column": 0,
+          "options": {
+            "per_row": 3
+          },
+          "content": {
+            "heading": {
+              "en": "Libraries",
+              "hr": "Biblioteke"
+            },
+            "intro": {
+              "en": "MIT licensed, no dependencies.",
+              "hr": "MIT licenca, bez ovisnosti."
+            },
+            "items": [
+              {
+                "heading": {
+                  "en": "parse",
+                  "hr": "parse"
+                },
+                "body": {
+                  "en": "<p>A strict, fast JSON and YAML reader.</p>",
+                  "hr": "<p>Strog i brz čitač JSON-a i YAML-a.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "probe",
+                  "hr": "probe"
+                },
+                "body": {
+                  "en": "<p>Tests that read like sentences.</p>",
+                  "hr": "<p>Testovi koji se čitaju kao rečenice.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "ship",
+                  "hr": "ship"
+                },
+                "body": {
+                  "en": "<p>One command from tag to release.</p>",
+                  "hr": "<p>Jedna naredba od taga do izdanja.</p>"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "mono-numbers",
+      "name": {
+        "en": "In numbers",
+        "hr": "U brojkama"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "tinted"
+        }
+      },
+      "blocks": [
+        {
+          "type": "stats",
+          "layout": "three",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "In use",
+              "hr": "U upotrebi"
+            },
+            "items": [
+              {
+                "value": "2.1M",
+                "label": {
+                  "en": "installs",
+                  "hr": "instalacija"
+                }
+              },
+              {
+                "value": "0",
+                "label": {
+                  "en": "dependencies",
+                  "hr": "ovisnosti"
+                }
+              },
+              {
+                "value": "11",
+                "label": {
+                  "en": "years",
+                  "hr": "godina"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "mono-voice",
+      "name": {
+        "en": "A client's words",
+        "hr": "Riječi klijenta"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "quote",
+          "layout": "plain",
+          "column": 0,
+          "options": {},
+          "content": {
+            "quote": {
+              "en": "The only library where I never had to open the source.",
+              "hr": "Jedina biblioteka u kojoj nikad nisam morao otvoriti izvorni kod."
+            },
+            "attribution": {
+              "en": "@dkovac",
+              "hr": "@dkovac"
+            },
+            "role": {
+              "en": "Maintainer",
+              "hr": "Održavatelj"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "mono-call",
+      "name": {
+        "en": "Call to action",
+        "hr": "Poziv na akciju"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "contrast"
+        }
+      },
+      "blocks": [
+        {
+          "type": "cta",
+          "layout": "beside",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Need it to do more?",
+              "hr": "Treba vam više?"
+            },
+            "body": {
+              "en": "We take on paid work twice a year.",
+              "hr": "Plaćene poslove primamo dvaput godišnje."
+            },
+            "action": {
+              "label": {
+                "en": "Write to us",
+                "hr": "Pišite nam"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

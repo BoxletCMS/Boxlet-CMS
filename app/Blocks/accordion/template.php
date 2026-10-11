@@ -14,20 +14,23 @@
  * @var array<string, mixed> $content
  * @var array<string, mixed> $style
  * @var string $layout
+ * @var array<string, string> $options measure comfortable/wide/full (D-188)
  */
 ?>
-<div class="accordion">
-<?php if ($content['heading'] !== ''): ?>
-    <h2 class="accordion-heading"><?= e($content['heading']) ?></h2>
+<div class="accordion measure-<?= e($options['measure']) ?>">
+<?php if (edit_show($content['heading'] !== '')): ?>
+    <h2 class="accordion-heading"<?= edit_attr('heading') ?>><?= e($content['heading']) ?></h2>
 <?php endif; ?>
     <div class="accordion-items">
 <?php foreach ($content['items'] as $at => $item): ?>
-        <details class="accordion-item<?= $item['question'] === '' && $item['answer'] === '' ? ' is-empty' : '' ?>"<?= $at === 0 && $content['start'] === 'first-open' ? ' open' : '' ?>>
-            <summary class="accordion-question"><?= e($item['question']) ?></summary>
-<?php if ($item['answer'] !== ''): ?>
-            <div class="accordion-answer richtext"><?= $item['answer'] ?></div>
+        <?php /* Every answer open in the canvas, to be typed in where it is read (D-178). */ ?>
+        <details class="accordion-item<?= $item['question'] === '' && $item['answer'] === '' ? ' is-empty' : '' ?>"<?= ($at === 0 && $content['start'] === 'first-open') || \App\Support\Editing::on() ? ' open' : '' ?><?= edit_item('items', $at) ?>>
+            <summary class="accordion-question"<?= edit_attr('items', $at, 'question') ?>><?= e($item['question']) ?></summary>
+<?php if (edit_show($item['answer'] !== '')): ?>
+            <div class="accordion-answer richtext"<?= edit_attr('items', $at, 'answer') ?>><?= $item['answer'] ?></div>
 <?php endif; ?>
         </details>
 <?php endforeach; ?>
+<?= edit_add('items', 'accordion-item') ?>
     </div>
 </div>

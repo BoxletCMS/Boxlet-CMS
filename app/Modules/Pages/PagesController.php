@@ -8,7 +8,6 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Modules\Admin\Activity;
 use App\Modules\Admin\AdminView;
-use App\Modules\Design\Composition;
 use App\Support\Dates;
 use App\Support\Url;
 
@@ -46,7 +45,7 @@ final class PagesController
             'styles' => ['admin-pages.css'],
             // The drag is an addition: the Up and Down buttons work without either file,
             // and pages.js returns early when Sortable is not there.
-            'scripts' => ['vendor/sortable.min.js', 'pages.js'],
+            'scripts' => ['vendor/sortable.min.js', 'pages.js', 'admin-bulk.js'],
             'pages' => $shown,
             'total' => count($all),
             'lang' => $lang,
@@ -196,7 +195,7 @@ final class PagesController
                 $types[] = $type;
             }
         }
-        $id = Page::create($db, $registry, $pageLocale, $title, $slug, $template['id'] ?? null, $types, Composition::active($db));
+        $id = Page::create($db, $registry, $pageLocale, $title, $slug, $template['id'] ?? null, $types);
         Activity::record($db, 'page', 'created', $id, $title);
         $this->container->get('session')->set('flash', t('pages.created'));
 
@@ -213,10 +212,20 @@ final class PagesController
         if ($page === null) {
             return self::missing();
         }
+        // Publish is the draft's when there is one (D-173): what the page list's button puts on
+        // the site is what the editor shows. Unpublish keeps the page as the draft.
         $published = $request->input('status') === 'published';
-        Page::setStatus($this->db(), $id, $published);
-        Activity::record($this->db(), 'page', $published ? 'published' : 'unpublished', $id, (string) $page['title']);
-        Sitemap::refresh($this->container);
+        if ($published) {
+            $errors = PagePublish::publish($this->container, $id);
+            if ($errors !== []) {
+                $this->container->get('session')->set('flash', t('pages.publish_refused', ['problem' => (string) reset($errors)]));
+
+                return Response::redirect($request->input('return') === 'edit' ? Url::admin('pages', $id) : Url::admin('pages'));
+            }
+        } else {
+            PagePublish::unpublish($this->container, $id);
+            Activity::record($this->db(), 'page', 'unpublished', $id, (string) $page['title']);
+        }
         $this->container->get('session')->set('flash', t($published ? 'pages.published' : 'pages.unpublished'));
 
         return Response::redirect($request->input('return') === 'edit' ? Url::admin('pages', $id) : Url::admin('pages'));

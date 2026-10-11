@@ -4,8 +4,8 @@
    already had: chrome.css says what the header and footer LOOK like — surfaces, colours of
    their own, density, edges, the menu's words, the button — and this file says where the
    header's parts STAND, what the bar does as the page scrolls, and how its menu folds on a
-   phone. Linked right after chrome.css; the same rule as everywhere on the front end: only
-   custom properties, no literal colours, pixel values, fonts or shadows. */
+   phone. Linked after chrome.css and chrome-footer.css; the same rule as everywhere on the
+   front end: only custom properties, no literal colours, pixel values, fonts or shadows. */
 
 /* THE ARRANGEMENTS (D-112): where the name, the menu and the button stand. `left` is the
    flex row above — name left, menu and button right. */
@@ -35,6 +35,7 @@
 .layout-masthead .site-header {
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
 }
 
 .layout-masthead .site-header-action {
@@ -48,8 +49,21 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   grid-template-areas: "before brand after" "action action action";
-  align-items: center;
+  /* The name and the two halves of the menu on one baseline, and the rows in the middle of
+     the bar's height rather than at its top (owner's review of phase 1). */
+  align-items: baseline;
+  align-content: center;
   justify-items: center;
+}
+
+/* No button, no second row: an empty one held the first against the top of the bar. */
+.layout-split .site-header:not(:has(.site-header-action)) {
+  grid-template-areas: "before brand after";
+}
+
+/* A logo picture has no baseline worth meeting: its bottom edge would be one. */
+.layout-split .site-header:has(.site-logo img) {
+  align-items: center;
 }
 
 .layout-split .site-nav {
@@ -80,16 +94,22 @@
    because that is what sticks or floats; the class is on the bar inside, which is what
    the template owns, and :has() reads it from there. */
 
-/* Sticky: always within reach, over whatever scrolls beneath on its own surface. */
+/* Sticky: always within reach, over whatever scrolls beneath on its own surface — as
+   see-through and as blurred as the owner says (D-164); a token of 1 and no blur is solid. */
 .block-header:has(> .container > .behaviour-sticky) {
   position: sticky;
   top: 0;
   z-index: 10;
+  /* Mixed in a property of its own, so background reads a token like every front-end
+     colour (blocks_test). */
+  --header-sticky-bg: color-mix(in srgb, var(--section-bg) calc(var(--chrome-header-opacity, 1) * 100%), transparent);
+  background: var(--header-sticky-bg);
+  backdrop-filter: blur(var(--chrome-header-blur, 0rem));
 }
 
 /* Over the top: laid over the first section, taking that section's colours rather than
    painting its own — which is what makes it readable over any surface a hero can have.
-   The first section gains the header's room above its own rhythm, so nothing sits under
+   The first section gains the header's room above its own padding, so nothing sits under
    the bar.
 
    THE SHEET IS WHAT IT IS LAID OVER (D-067). A header that BREAKS OUT of the sheet has
@@ -109,7 +129,7 @@
 }
 
 .page-sheet:has(> .block-header .behaviour-over) > main > .block:first-child {
-  padding-block-start: calc(var(--section-rhythm) + var(--space-3xl));
+  padding-block-start: calc(var(--section-pad-top) + var(--space-3xl));
 }
 
 .page-sheet:has(> main > .block:first-child:is(.surface-contrast, .surface-image)) > .block-header:has(.behaviour-over) {

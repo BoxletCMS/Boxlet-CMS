@@ -18,29 +18,43 @@
    narrower measure of its own, centred within the column (see .layout-center below). */
 .hero-text {
   display: grid;
-  gap: var(--space-m);
+  /* Heading, lead and actions, a fifth more than the space between lines apart (README 1.6). */
+  gap: calc(var(--space-m) * 1.25);
 }
 
 .hero-heading {
-  margin: 0;
-  font-size: var(--text-4xl);
-  /* A word longer than a phone is wide — "Northwind" at Bold's largest size — is broken
-     with a hyphen where the language allows and anywhere at all where it does not, rather
-     than pushing the page sideways. Measured on the demo's About page at 390 across.
-     anywhere, not break-word: only anywhere lets the word stop sizing the grid column the
-     heading sits in, and with break-word the column grew to 448 and took the page along. */
-  hyphens: auto;
+  /* Room under a large heading so its descenders stand clear of the lead — at least 0.4em
+     (owner's review of phase 1). The stack's own gap is a fixed length, so the larger the
+     heading, the more it needs: nothing under the default set or on a phone, more for a
+     display size like Bold's. */
+  margin: 0 0 max(0em, calc(0.42em - 1.25 * var(--space-m)));
+  /* The character's display size is the ceiling; the window's width brings it down, so a
+     wide scale does not stand a heading in seven lines on a phone (owner's review of phase
+     1: at most five for the demo's, at 390). Under the default set it comes to README 1.6's
+     fifty-four and thirty-four pixels. */
+  --hero-size: min(var(--text-4xl), calc(1rem + 4.6vw));
+  font-size: var(--hero-size);
+  /* A display line sits a little tighter than a heading's own leading, never so tight that
+     its descenders reach the line under it. */
+  line-height: max(1.06, calc(var(--leading-heading) - 0.08));
+  text-wrap: balance;
+  /* Balanced rather than hyphenated (README 1.6): a display line broken mid-word reads as
+     a mistake. A word longer than the column still breaks rather than overflowing. */
   overflow-wrap: anywhere;
 }
 
 .hero-subheading {
   margin: 0;
-  color: var(--section-muted);
-  font-size: var(--text-lg);
 }
 
 .hero-action {
-  margin: var(--space-s) 0 0;
+  margin: var(--space-xs) 0 0;
+}
+
+/* In a centred band, a left-ranged hero's parts are centred with its words: the lead keeps
+   its own measure, and stood at the start of the column under a centred heading (D-182). */
+.align-center .hero-text {
+  justify-items: center;
 }
 
 .layout-center .hero,
@@ -51,19 +65,11 @@
 
 /* A centred hero reads better on a shorter line than the full column gives it. */
 .layout-center .hero-text {
-  max-width: var(--container-narrow);
+  /* The heading runs as wide as the section (README 1.6: two lines, not three); the lead
+     keeps its own measure. */
   margin-inline: auto;
 }
 
-
-.layout-split .hero {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* A split hero always has a media element now, whether or not a picture has been chosen,
-   so the rules that re-flowed one WITHOUT it have gone rather than staying as selectors
-   that can no longer match. What they did — heading in one column, subheading and button
-   in the other — avoided an empty half but still left the lower part of the section dead. */
 
 /* ---- THE PICTURE BEHIND THE WORDS (D-118) -----------------------------------------------
 
@@ -155,20 +161,20 @@
   z-index: 1;
 }
 
-/* THE VEIL, in the contrast colour, at one of three strengths. The weakest is the least
-   that keeps the words at 4.5:1 over a picture of ANY brightness under every character —
-   measured, 0.65 is where Minimal reaches it (4.7:1); tests/hero_cover_test.php keeps it
-   so. Tokens, so a character can ask for more in one place. */
+/* THE VEIL, in the contrast colour, at one of three strengths, and never under the least
+   that keeps the words at 4.5:1 over a picture of ANY brightness, which the palette works out
+   (--veil-least, O-33): a fixed 0.65 held for the five characters in light mode only, and
+   not for a set's own colours, nor for Minimal in dark mode (0.68). */
 .hero.is-cover {
-  --hero-veil: 0.65;
+  --hero-veil: max(0.65, var(--veil-least, 0.65));
 }
 
 .hero.is-cover.veil-medium {
-  --hero-veil: 0.75;
+  --hero-veil: max(0.75, var(--veil-least, 0.75));
 }
 
 .hero.is-cover.veil-strong {
-  --hero-veil: 0.85;
+  --hero-veil: max(0.85, var(--veil-least, 0.85));
 }
 
 .hero-cover-picture::after {
@@ -231,30 +237,53 @@
 @media (min-width: 40rem) {
   .layout-cover-left .hero-cover-picture::after {
     background: none;
-    background-image: linear-gradient(90deg, var(--color-contrast) 0%, var(--color-contrast) 55%, transparent 100%);
+    background-image: var(--hero-veil-top, none), linear-gradient(90deg, var(--color-contrast) 0%, var(--color-contrast) 55%, transparent 100%);
   }
 
   .layout-cover-right .hero-cover-picture::after {
     background: none;
-    background-image: linear-gradient(270deg, var(--color-contrast) 0%, var(--color-contrast) 55%, transparent 100%);
+    background-image: var(--hero-veil-top, none), linear-gradient(270deg, var(--color-contrast) 0%, var(--color-contrast) 55%, transparent 100%);
   }
 
-  .layout-cover-low .hero.is-cover:not(.height-content) .hero-cover-picture::after {
+  .layout-cover-low .hero.is-cover:not(.height-auto) .hero-cover-picture::after {
     background: none;
-    background-image: linear-gradient(0deg, var(--color-contrast) 0%, var(--color-contrast) 50%, transparent 100%);
+    background-image: var(--hero-veil-top, none), linear-gradient(0deg, var(--color-contrast) 0%, var(--color-contrast) 50%, transparent 100%);
   }
+}
+
+/* UNDER A HEADER LAID OVER IT, THE VEIL REACHES THE TOP (D-194, the owner). A veil that clears
+   away from the words cleared from under the header's too: Gallery's menu, light for the
+   contrast surface, stood at 1.3:1 over the pale top of its picture. Where the header is laid
+   over a cover hero alone in the first band (chrome-header.css), the veil is also dense from
+   the top to the header's foot — its words end low in it: Minimal's links at 66 of 74 px, and
+   seven tenths of it left them at 4.37:1 — and clears, eased, over nearly three heights more,
+   so it ends in no edge. A layer of the same veil: where the two meet it is no darker than
+   either. The header's words have the guarantee the hero's have. Both of the band's shapes,
+   as above. */
+.page-sheet:has(> .block-header .behaviour-over) > main > .block-hero:first-child > .container > .hero.is-cover,
+.page-sheet:has(> .block-header .behaviour-over) > main > .block:first-child > .container > .section-cols > .section-column:only-child > :only-child > .hero.is-cover {
+  --hero-header: var(--chrome-header-height, 4.5rem);
+  --hero-veil-top: linear-gradient(180deg,
+    var(--color-contrast) 0%,
+    var(--color-contrast) var(--hero-header),
+    color-mix(in srgb, var(--color-contrast) 80%, transparent) calc(var(--hero-header) * 1.35),
+    color-mix(in srgb, var(--color-contrast) 50%, transparent) calc(var(--hero-header) * 1.9),
+    color-mix(in srgb, var(--color-contrast) 22%, transparent) calc(var(--hero-header) * 2.6),
+    color-mix(in srgb, var(--color-contrast) 6%, transparent) calc(var(--hero-header) * 3.2),
+    transparent calc(var(--hero-header) * 3.7));
 }
 
 /* ---- how tall ------------------------------------------------------------------------------ */
 
-/* 56svh: 70 was a fifth too tall, the owner's measure (2026-09-25, "Tall je malo previsok,
+/* Every arrangement since D-166, when the height became an option; it was the cover's only.
+   56svh: 70 was a fifth too tall, the owner's measure (2026-09-25, "Tall je malo previsok,
    treba ga smanjiti za 20%"). */
-.hero.is-cover.height-tall {
+.hero.height-tall {
   min-block-size: 56svh;
 }
 
 /* The whole window, less the band's own padding above and below, which the picture covers
    and the words do not. */
-.hero.is-cover.height-screen {
-  min-block-size: calc(100svh - 2 * var(--section-rhythm));
+.hero.height-screen {
+  min-block-size: calc(100svh - var(--section-pad-top) - var(--section-pad-bottom));
 }

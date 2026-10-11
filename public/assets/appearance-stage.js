@@ -216,6 +216,13 @@
     document.addEventListener('appearance:state', function (event) {
       var name = event.detail && event.detail.state;
       var words = state.getAttribute('data-' + name);
+      // How many, where it can be counted (appearance-changes.js, D-181); none is published.
+      var counter = window.boxletAppearanceChanges;
+      if (name === 'unpublished' && counter) {
+        var n = counter.count();
+        name = n === 0 ? 'published' : name;
+        words = n === 0 ? state.getAttribute('data-published') : state.getAttribute(n === 1 ? 'data-one' : 'data-many').replace(':count', String(n));
+      }
       if (words) {
         state.textContent = words;
         state.classList.toggle('state-unpublished', name !== 'published');

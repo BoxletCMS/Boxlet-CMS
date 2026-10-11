@@ -70,6 +70,21 @@ final class TranslationStatus
     }
 
     /**
+     * The same, with the source's language named for the notices that say so: the builder's
+     * summary and the inspector's notice on a stale block (D-043, D-175).
+     *
+     * @return array{source: array<string, mixed>|null, stale: array<int, array{source: int, type: string, content: array<string, mixed>}>, missing: int, sourceLabel: string}
+     */
+    public static function described(Db $db, Blocks $registry, int $pageId): array
+    {
+        $status = self::of($db, $registry, $pageId);
+        $code = (string) ($status['source']['locale'] ?? '');
+        $label = $code === '' ? '' : (string) ($db->one('SELECT label FROM locales WHERE code = ?', [$code])['label'] ?? $code);
+
+        return $status + ['sourceLabel' => $label];
+    }
+
+    /**
      * How many stale blocks each translation on the site has, keyed by page id; pages with
      * none are left out.
      *

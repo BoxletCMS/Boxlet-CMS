@@ -29,10 +29,12 @@ return [
     'overview.issue.stale' => '“:page” needs its translation brought up to date',
     'overview.issue.no_favicon' => 'No icon for browser tabs',
     'overview.issue.no_mail' => 'Messages from your forms are not mailed to you',
+    'overview.issue.exposed' => 'Anyone can download your site’s private files, the database password among them',
     'overview.where.media' => 'Media · :names',
     'overview.where.pages' => 'Pages · :language',
     'overview.where.branding' => 'Settings · Branding',
     'overview.where.mail' => 'Settings · Email',
+    'overview.where.exposed' => 'Your host · the web server ignores the .htaccess file beside the public folder. Point the domain at the public folder, or ask your host to allow .htaccess files.',
     'overview.and_more' => 'and :count more',
 
     'overview.most_read' => 'Most read · 14 days',

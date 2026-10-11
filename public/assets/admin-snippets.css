@@ -1,0 +1,26 @@
+/* The Snippets screen (D-201): each snippet's name with its Delete beside it, and its tag in
+   the letters it is typed in. */
+
+.snippet-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-2);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.snippet-head h2 {
+  margin: 0;
+}
+
+.snippet-tag {
+  max-inline-size: 24rem;
+  font-family: var(--ui-mono);
+}
+
+/* A snippet is a few words: three lines tall, growing with what is typed, as the footer's
+   words are on Navigation. */
+.snippet .richtext-editor .ProseMirror,
+.snippet-new .richtext-editor .ProseMirror {
+  min-block-size: calc(3em * var(--ui-leading));
+}

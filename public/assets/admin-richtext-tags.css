@@ -1,0 +1,68 @@
+/* THE REPLACEMENT TAGS IN A RICH TEXT FIELD (PLAN.md D-201): the toolbar's Insert, its list,
+   and a tag's chip in the words. Beside admin-richtext.css, wherever that is loaded.
+
+   Insert is words, not a glyph, so it is as wide as they are. */
+.rt-button-words {
+  padding-inline: var(--ui-2);
+  font-weight: 500;
+}
+
+/* The toolbar is what the Insert list is placed against: under the button, over the editor,
+   never pushing the words down. */
+.richtext-toolbar {
+  position: relative;
+}
+
+.rt-insert-menu {
+  position: absolute;
+  inset-block-start: calc(100% + var(--ui-1));
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 14rem;
+  max-block-size: 18rem;
+  overflow-y: auto;
+  padding: var(--ui-1);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  box-shadow: var(--ui-shadow-m);
+}
+
+.rt-insert-menu button {
+  padding: var(--ui-1) var(--ui-2);
+  background: var(--ui-panel);
+  border: 0;
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+  text-align: start;
+  cursor: pointer;
+}
+
+.rt-insert-menu button:hover,
+.rt-insert-menu button:focus-visible {
+  background: var(--ui-panel-sunken);
+}
+
+.rt-insert-menu button:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: -2px;
+}
+
+/* A tag in the words: a chip with what a visitor will see in it, kept as the tag. One
+   character to the caret: removed whole, never typed into. */
+.richtext-editor .rt-tag {
+  padding: 0 0.3em;
+  background: var(--ui-accent-soft);
+  border-radius: 0.3em;
+  box-shadow: inset 0 0 0 var(--ui-border) var(--ui-accent);
+  color: var(--ui-ink);
+  white-space: nowrap;
+}
+
+.richtext-editor .rt-tag.ProseMirror-selectednode {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 1px;
+}

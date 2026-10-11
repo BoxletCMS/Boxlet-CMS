@@ -4,6 +4,9 @@ namespace App\Core;
 
 final class Request
 {
+    /** The largest JSON body read, in bytes: a long page, with room. */
+    public const JSON_LIMIT = 4 * 1024 * 1024;
+
     /**
      * @param array<string, mixed>  $query
      * @param array<string, mixed>  $body
@@ -58,12 +61,35 @@ final class Request
             '/' . ltrim($path, '/'),
             $basePath,
             $_GET,
-            $_POST,
+            self::body($headers),
             $headers,
             (string) ($_SERVER['REMOTE_ADDR'] ?? ''),
             $https,
             $_FILES,
         );
+    }
+
+    /**
+     * The request's fields: a form's, as PHP parsed them, or a JSON body's (PLAN.md D-173) —
+     * the builder's autosave sends the whole page as one document, which a form would have to
+     * spell out as thousands of fields against max_input_vars. Only an object is a body; any
+     * other JSON, or a body past the size a page can be, is no fields at all.
+     *
+     * @param array<string, string> $headers
+     * @return array<string, mixed>
+     */
+    private static function body(array $headers): array
+    {
+        if ($_POST !== [] || !str_starts_with(strtolower($headers['content-type'] ?? ''), 'application/json')) {
+            return $_POST;
+        }
+        $raw = (string) file_get_contents('php://input', false, null, 0, self::JSON_LIMIT + 1);
+        if ($raw === '' || strlen($raw) > self::JSON_LIMIT) {
+            return [];
+        }
+        $decoded = json_decode($raw, true, 64);
+
+        return is_array($decoded) && !array_is_list($decoded) ? $decoded : [];
     }
 
     /**

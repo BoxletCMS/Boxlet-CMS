@@ -69,6 +69,32 @@
   margin-bottom: var(--ui-4);
 }
 
+/* The ticked rows, deleted together (D-218): what is ticked, and Delete, above the list. */
+.list-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-3);
+  margin-bottom: var(--ui-3);
+}
+
+.list-bulk-count {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+.col-pick {
+  inline-size: 2.5rem;
+}
+
+.col-pick input {
+  inline-size: 1.05rem;
+  block-size: 1.05rem;
+  margin: 0;
+  accent-color: var(--ui-accent);
+  vertical-align: middle;
+}
+
 .list-search {
   display: flex;
   gap: var(--ui-2);

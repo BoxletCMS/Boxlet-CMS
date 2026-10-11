@@ -1,0 +1,274 @@
+{
+  "$schema": "https://boxlet.dev/schema/design-set-v2.json",
+  "format": "boxlet-design-set",
+  "version": 2,
+  "id": "portfolio",
+  "name": {
+    "en": "Portfolio",
+    "hr": "Portfolio"
+  },
+  "description": {
+    "en": "Neutral and precise, a newspaper grotesque, the work up front. For designers, agencies and freelancers.",
+    "hr": "Neutralno i precizno, novinski grotesk, rad u prvom planu. Za dizajnere, agencije i freelancere."
+  },
+  "author": "Boxlet",
+  "tags": [
+    "neutral",
+    "grid",
+    "work",
+    "minimal"
+  ],
+  "decisions": {
+    "mode": "light",
+    "seed": "#2d2d2d",
+    "heading_font": "schibsted-grotesk",
+    "body_font": "schibsted-grotesk",
+    "text_size": 16,
+    "scale": 1.25,
+    "nudge_h1": 4,
+    "spacing": 1,
+    "section_gap": 80,
+    "radius": 4,
+    "shadow": "none",
+    "container": 76,
+    "button_style": "outline",
+    "button_radius": 4,
+    "button_height": 42,
+    "surface_contrast": 12
+  },
+  "dark": {
+    "seed": "#e6e6e6",
+    "surface_contrast": 14,
+    "shadow_strength": 40
+  },
+  "look": {
+    "header_opacity": 96,
+    "header_blur": 8,
+    "logo_size": 32,
+    "footer_columns": "3",
+    "footer_links": "auto",
+    "header_arrangement": "split",
+    "header_behaviour": "sticky",
+    "header_surface": "plain",
+    "header_edge": "none",
+    "header_height": 64,
+    "brand": "name",
+    "nav_style": "plain",
+    "nav_ink": "ink",
+    "header_button": "text",
+    "footer_layout": "menu_first",
+    "small_print_row": "split",
+    "footer_surface": "plain",
+    "footer_edge": "line"
+  },
+  "composition": {
+    "section": {
+      "surface": "plain",
+      "width": "wide",
+      "align": "left",
+      "divider": "none",
+      "v_align": "top",
+      "animation": "none",
+      "pad_top": "",
+      "pad_bottom": "",
+      "min_height": 0
+    },
+    "surfaces": {
+      "cta": "plain"
+    },
+    "dividers": {
+      "cta": "line"
+    },
+    "layouts": {
+      "hero": "left",
+      "cards": "grid",
+      "gallery": "two",
+      "picture": "full",
+      "quote": "plain",
+      "cta": "beside",
+      "image_text": "image-left",
+      "logos": "grid"
+    },
+    "options": {
+      "cards": {
+        "per_row": 3,
+        "image_shape": "wide"
+      },
+      "gallery": {
+        "shape": "wide"
+      }
+    }
+  },
+  "patterns": [
+    {
+      "id": "portfolio-welcome",
+      "name": {
+        "en": "Welcome",
+        "hr": "Dobrodošlica"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "hero",
+          "layout": "left",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Identity and interfaces for small brands",
+              "hr": "Identiteti i sučelja za male brendove"
+            },
+            "subheading": {
+              "en": "I am Lea, an independent designer in Rijeka. Selected work below.",
+              "hr": "Ja sam Lea, samostalna dizajnerica iz Rijeke. Odabrani radovi su ispod."
+            },
+            "cta": {
+              "label": {
+                "en": "Start a project",
+                "hr": "Započnite projekt"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "portfolio-offer",
+      "name": {
+        "en": "What we offer",
+        "hr": "Što nudimo"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "cards",
+          "layout": "grid",
+          "column": 0,
+          "options": {
+            "per_row": 3
+          },
+          "content": {
+            "heading": {
+              "en": "Services",
+              "hr": "Usluge"
+            },
+            "intro": {
+              "en": "Working alone or with two trusted partners.",
+              "hr": "Radim sama ili s dvoje provjerenih suradnika."
+            },
+            "items": [
+              {
+                "heading": {
+                  "en": "Identity",
+                  "hr": "Identitet"
+                },
+                "body": {
+                  "en": "<p>Name, mark, type and colour.</p>",
+                  "hr": "<p>Ime, znak, pismo i boja.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Websites",
+                  "hr": "Web stranice"
+                },
+                "body": {
+                  "en": "<p>Design and build, ready to edit.</p>",
+                  "hr": "<p>Dizajn i izrada, spremno za uređivanje.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Packaging",
+                  "hr": "Ambalaža"
+                },
+                "body": {
+                  "en": "<p>From the shelf to the unboxing.</p>",
+                  "hr": "<p>Od police do otvaranja.</p>"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "portfolio-voice",
+      "name": {
+        "en": "A client's words",
+        "hr": "Riječi klijenta"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "quote",
+          "layout": "plain",
+          "column": 0,
+          "options": {},
+          "content": {
+            "quote": {
+              "en": "Lea understood the brand before we did.",
+              "hr": "Lea je shvatila brend prije nas."
+            },
+            "attribution": {
+              "en": "Tin B.",
+              "hr": "Tin B."
+            },
+            "role": {
+              "en": "Founder, Kava Kava",
+              "hr": "Osnivač, Kava Kava"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "portfolio-call",
+      "name": {
+        "en": "Call to action",
+        "hr": "Poziv na akciju"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "contrast"
+        }
+      },
+      "blocks": [
+        {
+          "type": "cta",
+          "layout": "beside",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Free from March",
+              "hr": "Slobodna od ožujka"
+            },
+            "body": {
+              "en": "Tell me what you are making.",
+              "hr": "Recite mi što radite."
+            },
+            "action": {
+              "label": {
+                "en": "Start a project",
+                "hr": "Započnite projekt"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

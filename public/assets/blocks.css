@@ -1,4 +1,4 @@
-/* The page blocks' own styles: text, image and text, columns, form. Split out of site.css,
+/* The page blocks' own styles: text, image and text, form. Split out of site.css,
    which keeps the page and what every block shares, when the two together passed the size
    limit. The same rule: only custom properties from tokens.css and the --section-*
    properties each section sets in sections.css. No literal colours, pixel values, fonts or
@@ -7,26 +7,32 @@
    The nine blocks D-105 added are in blocks-words.css and blocks-media.css, linked straight
    after this one: together they passed the hard size limit (PLAN.md D-117), and those nine
    are the seam — they arrived together and share nothing with the five above. The hero is
-   blocks-hero.css, linked straight BEFORE this one, where its rules stood (D-118). */
+   blocks-hero.css, linked straight BEFORE this one, where its rules stood (D-118). Cards are
+   blocks-cards.css, linked straight after this one, split when a card's picture became a shape
+   and the last card of an odd two stopped standing alone (D-194). */
 
 /* Text and image-text */
 
-.text-heading,
-.image-text-heading {
-  margin: 0 0 var(--space-m);
-  font-size: var(--text-2xl);
-}
 
+
+/* As many columns as hold 16rem, at most two (D-184). */
 .layout-columns .richtext {
-  columns: 2;
+  columns: 16rem 2;
   column-gap: var(--space-xl);
 }
 
+/* Two equal columns while each holds 16rem of words, else one (D-184). */
 .image-text {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-xl);
+  grid-template-columns: repeat(auto-fit, minmax(max(16rem, calc((100% - var(--space-columns)) / 2)), 1fr));
+  gap: var(--space-columns);
   align-items: center;
+}
+
+/* The picture stands at least this tall beside the words, whatever its own shape. */
+.image-text-media .media-placeholder {
+  aspect-ratio: auto;
+  min-block-size: calc(var(--space-m) * 17.5);
 }
 
 .layout-image-right .image-text-media {
@@ -66,110 +72,6 @@
   object-fit: contain;
 }
 
-/* Columns (PLAN.md D-008)
-
-   The layout is how many columns share a row; more items start a new row on the same
-   grid. minmax(0, 1fr) rather than 1fr, so a long word or a picture's intrinsic width
-   cannot push one column wider than the others. */
-
-.columns-head {
-  margin-block-end: var(--space-l);
-}
-
-.columns-heading {
-  margin: 0;
-  font-size: var(--text-2xl);
-}
-
-.columns-intro {
-  max-inline-size: var(--container-narrow);
-  margin: var(--space-s) 0 0;
-  color: var(--section-muted);
-  /* Body size, not the hero's larger subheading: under Minimal's tight scale on a phone
-     the larger size came out as big as the block's own heading, and the introduction
-     read as the title. */
-  font-size: var(--text-base);
-}
-
-.align-center .columns-intro {
-  margin-inline: auto;
-}
-
-.columns-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-xl) var(--space-l);
-}
-
-.layout-two .columns-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.layout-four .columns-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-l) var(--space-m);
-}
-
-.columns-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s);
-}
-
-.columns-media {
-  margin-block-end: var(--space-xs);
-}
-
-/* One shape for every picture in the block, so a row lines up whatever was uploaded. */
-.columns-media img,
-.columns-media .media-placeholder {
-  display: block;
-  inline-size: 100%;
-  block-size: auto;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  border-radius: var(--radius-l);
-}
-
-.shape-square .columns-media img,
-.shape-square .columns-media .media-placeholder {
-  aspect-ratio: 1;
-}
-
-/* A portrait: smaller than the column, so a row of people reads as faces rather than as a
-   wall of photographs, and centred on the column when the section is. Cut to a circle
-   rather than rounded: a circle is a shape, not the character's radius, and border-radius
-   here may only take a token. */
-.shape-round .columns-media img,
-.shape-round .columns-media .media-placeholder {
-  inline-size: 60%;
-  aspect-ratio: 1;
-  clip-path: circle(50%);
-}
-
-.align-center .shape-round .columns-media img,
-.align-center .shape-round .columns-media .media-placeholder {
-  margin-inline: auto;
-}
-
-.columns-item-heading {
-  margin: 0;
-  font-size: var(--text-lg);
-}
-
-.columns-link {
-  margin: auto 0 0;
-  padding-block-start: var(--space-xs);
-  font-weight: var(--heading-weight);
-}
-
-/* Four in a row needs more room than a tablet gives it: two rows of two instead. */
-@media (max-width: 64rem) {
-  .layout-four .columns-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 /* Form (PLAN.md D-046)
 
    Fields in the section's own colours, so a form reads on a plain section and a contrast
@@ -181,13 +83,10 @@
 
 .form-block-heading {
   margin: 0;
-  font-size: var(--text-2xl);
 }
 
 .form-block-intro {
-  max-inline-size: var(--container-narrow);
   margin: var(--space-s) 0 0;
-  color: var(--section-muted);
 }
 
 .layout-beside .form-block {
@@ -296,12 +195,6 @@
 
   .layout-columns .richtext {
     columns: 1;
-  }
-
-  .columns-grid,
-  .layout-two .columns-grid,
-  .layout-four .columns-grid {
-    grid-template-columns: minmax(0, 1fr);
   }
 
   .layout-beside .form-block {

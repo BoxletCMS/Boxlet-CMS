@@ -21,6 +21,10 @@ return [
         // should be the quiet one.
         'height' => ['type' => 'select', 'options' => ['small', 'medium', 'large']],
     ],
-    'layouts' => ['space', 'line'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'space' => ['line' => [[4, 3, 40, 2], [4, 19, 40, 2]]],
+        'line' => ['line' => [[4, 3, 40, 2], [4, 19, 40, 2]], 'logo' => [[8, 11, 32, 1]]],
+    ],
     'defaults' => ['layout' => 'space'],
 ];

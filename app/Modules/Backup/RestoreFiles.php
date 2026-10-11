@@ -13,13 +13,21 @@ use ZipArchive;
  * written again from the archive. Only entries under storage/uploads/ and public/m/ are
  * written, and only inside those folders; anything else in the archive is not a file of the
  * site and is passed over.
+ *
+ * And the design sets the owner dropped into designs/custom/ (D-155), written back but never
+ * emptied first: they are the owner's own files, put there by hand, and a file there that the
+ * backup does not hold was not Boxlet's to take away.
  */
 final class RestoreFiles
 {
+    private readonly BackupFolders $folders;
+
     public function __construct(
         private readonly string $uploads,
         private readonly string $media,
+        string $customDesigns = '',
     ) {
+        $this->folders = new BackupFolders($uploads, $media, $customDesigns);
     }
 
     /**
@@ -34,7 +42,7 @@ final class RestoreFiles
         while ($entry < $zip->numFiles && ($first || microtime(true) < $until)) {
             $first = false;
             $name = (string) $zip->getNameIndex($entry);
-            $target = $this->target($name);
+            $target = $this->folders->where($name);
             if ($target !== null) {
                 if (!is_dir(dirname($target))) {
                     mkdir(dirname($target), 0775, true);
@@ -53,21 +61,6 @@ final class RestoreFiles
         }
 
         return $entry;
-    }
-
-    /** Where an archive entry goes on this site, or null for one that is not a file of it. */
-    private function target(string $name): ?string
-    {
-        if ($name === '' || str_contains('/' . $name . '/', '/../') || str_contains($name, "\0") || str_starts_with($name, '/')) {
-            return null;
-        }
-        foreach (['storage/uploads/' => $this->uploads, 'public/m/' => $this->media] as $prefix => $directory) {
-            if (str_starts_with($name, $prefix) && strlen($name) > strlen($prefix) && !str_ends_with($name, '/')) {
-                return $directory . '/' . substr($name, strlen($prefix));
-            }
-        }
-
-        return null;
     }
 
     /** Removes every file in both folders but their dot files (.htaccess, .gitkeep). */

@@ -1,0 +1,94 @@
+/* The builder's quick inserter inside the canvas iframe (PLAN.md D-175; builder-inserter.js
+ * draws it). canvas.css's rule holds here: literals and --bx- values, set on .bx-canvas, never
+ * a site token; every size in em of the layer's, which keeps it its size on screen. */
+
+.bx-inserter {
+  inline-size: min(34em, calc(100vw - 2em));
+  padding: 0.5em;
+  border-radius: 0.75em;
+  background: var(--bx-ink);
+  color: var(--bx-paper);
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 1px var(--bx-paper), 0 16px 40px rgb(0 0 0 / 0.3);
+}
+
+.bx-inserter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 0.4em 0.4em;
+  color: var(--bx-muted);
+}
+
+.bx-inserter-group {
+  padding: 0.6em 0 0.4em 0.4em;
+  color: var(--bx-muted);
+}
+
+.bx-inserter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.375em;
+}
+
+.bx-inserter-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-inline-size: 0;
+  padding: 0.55em 0.6em;
+  border: 0;
+  border-radius: 0.5em;
+  background: var(--bx-ink-raised);
+  color: var(--bx-paper);
+  font: var(--bx-font);
+  text-align: start;
+  cursor: pointer;
+}
+
+.bx-inserter-item .bx-icon {
+  flex: none;
+  color: var(--bx-muted);
+}
+
+.bx-inserter-item:hover {
+  background: var(--bx-select);
+}
+
+.bx-inserter-item:hover .bx-icon {
+  color: var(--bx-paper);
+}
+
+/* While the inserter is open the toolbars give way (D-176): it is the one thing being used. */
+.bx-layer:has(> .bx-inserter) > .bx-toolbar {
+  display: none;
+}
+
+/* "+ Block" in a column (builder-columns.js, D-206): "Add section at the end"'s pill, dark in a
+   white ring, a shape and a word at rest on any surface; centred on the point it is put at. */
+.bx-add-column {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.4em 0.9em;
+  border: 2px solid var(--bx-paper);
+  border-radius: 999px;
+  background: var(--bx-ink);
+  color: var(--bx-paper);
+  font: var(--bx-font);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.25);
+  cursor: pointer;
+}
+
+.bx-add-column:hover,
+.bx-add-column:focus-visible {
+  background: var(--bx-select);
+  box-shadow: 0 0 0 2px var(--bx-ink);
+}
+
+/* Under what a column holds: a line from its left edge, not centred on the band's middle,
+   where the "+" between bands stands. */
+.bx-add-column-under {
+  transform: translateY(-50%);
+}

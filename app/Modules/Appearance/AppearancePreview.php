@@ -7,16 +7,22 @@ use App\Core\Db;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\View;
+use App\Modules\Design\Characters;
 use App\Modules\Design\Composition;
+use App\Modules\Design\SectionStyle;
 use App\Modules\Design\Design;
 use App\Modules\Design\Derived;
+use App\Modules\Design\Fonts;
 use App\Modules\Design\Palette;
+use App\Modules\Design\PalettePairs;
 use App\Modules\Design\Presets;
 use App\Modules\Design\TokenCompiler;
 use App\Modules\Design\Tokens;
 use App\Modules\Design\Typography;
-use App\Modules\Pages\Page;
+use App\Modules\Pages\PageDocument;
 use App\Modules\Pages\PageLayoutData;
+use App\Modules\Pages\PageRender;
+use App\Modules\Settings\ChromeLook;
 use App\Support\Url;
 
 /**
@@ -67,24 +73,35 @@ final class AppearancePreview
             [''],
         ));
 
-        $blocks = [];
+        // Each section as it would be drawn under the character being tried: the owner's own
+        // values over what that character composes (D-165), which is what publishing the
+        // design gives — drawn by the page's own drawing, so the picture is the page (D-168).
+        // A block that follows the character is drawn in the layout the one being tried names
+        // (PageRender); a layout the owner chose is drawn as it is (D-191).
+        $basis = $character !== '' ? $character : Composition::active($this->db());
         if ($home !== null) {
-            foreach (Page::blocks($this->db(), (int) $home['id']) as $block) {
-                if ($registry->has($block['type'])) {
-                    $blocks[] = [$block['type'], $block['content'], $block['style'], $block['layout']];
-                }
-            }
+            $drawn = PageRender::draw(
+                $this->db(),
+                $registry,
+                PageDocument::stored($this->db(), $registry, (int) $home['id']) ?? ['blocks' => [], 'sections' => []],
+                $shown,
+                $basis,
+                (string) $this->container->get('config')->get('app.key'),
+                ['pageId' => (int) $home['id'], 'design' => Tokens::resolve($decisions, $basis)],
+            );
+            $html = $drawn['html'];
+            $firstSurface = $drawn['firstSurface'];
         } else {
-            $blocks = self::specimen();
-        }
-
-        $html = '';
-        foreach ($blocks as [$type, $content, $style, $layout]) {
-            if ($character !== '') {
-                $style = Composition::style($character, $type);
-                $layout = Composition::layout($registry, $character, $type);
+            $html = '';
+            $firstSurface = null;
+            foreach (self::specimen() as [$type, $content, $style, $layout]) {
+                $style = SectionStyle::effective(SectionStyle::normalize($style), Composition::style($basis, $type));
+                $firstSurface ??= (string) $style['surface'];
+                if ($character !== '') {
+                    $layout = Composition::layout($registry, $character, $type);
+                }
+                $html .= $registry->render($type, $content, $style, $layout, [], false, 'section', [], '', [], Composition::options($basis, $type));
             }
-            $html .= $registry->render($type, $content, $style, $layout);
         }
 
         // Every variable the layout reads comes from ONE place (D-057), and everything the
@@ -97,14 +114,13 @@ final class AppearancePreview
         // And the design itself with what the first section stands on, for the choice
         // between the two logos (D-112): the same facts a visitor's page hands the layout.
         $trying['decisions'] = $decisions;
-        $trying['first_surface'] = '';
-        foreach ($blocks as [$type, $content, $style, $layout]) {
-            $trying['first_surface'] = (string) (($character !== '' ? Composition::style($character, $type) : $style)['surface'] ?? '');
-            break;
-        }
+        $trying['first_surface'] = $firstSurface ?? '';
+        $layout = PageLayoutData::forPreview($this->container, $shown, t('design.preview'), $trying);
+        $layout['headerHtml'] = self::region($layout['headerHtml'], 'header', 'header', 1);
+        $layout['footerHtml'] = self::region($layout['footerHtml'], 'footer', 'footer', 1);
         $body = (new View(dirname(__DIR__) . '/Pages/views'))->render('page', $shown, [
-            'blocksHtml' => $html,
-        ] + PageLayoutData::forPreview($this->container, $shown, t('design.preview'), $trying));
+            'blocksHtml' => self::region($html, 'section class="block', 'section', -1),
+        ] + $layout);
         $response = Response::admin($body);
         // The one admin page that may be framed, and only by the admin itself.
         $response->headers['Content-Security-Policy'] = "default-src 'self'; img-src 'self' data:; form-action 'none'; frame-ancestors 'self'; base-uri 'none'";
@@ -114,50 +130,49 @@ final class AppearancePreview
     }
 
     /**
+     * PRESSING A PART OF THE PICTURE OPENS ITS SETTINGS (D-181, README 5.7): the wrappers say
+     * what they are — the header, each band (`<section class="block`), the footer — here, in
+     * the preview alone, at the end of their opening tag (appearance-regions.js reads them).
+     */
+    private static function region(string $html, string $opening, string $name, int $limit): string
+    {
+        return preg_replace('~(<' . preg_quote($opening, '~') . '\b[^>]*)>~', '$1 data-bx-region="' . $name . '">', $html, $limit) ?? $html;
+    }
+
+    /**
      * @param array<string, string> $params
      */
     public function stylesheet(Request $request, string $locale, array $params): Response
     {
         $decisions = $this->decisions($request->query);
-        $fonts = Typography::fontFaces($decisions['typography'], Url::asset('assets/fonts'));
-        $css = (new TokenCompiler())->css(Derived::from($decisions), $fonts);
+        $fonts = Typography::fontFaces([$decisions['heading_font'], $decisions['body_font']], Url::asset('assets/fonts'));
+        $css = (new TokenCompiler())->css(Derived::from($decisions, Composition::section($this->character($request->query), [])['width']), $fonts);
 
         return new Response($css, 200, ['Content-Type' => 'text/css; charset=utf-8', 'Cache-Control' => 'no-store']);
     }
 
     /**
-     * The six typefaces, for the cards that choose between them (PLAN.md D-065).
+     * The library's faces, for the pickers that choose between them (PLAN.md D-065, D-185).
      *
-     * THE ONE PLACE THE ADMIN LOADS THE SITE'S FONTS, and it is not a leak of the site's
-     * design into the tool: these faces are the thing being CHOSEN, and a list of six names
-     * is not a choice anybody can make. Nothing else on the screen uses them — the sample is
-     * two letters wide.
+     * THE ONE PLACE THE ADMIN LOADS THE SITE'S FONTS, and it is not a leak of the site's design
+     * into the tool: these faces are the thing being CHOSEN, and a list of names is not a choice
+     * anybody can make. Nothing else on the screen uses them. A browser fetches a face only when
+     * text is drawn in it, so a closed picker costs nothing.
      *
-     * Served rather than written into a stylesheet by hand, because Typography already knows
-     * where the files are and what weights they come in; a second copy of that would drift
-     * the first time a family changed.
+     * Served rather than written into a stylesheet by hand, because Fonts already knows where
+     * the files are and what weights they come in; a second copy of that would drift.
      *
      * @param array<string, string> $params
      */
     public function typefaces(Request $request, string $locale, array $params): Response
     {
-        $css = '';
-        foreach (array_keys(Typography::PAIRINGS) as $pairing) {
-            $css .= Typography::fontFaces($pairing, Url::asset('assets/fonts'));
-        }
-        /*
-         * And what each card's sample is set in — and, since D-075, the SPECIMEN too. The
-         * stack is Typography's, so neither can ever show a face the site would not use.
-         *
-         * The specimen is the one place on this screen where both halves of a pairing are
-         * shown: a pairing is a heading face AND a body face, and two lines of each is the
-         * only way to see whether they belong together.
-         */
-        foreach (Typography::PAIRINGS as $name => $pairing) {
-            $heading = Typography::stack($pairing['heading']);
-            $css .= '.typeface-sample[data-typeface="' . $name . '"] { font-family: ' . $heading . "; }\n";
-            $css .= '.specimen[data-typeface="' . $name . '"] .specimen-heading { font-family: ' . $heading . "; }\n";
-            $css .= '.specimen[data-typeface="' . $name . '"] .specimen-body { font-family: ' . Typography::stack($pairing['body']) . "; }\n";
+        $css = Typography::fontFaces(array_keys(Fonts::ALL), Url::asset('assets/fonts'));
+        // What each sample is set in, and the specimen's two halves: the stack is Fonts', so
+        // none can show a face the site would not use.
+        foreach (Fonts::ALL as $font => $definition) {
+            $css .= '.font-sample[data-font="' . $font . '"] { font-family: ' . $definition['stack'] . "; }\n";
+            $css .= '.specimen[data-heading-font="' . $font . '"] .specimen-heading { font-family: ' . $definition['stack'] . "; }\n";
+            $css .= '.specimen[data-body-font="' . $font . '"] .specimen-body { font-family: ' . $definition['stack'] . "; }\n";
         }
 
         return new Response($css, 200, ['Content-Type' => 'text/css; charset=utf-8', 'Cache-Control' => 'max-age=3600']);
@@ -172,23 +187,30 @@ final class AppearancePreview
      */
     public function check(Request $request, string $locale, array $params): Response
     {
-        $result = Tokens::validate(AppearanceForm::decisions($request->query));
-        $decisions = $result['decisions'];
-        $byHand = Tokens::byHand($decisions);
-        $colors = Palette::colors($decisions['seed'], $decisions['secondary'], $decisions['surface_contrast'], $byHand);
+        $character = $this->character($request->query);
+        $result = Tokens::validate(self::fields($request->query), $character);
+        $decisions = Tokens::resolve($result['decisions'], $character, AppearanceForm::dark($request->query));
+        $colors = Palette::forDecisions($decisions);
+        $pairs = PalettePairs::pairs($colors, $decisions['secondary'] !== '', Tokens::byHand($decisions), Tokens::ownChrome($decisions));
         $body = json_encode([
             'errors' => (object) $result['errors'],
             'colors' => $colors,
-            'pairs' => Palette::pairs($colors, $decisions['secondary'] !== '', $byHand, Tokens::ownChrome($decisions)),
+            'pairs' => $pairs,
             // What every control comes to, so a readout follows the control it belongs to
-            // instead of holding the number the page was rendered with (D-066).
-            'readouts' => AppearanceForm::readouts($decisions),
+            // instead of holding the number the page was rendered with (D-066) — and the
+            // line under each section's name on the home, by the same rule (D-157).
+            'readouts' => AppearanceForm::readouts($decisions) + SectionSummaries::of($decisions, $pairs),
+            // The layout diagram's rectangles, worked out where the screen draws them.
+            'diagram' => LayoutDiagram::geometry($decisions),
         ], JSON_THROW_ON_ERROR);
 
         return new Response($body, 200, ['Content-Type' => 'application/json', 'Cache-Control' => 'no-store']);
     }
 
     /**
+     * The design a request is drawing, every key answered: a character by name, the site's
+     * own when the request says nothing, or what the screen is trying (D-164).
+     *
      * @param array<mixed> $query
      * @return array<string, string>
      */
@@ -196,13 +218,45 @@ final class AppearancePreview
     {
         $preset = $query['preset'] ?? null;
         if (is_string($preset) && Presets::exists($preset)) {
-            return Presets::get($preset);
+            return Characters::decisions($preset);
         }
         if (!isset($query['seed'])) {
-            return Design::load($this->db());
+            return Design::resolved($this->db());
+        }
+        $character = $this->character($query);
+
+        return Tokens::resolve(Tokens::validate(self::fields($query), $character)['decisions'], $character, AppearanceForm::dark($query));
+    }
+
+    /**
+     * The screen's fields as decisions: the switches read, and the header and footer's
+     * `look_` fields under their own keys.
+     *
+     * @param array<mixed> $query
+     * @return array<mixed>
+     */
+    private static function fields(array $query): array
+    {
+        $fields = AppearanceForm::decisions($query);
+        foreach (ChromeLook::keys() as $key) {
+            if (array_key_exists(ChromeLook::field($key), $query)) {
+                $fields[$key] = $query[ChromeLook::field($key)];
+            }
         }
 
-        return Tokens::validate(AppearanceForm::decisions($query))['decisions'];
+        return $fields;
+    }
+
+    /**
+     * The character a request draws over: the one it names, else the site's.
+     *
+     * @param array<mixed> $query
+     */
+    private function character(array $query): string
+    {
+        $named = $query['character'] ?? null;
+
+        return is_string($named) && Presets::exists($named) ? $named : Composition::active($this->db());
     }
 
     /**
@@ -216,7 +270,7 @@ final class AppearancePreview
         $paragraph = static fn (string $key): string => '<p>' . e(t($key)) . ' <a href="#">' . e(t('design.specimen.link')) . '</a>.</p>';
 
         return [
-            ['hero', ['heading' => t('design.specimen.hero'), 'subheading' => t('design.specimen.hero_sub'), 'cta' => ['label' => t('design.specimen.button'), 'url' => '#']], ['surface' => 'gradient', 'rhythm' => 'airy', 'align' => 'center'], 'center'],
+            ['hero', ['heading' => t('design.specimen.hero'), 'subheading' => t('design.specimen.hero_sub'), 'cta' => ['label' => t('design.specimen.button'), 'url' => '#']], ['surface' => 'gradient', 'pad_top' => '120', 'pad_bottom' => '120', 'align' => 'center'], 'center'],
             ['text', ['heading' => t('design.specimen.text_heading'), 'body' => $paragraph('design.specimen.text_body')], [], 'single'],
             ['image_text', ['heading' => t('design.specimen.tinted_heading'), 'body' => $paragraph('design.specimen.tinted_body'), 'image' => 1, 'link' => ['label' => t('design.specimen.button'), 'url' => '#']], ['surface' => 'tinted', 'divider' => 'line'], 'image-left'],
             ['hero', ['heading' => t('design.specimen.contrast_heading'), 'subheading' => t('design.specimen.contrast_body'), 'cta' => ['label' => t('design.specimen.button'), 'url' => '#']], ['surface' => 'contrast', 'divider' => 'slant'], 'left'],

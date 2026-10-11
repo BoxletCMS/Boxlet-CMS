@@ -19,8 +19,15 @@ return [
     'fields' => [
         'image' => ['type' => 'media'],
         'caption' => ['type' => 'text', 'translatable' => true, 'sample' => 'preview.picture.caption'],
-        'shape' => ['type' => 'select', 'options' => ['natural', 'wide', 'square', 'round']],
     ],
-    'layouts' => ['full', 'inset'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'full' => ['image' => [[2, 3, 44, 18]]],
+        'inset' => ['image' => [[10, 4, 28, 16]]],
+    ],
     'defaults' => ['layout' => 'full'],
+    'options' => [
+        // The picture as it was taken, or cropped to a shape (D-166: an option).
+        'shape' => ['values' => ['natural', 'wide', 'square', 'round'], 'default' => 'natural'],
+    ],
 ];

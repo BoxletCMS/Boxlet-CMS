@@ -23,6 +23,22 @@ final class Menu
     public const MAX_DEPTH = 1;
 
     /**
+     * The menu names on offer, each once. The same name in two languages is one choice: that
+     * is the point of the header storing a name rather than an id (D-030).
+     *
+     * @return list<string>
+     */
+    public static function names(Db $db): array
+    {
+        $names = [];
+        foreach ($db->all('SELECT name FROM menus ORDER BY name') as $row) {
+            $names[(string) $row['name']] = true;
+        }
+
+        return array_map('strval', array_keys($names));
+    }
+
+    /**
      * Every menu, ordered for the admin list.
      *
      * @return list<array{id: int, locale: string, name: string, items: int}>
@@ -172,6 +188,20 @@ final class Menu
     public static function deleteItem(Db $db, int $id): void
     {
         $db->query('DELETE FROM menu_items WHERE id = ?', [$id]);
+    }
+
+    /**
+     * A PAGE DELETED TAKES ITS MENU ITEMS WITH IT (PLAN.md D-218, the owner): an item that
+     * goes nowhere was left as "broken" for the owner to find and remove by hand, which after
+     * deleting the demo's pages was every item of two menus. The items under one stay, moved
+     * up to where it stood: they lead to pages of their own.
+     */
+    public static function pageDeleted(Db $db, int $pageId): void
+    {
+        foreach ($db->all('SELECT id, parent_id FROM menu_items WHERE page_id = ?', [$pageId]) as $item) {
+            $db->query('UPDATE menu_items SET parent_id = ? WHERE parent_id = ?', [$item['parent_id'] === null ? null : (int) $item['parent_id'], (int) $item['id']]);
+            $db->query('DELETE FROM menu_items WHERE id = ?', [(int) $item['id']]);
+        }
     }
 
     /**

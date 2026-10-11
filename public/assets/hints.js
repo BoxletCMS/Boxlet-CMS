@@ -53,7 +53,16 @@
     function draw(showing) {
       root.setAttribute('data-hints', showing ? 'on' : 'off');
       button.setAttribute('aria-pressed', showing ? 'true' : 'false');
-      button.textContent = button.getAttribute(showing ? 'data-hide' : 'data-show');
+      // A button that is an icon keeps it: its words go into its label and its title
+      // (the Appearance inspector's, D-161). One that is only words is the words.
+      var said = button.getAttribute(showing ? 'data-hide' : 'data-show');
+      var label = button.querySelector('[data-hints-label]');
+      if (label) {
+        label.textContent = said;
+        button.title = said;
+      } else {
+        button.textContent = said;
+      }
     }
 
     // OFF is the default, which is what the owner asked for; anything stored wins over it.

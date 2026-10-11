@@ -154,7 +154,6 @@ return [
     'stats.geo_cancelled' => 'The download was stopped. Nothing was changed.',
     'stats.geo_started' => 'The download has begun. Leave this page open, or press Continue.',
     'stats.geo_download_none' => 'There is no download to carry on.',
-    'stats.geo_download_no_size' => 'the server did not say how large the file is',
     'stats.attribution' => 'IP geolocation by DB-IP',
 
     // The suggested privacy-policy text.

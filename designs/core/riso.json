@@ -1,0 +1,328 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "riso",
+    "name": {
+        "en": "Riso",
+        "hr": "Riso"
+    },
+    "description": {
+        "en": "A two-colour print look: pink and blue, hard offset shadows, a quirky grotesque. For print studios, bookshops and cultural spaces.",
+        "hr": "Izgled dvobojnog tiska: ružičasta i plava, tvrde pomaknute sjene, neobičan grotesk. Za tiskare, knjižare i kulturne prostore."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#b3195a",
+        "secondary": "#1f3fb4",
+        "surface_contrast": "38",
+        "heading_font": "bricolage-grotesque",
+        "body_font": "bricolage-grotesque",
+        "text_size": "17",
+        "scale": "1.35",
+        "heading_weight": "800",
+        "tracking": "-0.03",
+        "nudge_h1": "10",
+        "spacing": "1.05",
+        "section_gap": "88",
+        "radius": "0",
+        "border_width": "2",
+        "shadow": "hard",
+        "shadow_strength": "100",
+        "container": "68",
+        "button_radius": "0",
+        "button_height": "50"
+    },
+    "dark": {
+        "seed": "#ff79b0",
+        "secondary": "#3355d6",
+        "surface_contrast": "30",
+        "shadow_strength": "100"
+    },
+    "look": {
+        "header_arrangement": "left",
+        "header_behaviour": "static",
+        "header_opacity": "100",
+        "header_blur": "0",
+        "header_surface": "plain",
+        "header_edge": "line",
+        "header_height": "72",
+        "logo_size": "32",
+        "brand": "name",
+        "nav_style": "bar",
+        "nav_ink": "accent",
+        "header_button": "filled",
+        "footer_layout": "columns",
+        "footer_columns": "3",
+        "footer_links": "auto",
+        "small_print_row": "split",
+        "footer_surface": "tinted",
+        "footer_edge": "line"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "wide",
+            "align": "left",
+            "divider": "none",
+            "animation": "none"
+        },
+        "surfaces": {
+            "stats": "contrast",
+            "quote": "tinted",
+            "cta": "contrast"
+        },
+        "dividers": {
+            "cta": "slant"
+        },
+        "layouts": {
+            "hero": "left",
+            "cards": "grid",
+            "stats": "three",
+            "quote": "big",
+            "cta": "banner",
+            "gallery": "three",
+            "image_text": "image-left"
+        },
+        "options": {
+            "cards": {
+                "image_shape": "wide",
+                "per_row": "3"
+            },
+            "gallery": {
+                "shape": "square"
+            }
+        }
+    },
+    "patterns": [
+        {
+            "id": "riso-welcome",
+            "name": {
+                "en": "Welcome",
+                "hr": "Dobrodošlica"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "split",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Printed in two colours, by hand",
+                            "hr": "Tiskano u dvije boje, ručno"
+                        },
+                        "subheading": {
+                            "en": "A small riso studio printing zines, posters and books for people who make things.",
+                            "hr": "Mali riso studio koji tiska zinove, plakate i knjige za ljude koji stvaraju."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "Order a print",
+                                "hr": "Naručite tisak"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "riso-offer",
+            "name": {
+                "en": "What we offer",
+                "hr": "Što nudimo"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {
+                        "per_row": "3"
+                    },
+                    "content": {
+                        "heading": {
+                            "en": "What we print",
+                            "hr": "Što tiskamo"
+                        },
+                        "intro": {
+                            "en": "From fifty copies to five thousand.",
+                            "hr": "Od pedeset do pet tisuća primjeraka."
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "Zines",
+                                    "hr": "Zinovi"
+                                },
+                                "body": {
+                                    "en": "<p>Stapled, folded, ready on Friday.</p>",
+                                    "hr": "<p>Klamano, presavijeno, gotovo u petak.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Posters",
+                                    "hr": "Plakati"
+                                },
+                                "body": {
+                                    "en": "<p>A3 and A2, up to four colours.</p>",
+                                    "hr": "<p>A3 i A2, do četiri boje.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Books",
+                                    "hr": "Knjige"
+                                },
+                                "body": {
+                                    "en": "<p>Short runs, sewn or perfect bound.</p>",
+                                    "hr": "<p>Male naklade, šivano ili lijepljeno.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "riso-numbers",
+            "name": {
+                "en": "In numbers",
+                "hr": "U brojkama"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "tinted"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "stats",
+                    "layout": "three",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "This year",
+                            "hr": "Ove godine"
+                        },
+                        "items": [
+                            {
+                                "value": {
+                                    "en": "212"
+                                },
+                                "label": {
+                                    "en": "jobs",
+                                    "hr": "poslova"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "9"
+                                },
+                                "label": {
+                                    "en": "ink colours",
+                                    "hr": "boja tinte"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "1"
+                                },
+                                "label": {
+                                    "en": "old machine",
+                                    "hr": "stari stroj"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "riso-voice",
+            "name": {
+                "en": "A client's words",
+                "hr": "Riječi klijenta"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "quote",
+                    "layout": "card",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "The pink is never the same twice, and that is the point.",
+                            "hr": "Ružičasta nikad nije ista dvaput, i u tome je stvar."
+                        },
+                        "attribution": {
+                            "en": "Nina P.",
+                            "hr": "Nina P."
+                        },
+                        "role": {
+                            "en": "Illustrator",
+                            "hr": "Ilustratorica"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "riso-call",
+            "name": {
+                "en": "Call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "beside",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Bring a file, leave with a stack",
+                            "hr": "Donesite datoteku, odnesite hrpu"
+                        },
+                        "body": {
+                            "en": "Open studio every Thursday.",
+                            "hr": "Otvoreni studio svakog četvrtka."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Order a print",
+                                "hr": "Naručite tisak"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

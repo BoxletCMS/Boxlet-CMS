@@ -10,7 +10,7 @@
  * WHILE A PAGE IS DRAGGED its subpages are folded away, because they go with it; the row
  * shows the level it will land at, and the page it will go under.
  *
- * SortableJS rather than native drag and drop, for the same reason canvas.js uses it: it
+ * SortableJS rather than native drag and drop, for the same reason the builder's tree uses it: it
  * handles touch, and a tablet is a real case for this screen. forceFallback, so the pointer
  * is reported the same way on every browser, which the level is read from.
  */

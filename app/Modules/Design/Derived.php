@@ -3,237 +3,160 @@
 namespace App\Modules\Design;
 
 /**
- * What the decisions PRODUCE: every custom property TokenCompiler writes (SPEC §5.4).
+ * What the decisions PRODUCE: every custom property TokenCompiler writes (SPEC §5.4;
+ * PLAN.md D-164).
  *
- * Its own file because it is its own question. Tokens answers "is this a decision Boxlet
- * accepts, and what does it mean to a person"; this answers "what CSS does it come to". The
- * two grew into one file of 355 lines, which is where a file stops being read and starts
- * being searched (CLAUDE.md), and they were never the same concern.
+ * NOTHING HERE VALIDATES. It is handed a design with every key answered (Tokens::resolve()),
+ * which is what lets these methods read as arithmetic. Every number reaches CSS through
+ * CssNumber, so the same design compiles to the same bytes on every PHP (O-40).
  *
- * NOTHING HERE VALIDATES. Everything it is handed has already been through
- * Tokens::validate(), which is what lets these methods read as arithmetic rather than as a
- * second opinion about what a decision may be.
+ * The page's own frame and the chrome's numbers are DerivedPage's; this file is the type,
+ * the space, the shapes and the buttons.
  */
 final class Derived
 {
     /** Type steps as powers of the scale ratio, from small print to the largest heading. */
     public const TYPE_STEPS = ['sm' => -1, 'base' => 0, 'lg' => 1, 'xl' => 2, '2xl' => 3, '3xl' => 4, '4xl' => 5];
     public const SPACE_STEPS = ['xs' => 0.25, 's' => 0.5, 'm' => 1, 'l' => 2, 'xl' => 4, '2xl' => 6, '3xl' => 8];
-    public const RADII = [
-        'none' => ['s' => '0', 'm' => '0', 'l' => '0', 'button' => '0'],
-        'subtle' => ['s' => '0.125rem', 'm' => '0.25rem', 'l' => '0.5rem', 'button' => '0.25rem'],
-        'round' => ['s' => '0.375rem', 'm' => '0.75rem', 'l' => '1.25rem', 'button' => '0.75rem'],
-        'pill' => ['s' => '0.5rem', 'm' => '1rem', 'l' => '2rem', 'button' => '999rem'],
-    ];
+
+    /** Small and large corners as fixed shares of the decision's own (README 1.2). */
+    private const RADIUS_SHARES = ['s' => 0.5, 'm' => 1.0, 'l' => 1.67];
+
+    /** What a heading shrinks to on a phone: a share of its size, never below 1.25rem. */
+    private const PHONE_SHARE = 0.63;
 
     /**
      * Every custom property the decisions produce, for TokenCompiler: group => name =>
      * value, emitted as --group-name.
      *
-     * @param array<string, string> $decisions validated decisions
+     * @param array<string, string> $resolved every key answered
      * @return array<string, array<string, string>>
+     * @param string $sectionWidth the width the character composes a section in: what a header
+     *        or footer that runs to the content lines up with (owner's review of phase 1)
      */
-    public static function from(array $decisions): array
+    public static function from(array $resolved, string $sectionWidth = 'normal'): array
     {
-        $colors = Palette::colors($decisions['seed'], $decisions['secondary'], $decisions['surface_contrast'], Tokens::byHand($decisions));
-        $pairing = Typography::PAIRINGS[$decisions['typography']];
-        $width = Tokens::width($decisions['container']) ?? 56.0;
-        $hard = $decisions['shadow'] === 'hard';
+        $colors = Palette::forDecisions($resolved);
+        $heading = Fonts::known($resolved['heading_font']);
+        $body = Fonts::known($resolved['body_font']);
+        $face = Fonts::ALL[$heading]['heading'];
+        $unit = (float) $resolved['spacing'];
 
         return [
             'color' => $colors,
-            'font' => ['heading' => Typography::stack($pairing['heading']), 'body' => Typography::stack($pairing['body'])],
-            // The pairing's own treatment, unless the owner has taken one over (D-066).
+            'font' => ['heading' => Fonts::stack($heading), 'body' => Fonts::stack($body)],
+            // The heading family's own treatment, unless the owner has taken one over (D-066,
+            // D-185); a weight its files do not have is the nearest one they do.
             'heading' => [
-                'weight' => $decisions['heading_weight'] !== '' ? $decisions['heading_weight'] : $pairing['heading_weight'],
-                'tracking' => Tokens::TRACKING[$decisions['tracking']] ?? $pairing['tracking'],
-                'transform' => Tokens::CAPS[$decisions['caps']] ?? $pairing['transform'],
+                'weight' => (string) Fonts::weight($heading, (int) ($resolved['heading_weight'] !== '' ? $resolved['heading_weight'] : $face[0])),
+                'tracking' => CssNumber::of((float) ($resolved['tracking'] !== '' ? $resolved['tracking'] : $face[1])) . 'em',
+                'transform' => Tokens::CAPS[$resolved['caps']] ?? ($face[3] ? 'uppercase' : 'none'),
             ],
-            'body' => ['weight' => $pairing['body_weight']],
-            'leading' => ['body' => $pairing['leading_body'], 'heading' => $pairing['leading_heading']],
-            'text' => self::typeScale($decisions),
-            'space' => self::spaceScale(Tokens::SPACING[$decisions['spacing']]),
-            'radius' => self::RADII[$decisions['radius']],
-            'shadow' => self::shadows($decisions['shadow'], $colors['text']),
-            // Hard shadows come with heavy rules and outlined cards; everything else is hairline.
-            'border' => ['width' => $hard ? '3px' : '1px', 'card' => $hard ? '3px' : '0px'],
-            'container' => ['width' => self::rem($width), 'narrow' => self::rem($width * 0.68), 'wide' => self::rem($width * 1.3)],
-            'page' => self::page($decisions, $colors, Tokens::SPACING[$decisions['spacing']]),
-            'chrome' => self::chrome($decisions, $colors),
+            'body' => ['weight' => '400'],
+            'leading' => [
+                'body' => $resolved['line_height'] !== '' ? $resolved['line_height'] : Fonts::ALL[$body]['leading'],
+                'heading' => $face[2],
+            ],
+            'text' => self::typeScale($resolved),
+            'space' => self::spaceScale($unit) + [
+                // The default padding of a section, top and bottom (README 1.6: 80px).
+                'section' => CssNumber::rem((float) $resolved['section_gap']),
+                // Between the columns of a section, and between blocks in one column.
+                'columns' => self::rem($unit * 2.5),
+                'blocks' => self::rem($unit * 1.5),
+            ],
+            'radius' => self::radii((float) $resolved['radius'], (float) $resolved['button_radius']),
+            'shadow' => self::shadows($resolved['shadow'], (float) $resolved['shadow_strength'], self::shadowInk($colors)),
+            // The width of every rule and outline; a card is outlined only with hard shadows.
+            'border' => [
+                'width' => CssNumber::of((float) $resolved['border_width']) . 'px',
+                'card' => $resolved['shadow'] === 'hard' ? CssNumber::of(max(2.0, (float) $resolved['border_width'])) . 'px' : '0px',
+            ],
+            // A link in the text's own colour is told apart by its line (D-185): a dark page's
+            // link from a seed with almost no hue is the text's ink, and a standalone link
+            // (.text-link), bold and unlined elsewhere, is underlined then.
+            'link' => ['line' => $colors['link'] === $colors['text'] ? 'underline' : 'none'],
+            'button' => [
+                'height' => CssNumber::rem((float) $resolved['button_height']),
+                'transform' => $resolved['button_caps'] === 'yes' ? 'uppercase' : 'none',
+                // The style as two numbers, because a token at the root cannot name the
+                // section's colours (a var() in one resolves where it is declared): how much
+                // of the button colour fills it, and whether its words take the colour on it
+                // (1) or the button colour itself (0). Filled, outline, soft (D-164).
+                'fill' => ['filled' => '1', 'outline' => '0', 'soft' => '0.14'][$resolved['button_style']] ?? '1',
+                'filled' => $resolved['button_style'] === 'outline' || $resolved['button_style'] === 'soft' ? '0' : '1',
+            ],
+            'container' => [
+                'width' => self::rem((float) $resolved['container']),
+                // README 1.6 at 60rem: narrow 640px, wide 1120px.
+                'narrow' => self::rem((float) $resolved['container'] * 2 / 3),
+                'wide' => self::rem((float) $resolved['container'] * 7 / 6),
+            ],
+            // The least veil that keeps words over a picture at 4.5:1 (O-33, D-183): a band
+            // with a picture and a cover hero's every strength never go under it.
+            'veil' => ['least' => CssNumber::of(PaletteInks::veil($colors))],
+            'page' => DerivedPage::page($resolved, $colors, $sectionWidth),
+            'chrome' => DerivedPage::chrome($resolved, $colors),
         ];
     }
 
     /**
-     * The header's and the footer's own colours, and the ink derived for them (D-076).
+     * ONE PLACE WHERE A SIZE IS WORKED OUT (D-066), in rem: text size × scale^step, plus the
+     * step's nudge in pixels, never below half a rem.
      *
-     * EMITTED ONLY WHEN THE OWNER SET ONE, which is what makes this need no rule of its own
-     * and no class on the element. chrome.css reads every one of these through
-     * `var(--chrome-header-bg, <what the surface class gave>)`, so a token that is not here
-     * is not a colour that is wrong — it is the palette's shade, standing exactly as before.
-     *
-     * The three inks are the same three the contrast surface has always had, from the same
-     * function (Palette::inksOn): a surface that carries text needs an ink that can be read
-     * on it, a muted one beside it and a raised one for whatever sits on top.
-     *
-     * @param array<string, string> $decisions
-     * @param array<string, string> $colors
-     * @return array<string, string>
+     * @param array<string, string> $resolved
      */
-    private static function chrome(array $decisions, array $colors): array
+    public static function sizeOf(array $resolved, string $step): float
     {
-        $tokens = [];
-        foreach (Tokens::ownChrome($decisions) as $part => $surface) {
-            $inks = Palette::inksOn($surface, $colors);
-            $tokens[$part . '-bg'] = $surface;
-            $tokens[$part . '-text'] = $inks['text'];
-            $tokens[$part . '-muted'] = $inks['muted'];
-            $tokens[$part . '-raised'] = $inks['raised'];
-        }
-
-        return $tokens;
-    }
-
-    /**
-     * The page as a sheet (D-031): what sits around it, how far it is inset, and how wide
-     * the header runs.
-     *
-     * THE FRAME IS ZERO WHEN THE PAGE IS NOT BOXED, which is what makes the background
-     * decision harmless rather than conditional: there is no area around the sheet, so the
-     * colour has nothing to paint and no text can land on it. One value decides it, in one
-     * place, instead of every rule asking whether boxing is on.
-     *
-     * @param array<string, string> $decisions
-     * @param array<string, string> $colors
-     * @return array<string, string>
-     */
-    private static function page(array $decisions, array $colors, float $spacingUnit): array
-    {
-        $boxed = $decisions['boxed'] === 'yes';
-
-        return [
-            // A shade of the palette, or the owner's own colour where they gave one (D-076).
-            // Nothing else changes: this is the one value the whole boxed-page decision
-            // runs through, so a free colour here needs no second rule anywhere.
-            'bg' => $decisions['page_background_colour'] !== ''
-                ? $decisions['page_background_colour']
-                : ($colors[$decisions['page_background']] ?? $colors['surface']),
-            'frame' => $boxed ? self::rem($spacingUnit * (Tokens::FRAME[$decisions['frame']] ?? 3.0)) : '0',
-            // The room above and below the sheet, apart from the sides (D-116): zero glues a
-            // header or footer that breaks out of the sheet to it.
-            'frame-block' => $boxed ? self::rem($spacingUnit * (float) $decisions['sheet_gap']) : '0',
-            // The sheet's own width, centred in the window; `none` when it is not boxed, so
-            // the sheet fills the window as it always did (D-116).
-            'sheet-width' => $boxed ? self::rem((float) $decisions['sheet_width']) : 'none',
-            // The sheet's own corners and lift, and both are ZERO WHEN IT IS NOT BOXED for
-            // the same reason the frame is: an unboxed sheet fills the window, and a
-            // rounded corner or a shadow on something with no edge visible is a rule that
-            // does nothing but has to be read by everyone after (D-067).
-            'sheet-radius' => $boxed ? match ($decisions['sheet_radius']) {
-                'round' => self::RADII['round']['l'],
-                'soft' => self::RADII['subtle']['l'],
-                default => '0',
-            } : '0',
-            'sheet-shadow' => $boxed ? match ($decisions['sheet_shadow']) {
-                'shadow' => self::shadows('soft', $colors['text'])['l'],
-                'hairline' => '0 0 0 1px ' . $colors['border'],
-                default => 'none',
-            } : 'none',
-            // The sheet keeps the page background; only what surrounds it changes.
-            'sheet' => $colors['background'],
-            // "Full width" on a boxed page is the sheet's width (D-116, the owner's detail):
-            // a header as wide as the window over a box narrower than it lined up with
-            // nothing. Less the container's own side padding, because the container is
-            // content-box and its padding would otherwise stand OUTSIDE the sheet's edge —
-            // measured: 1464px of header over a 1408px sheet. Unboxed, the sheet is the
-            // window and full is 100%, which an auto width already keeps inside it.
-            'header-width' => self::chromeWidth($decisions['header_width'], $decisions, $boxed),
-            // And the footer's contents, by the same two answers (D-116).
-            'footer-width' => self::chromeWidth($decisions['footer_width'], $decisions, $boxed),
-        ];
-    }
-
-    /**
-     * How wide the header's or the footer's contents run (D-031, D-116): the page's content
-     * column, or "full" — the sheet's width on a boxed page, less the container's own side
-     * padding, because the container is content-box and its padding would otherwise stand
-     * outside the sheet's edge (measured: 1464px of header over a 1408px sheet); 100% when
-     * the page is not boxed, which an auto width already keeps inside the window.
-     *
-     * @param array<string, string> $decisions
-     */
-    private static function chromeWidth(string $choice, array $decisions, bool $boxed): string
-    {
-        // `window` (D-123): as wide as the bar it stands in — the window when the bar runs
-        // across it, the sheet when the bar is inside it.
-        if ($choice === 'window') {
-            return '100%';
-        }
-        if ($choice !== 'full') {
-            return self::rem(Tokens::width($decisions['container']) ?? 56.0);
-        }
-
-        return $boxed ? 'calc(' . self::rem((float) $decisions['sheet_width']) . ' - 2 * var(--space-l))' : '100%';
-    }
-
-    /**
-     * The nudges in rem, keyed by the step each one moves (D-066). Pixels on the screen,
-     * because that is what a person is nudging; rem here, because that is what the scale is
-     * in and 16 is the root the whole model assumes.
-     *
-     * @param array<string, string> $decisions
-     * @return array<string, float>
-     */
-    private static function nudges(array $decisions): array
-    {
-        $nudges = [];
+        $ratio = (float) $resolved['scale'];
+        $base = (float) $resolved['text_size'] / 16;
+        $nudge = 0.0;
         foreach (Tokens::NUDGES as $key => $bounds) {
-            $nudges[$bounds['step']] = (float) ($decisions[$key] ?? 0) / 16;
+            if ($bounds['step'] === $step) {
+                $nudge = (float) ($resolved[$key] ?? 0) / 16;
+            }
         }
 
-        return $nudges;
+        $size = max(0.5, $base * $ratio ** self::TYPE_STEPS[$step] + $nudge);
+
+        // NOTHING ON THE PAGE IS SMALLER THAN SMALL TEXT (D-187, the owner): the step under the
+        // body is never under 0.875 of it. Bold's scale of 1.5 drew a caption, a number's
+        // label and the footer at 10.7px; Brutalist's at 11.3. Here, so the page, the
+        // specimen and the nudge's readout say one size.
+        return $step === 'sm' ? max($size, $base * 0.875) : $size;
     }
 
-    /**
-     * ONE PLACE WHERE A SIZE IS WORKED OUT (D-066), in rem.
-     *
-     * The compiler needs it as CSS and the screen needs it as a number a person reads, and
-     * for a while they each did the arithmetic. The screen's copy was written first and did
-     * not know about the nudges, so every readout in the Type tab was wrong the moment one
-     * was used — caught by a test within a minute of the nudges existing. Two copies of a
-     * formula are two answers waiting to differ.
-     *
-     * @param array<string, string> $decisions validated decisions
-     */
-    public static function sizeOf(array $decisions, string $step): float
+    /** What a heading of $size rem comes to on a phone. */
+    public static function phoneSize(float $size): float
     {
-        $ratio = (float) $decisions['scale'];
-        $base = Tokens::TEXT_SIZE[$decisions['text_size']] ?? 1.0;
-        $nudges = self::nudges($decisions);
-
-        // The nudge lands AFTER the ratio, so the scale stays the relationship it is and the
-        // nudge stays the exception it is. Never below half a rem: a size of zero is not a
-        // smaller heading, it is a missing one.
-        return max(0.5, $base * $ratio ** self::TYPE_STEPS[$step] + ($nudges[$step] ?? 0.0));
+        return max(1.25, $size * self::PHONE_SHARE);
     }
 
     /**
-     * @param array<string, string> $decisions
+     * @param array<string, string> $resolved
      * @return array<string, string>
      */
-    private static function typeScale(array $decisions): array
+    private static function typeScale(array $resolved): array
     {
         $sizes = [];
+        // Small text, a share of the body size rather than a step of the scale: 14px under
+        // the default set (README 1.6), still readable on a wide scale where `sm` is not.
+        $small = self::sizeOf($resolved, 'base') * 0.875;
         foreach (self::TYPE_STEPS as $name => $step) {
-            $size = self::sizeOf($decisions, $name);
+            $size = self::sizeOf($resolved, $name);
             if ($step < 3) {
                 $sizes[$name] = self::rem($size);
                 continue;
             }
-            // Headings shrink on narrow screens: 72% at a 30rem viewport, full size from 75rem.
-            $min = max(1.25, $size * 0.72);
-            $slope = ($size - $min) / 0.45;
-            $sizes[$name] = sprintf('clamp(%s, %s + %svw, %s)', self::rem($min), self::rem($min - 0.3 * $slope), self::number($slope), self::rem($size));
+            // Headings shrink on narrow screens: the phone size at a 22rem viewport, full
+            // size from 75rem.
+            $min = self::phoneSize($size);
+            $slope = ($size - $min) / 0.53;
+            $sizes[$name] = sprintf('clamp(%s, %s + %svw, %s)', self::rem($min), self::rem($min - 0.22 * $slope), CssNumber::of($slope), self::rem($size));
         }
+        // The lead paragraph under a heading (README 1.6: 18px at a 16px body).
+        $sizes['lead'] = self::rem(self::sizeOf($resolved, 'base') * 1.125);
+        $sizes['small'] = self::rem($small);
 
         return $sizes;
     }
@@ -247,31 +170,76 @@ final class Derived
     }
 
     /**
+     * The corners: s, m and l as shares of the decision, and the buttons' own — 28 is a pill.
+     *
      * @return array<string, string>
      */
-    private static function shadows(string $character, string $ink): array
+    private static function radii(float $radius, float $button): array
+    {
+        $radii = [];
+        foreach (self::RADIUS_SHARES as $name => $share) {
+            $radii[$name] = CssNumber::rem($radius * $share);
+        }
+        $radii['button'] = $button >= 28 ? '999px' : CssNumber::rem($button);
+
+        return $radii;
+    }
+
+    /**
+     * The three shadow sizes for a style, and a band's edge, at a strength of 0–100 (40 is what
+     * soft always was).
+     *
+     * @return array<string, string>
+     */
+    public static function shadows(string $style, float $strength, string $ink): array
     {
         $rgb = Color::channels($ink);
+        $alpha = static fn (float $at40): string => CssNumber::of($at40 * $strength / 40, 3);
+        $offset = static fn (float $at50): string => CssNumber::of(max(0.0, $at50 * $strength / 50)) . 'px';
 
-        return match ($character) {
-            'soft' => ['s' => "0 1px 3px rgb({$rgb} / 0.08)", 'm' => "0 6px 18px rgb({$rgb} / 0.1)", 'l' => "0 18px 48px rgb({$rgb} / 0.14)"],
-            'hard' => ['s' => "3px 3px 0 {$ink}", 'm' => "6px 6px 0 {$ink}", 'l' => "10px 10px 0 {$ink}"],
+        $sizes = match ($style) {
+            'soft' => [
+                's' => "0 1px 3px rgb({$rgb} / {$alpha(0.08)})",
+                'm' => "0 6px 18px rgb({$rgb} / {$alpha(0.1)})",
+                'l' => "0 18px 48px rgb({$rgb} / {$alpha(0.14)})",
+            ],
+            'hard' => ['s' => "{$offset(3)} {$offset(3)} 0 {$ink}", 'm' => "{$offset(6)} {$offset(6)} 0 {$ink}", 'l' => "{$offset(10)} {$offset(10)} 0 {$ink}"],
             'layered' => [
-                's' => "0 1px 1px rgb({$rgb} / 0.06), 0 2px 4px rgb({$rgb} / 0.06)",
-                'm' => "0 1px 2px rgb({$rgb} / 0.06), 0 4px 8px rgb({$rgb} / 0.06), 0 12px 24px rgb({$rgb} / 0.08)",
-                'l' => "0 2px 4px rgb({$rgb} / 0.05), 0 8px 16px rgb({$rgb} / 0.07), 0 24px 48px rgb({$rgb} / 0.12)",
+                's' => "0 1px 1px rgb({$rgb} / {$alpha(0.06)}), 0 2px 4px rgb({$rgb} / {$alpha(0.06)})",
+                'm' => "0 1px 2px rgb({$rgb} / {$alpha(0.06)}), 0 4px 8px rgb({$rgb} / {$alpha(0.06)}), 0 12px 24px rgb({$rgb} / {$alpha(0.08)})",
+                'l' => "0 2px 4px rgb({$rgb} / {$alpha(0.05)}), 0 8px 16px rgb({$rgb} / {$alpha(0.07)}), 0 24px 48px rgb({$rgb} / {$alpha(0.12)})",
             ],
             default => ['s' => 'none', 'm' => 'none', 'l' => 'none'],
         };
+        // THE EDGE OF A BAND (D-170): a header's shadow, thrown straight down. A hard shadow
+        // thrown down and to the right left a notch of the page at the left end of a header
+        // that runs from edge to edge (measured under Brutalist: 6px). The others have no
+        // sideways offset, so theirs is the middle size as it is.
+        $sizes['edge'] = $style === 'hard' ? "0 {$offset(6)} 0 {$ink}" : $sizes['m'];
+
+        return $sizes;
     }
 
-    private static function rem(float $value): string
+    /**
+     * WHAT A SHADOW IS DRAWN IN: the text's ink on a light page, and on a dark one a tone darker
+     * than the page (D-185, the owner). The text's ink there is light, and a hard shadow of it
+     * drew a light line under Brutalist's header and light edges to its cards: a shadow is
+     * never lighter than what it lies on.
+     *
+     * @param array<string, string> $colors
+     */
+    public static function shadowInk(array $colors): string
     {
-        return self::number($value) . 'rem';
+        [$lightness, $chroma, $hue] = Color::toOklch($colors['background']);
+        if ($lightness >= 0.5) {
+            return $colors['text'];
+        }
+
+        return Color::fromOklch($lightness * 0.45, min($chroma, 0.02), $hue);
     }
 
-    private static function number(float $value): string
+    public static function rem(float $value): string
     {
-        return rtrim(rtrim(number_format($value, 3, '.', ''), '0'), '.');
+        return CssNumber::of($value) . 'rem';
     }
 }

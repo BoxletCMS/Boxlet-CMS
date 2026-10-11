@@ -13,7 +13,9 @@ use DateTimeZone;
 use RuntimeException;
 
 /**
- * install.php: requirements + token → database → admin → site → install → done.
+ * install.php: requirements + token → database → admin → site → install → done. With the
+ * demo, the install comes in two halves with the demo's pictures between them, a few to a
+ * request (D-214).
  *
  * Progress lives in the session and nothing is written until the last step. Every
  * step after the first needs the token from storage/install-token.txt, which proves
@@ -36,6 +38,9 @@ final class InstallController
         private readonly Closure $rewriteWorks,
         private readonly Closure $privateHidden,
         private readonly ?string $cacheDirectory = null,
+        // What stores a demo picture, for the tests: making fifty pictures' sizes is the
+        // media tests' business (InstallDemo::storer() otherwise).
+        private readonly ?Closure $demoStore = null,
     ) {
     }
 
@@ -46,7 +51,7 @@ final class InstallController
         }
 
         $state = $this->state();
-        $step = $this->tokenAccepted($state) ? (string) ($state['step'] ?? 'database') : 'requirements';
+        $step = InstallToken::accepted($this->storage, $state) ? (string) ($state['step'] ?? 'database') : 'requirements';
 
         if ($request->method !== 'POST') {
             return $this->show($step);
@@ -65,6 +70,7 @@ final class InstallController
                 'requirements' => $this->submitToken($request),
                 'database' => $this->submitDatabase($request),
                 'admin' => $this->submitAdmin($request),
+                'demo' => $this->submitDemo($state),
                 default => $this->submitSite($request, $state),
             };
         } catch (RuntimeException $e) {
@@ -77,11 +83,11 @@ final class InstallController
         if (Requirements::blocked($this->checks())) {
             throw new RuntimeException(t('install.req.blocked'));
         }
-        if (!hash_equals($this->token(), trim($request->input('token')))) {
+        if (!hash_equals(InstallToken::get($this->storage), trim($request->input('token')))) {
             throw new RuntimeException(t('install.token.wrong'));
         }
         $this->session->regenerate();
-        $this->save(['token' => hash('sha256', $this->token()), 'step' => 'database']);
+        $this->save(['token' => hash('sha256', InstallToken::get($this->storage)), 'step' => 'database']);
 
         return Response::redirect(Url::asset('install.php'));
     }
@@ -148,7 +154,7 @@ final class InstallController
         if ($site['name'] === '' || mb_strlen($site['name']) > 100) {
             throw new RuntimeException(t('install.site.bad_name'));
         }
-        if (!isset(self::languages()[$site['locale']])) {
+        if (!isset(Installer::languages()[$site['locale']])) {
             throw new RuntimeException(t('install.site.bad_locale'));
         }
         if (!in_array($site['timezone'], DateTimeZone::listIdentifiers(), true)) {
@@ -162,14 +168,60 @@ final class InstallController
         }
 
         $db = DatabaseSetup::fromEnv($this->root, $state['db']);
-        $cache = $this->cacheDirectory ?? $this->root . '/public/cache';
-        $installer = new Installer($this->root, $this->storage, $this->envPath, $cache);
-        $installer->run($db, $state['db'], $state['admin'], $site, $request->input('demo') === '1');
+        $this->installer()->start($db, $state['admin'], $site);
+        // The demo's pictures come next, a few to a request; then the install is finished.
+        if ($request->input('demo') === '1') {
+            $this->save(['site' => $site, 'step' => 'demo', 'demo' => InstallDemo::START]);
 
+            return Response::redirect(Url::asset('install.php'));
+        }
+        $this->installer()->finish($db, $state['db'], $site, false);
+
+        return $this->installed();
+    }
+
+    /**
+     * One request's worth of the demo's pictures (InstallDemo), and when the last is in, the
+     * demo put together and the install finished.
+     *
+     * @param array<mixed> $state
+     */
+    private function submitDemo(array $state): Response
+    {
+        $site = $state['site'] ?? null;
+        if (!is_array($state['db'] ?? null) || !is_array($site) || !is_array($state['demo'] ?? null)) {
+            throw new RuntimeException(t('install.state_lost'));
+        }
+        /** @var array{name: string, locale: string, timezone: string} $site */
+        $progress = InstallDemo::state($state['demo']);
+        $db = DatabaseSetup::resume($this->root, $state['db']);
+        $lang = $site['locale'] === 'hr' ? 'hr' : 'en';
+        $progress = InstallDemo::advance($this->root, $this->storage, dirname($this->script), $db, $lang, $progress, $this->demoStore);
+        if (!InstallDemo::finished($progress, $lang, $this->storage, $this->demoStore)) {
+            $this->save(['demo' => $progress]);
+
+            return Response::redirect(Url::asset('install.php'));
+        }
+        // Without the package its pages come without pictures, and the done page says so.
+        $store = $progress['none'] ? null : InstallDemo::seedStore($progress['done'], \App\Modules\Demo\DemoPictures::importer($db, $this->storage, dirname($this->script)));
+        $this->installer()->finish($db, $state['db'], $site, true, $store, InstallDemo::source($this->storage, $this->demoStore));
+        InstallDemoPackage::clean($this->storage);
+
+        return $this->installed($progress['none']);
+    }
+
+    private function installer(): Installer
+    {
+        return new Installer($this->root, $this->storage, $this->envPath, $this->cacheDirectory ?? $this->root . '/public/cache', dirname($this->script));
+    }
+
+    /** The install is done: the session's progress forgotten, install.php deleted where it can be. */
+    private function installed(bool $withoutPictures = false): Response
+    {
         $this->session->remove('install');
         $this->session->regenerate();
 
-        return $this->page('done', ['deleted' => Installer::deleteScript($this->script)]);
+        return $this->page('done', ['deleted' => Installer::deleteScript($this->script), 'withoutPictures' => $withoutPictures]);
     }
 
     /**
@@ -183,12 +235,17 @@ final class InstallController
             $data['blocked'] = Requirements::blocked($data['checks']);
             $data['tokenPath'] = $this->storage . '/install-token.txt';
             if (!$data['blocked']) {
-                $this->token();
+                InstallToken::get($this->storage);
             }
         }
         if ($step === 'site') {
-            $data['languages'] = self::languages();
+            $data['languages'] = Installer::languages();
             $data['timezones'] = DateTimeZone::listIdentifiers();
+        }
+        if ($step === 'demo') {
+            $state = $this->state();
+            $lang = ($state['site']['locale'] ?? '') === 'hr' ? 'hr' : 'en';
+            $data += InstallDemo::progress(InstallDemo::state($state['demo'] ?? null), $lang, $this->storage, $this->demoStore);
         }
 
         return $this->page($step, $data, $status);
@@ -221,32 +278,6 @@ final class InstallController
     }
 
     /**
-     * The token in storage/install-token.txt, created on the first visit.
-     */
-    private function token(): string
-    {
-        $file = $this->storage . '/install-token.txt';
-        if (!is_file($file)) {
-            file_put_contents($file, bin2hex(random_bytes(16)) . "\n");
-            chmod($file, 0600);
-        }
-
-        return trim((string) file_get_contents($file));
-    }
-
-    /**
-     * @param array<mixed> $state
-     */
-    private function tokenAccepted(array $state): bool
-    {
-        $file = $this->storage . '/install-token.txt';
-
-        return is_string($state['token'] ?? null)
-            && is_file($file)
-            && hash_equals(hash('sha256', trim((string) file_get_contents($file))), $state['token']);
-    }
-
-    /**
      * @return array<mixed>
      */
     private function state(): array
@@ -262,13 +293,5 @@ final class InstallController
     private function save(array $changes): void
     {
         $this->session->set('install', $changes + $this->state());
-    }
-
-    /**
-     * @return array<string, string> ISO 639-1 code => native name
-     */
-    private static function languages(): array
-    {
-        return require dirname(__DIR__) . '/I18n/languages.php';
     }
 }

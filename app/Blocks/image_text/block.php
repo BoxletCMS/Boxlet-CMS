@@ -15,6 +15,10 @@ return [
         'image_fit' => ['type' => 'select', 'options' => ['cover', 'contain']],
         'link' => ['type' => 'link', 'translatable' => true, 'sample' => 'preview.image_text.link'],
     ],
-    'layouts' => ['image-left', 'image-right'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'image-left' => ['image' => [[4, 4, 18, 16]], 'line' => [[26, 7, 16, 2], [26, 11, 18, 1], [26, 14, 14, 1]]],
+        'image-right' => ['image' => [[26, 4, 18, 16]], 'line' => [[4, 7, 16, 2], [4, 11, 18, 1], [4, 14, 14, 1]]],
+    ],
     'defaults' => ['layout' => 'image-left'],
 ];

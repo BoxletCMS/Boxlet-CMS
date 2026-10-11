@@ -1,0 +1,249 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "editorial",
+    "name": {
+        "en": "Editorial"
+    },
+    "description": {
+        "en": "Serif type on a wide scale, a narrow reading column, generous air, quiet surfaces."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#8a1c2b",
+        "secondary": "#1f1a17",
+        "heading_font": "playfair-display",
+        "body_font": "source-serif-4",
+        "text_size": "17",
+        "scale": "1.335",
+        "spacing": "1.25",
+        "section_gap": "112",
+        "container": "42",
+        "button_radius": "4"
+    },
+    "look": {
+        "header_arrangement": "masthead",
+        "header_behaviour": "static",
+        "header_opacity": "100",
+        "header_blur": "0",
+        "header_surface": "plain",
+        "header_edge": "line",
+        "header_height": "92",
+        "logo_size": "44",
+        "brand": "logo",
+        "nav_style": "caps",
+        "nav_ink": "ink",
+        "header_button": "outline",
+        "footer_layout": "simple",
+        "footer_columns": "2",
+        "footer_links": "auto",
+        "small_print_row": "left",
+        "footer_surface": "tinted",
+        "footer_edge": "line"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "normal",
+            "align": "left",
+            "divider": "none",
+            "animation": "none"
+        },
+        "surfaces": {
+            "image_text": "tinted"
+        },
+        "dividers": {},
+        "layouts": {
+            "hero": "left",
+            "image_text": "image-left",
+            "text": "single"
+        },
+        "options": {}
+    },
+    "patterns": [
+        {
+            "id": "hero-button",
+            "name": {
+                "en": "Hero with a button",
+                "hr": "Hero s gumbom"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "tinted",
+                    "pad_top": "112",
+                    "pad_bottom": "112"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "center",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "A new heading",
+                            "hr": "Novi naslov"
+                        },
+                        "subheading": {
+                            "en": "A short line that explains the offer.",
+                            "hr": "Kratak tekst koji objašnjava ponudu."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "Find out more",
+                                "hr": "Saznaj više"
+                            },
+                            "url": "/"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "three-cards",
+            "name": {
+                "en": "Three cards",
+                "hr": "Tri kartice"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Cards",
+                            "hr": "Naslov kartica"
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "First",
+                                    "hr": "Prva"
+                                },
+                                "body": {
+                                    "en": "<p>A short description.</p>",
+                                    "hr": "<p>Kratki opis.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Second",
+                                    "hr": "Druga"
+                                },
+                                "body": {
+                                    "en": "<p>A short description.</p>",
+                                    "hr": "<p>Kratki opis.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Third",
+                                    "hr": "Treća"
+                                },
+                                "body": {
+                                    "en": "<p>A short description.</p>",
+                                    "hr": "<p>Kratki opis.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "text-quote",
+            "name": {
+                "en": "Text and a quotation",
+                "hr": "Tekst + citat"
+            },
+            "section": {
+                "layout": "wide-left",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "text",
+                    "layout": "single",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Heading",
+                            "hr": "Naslov"
+                        },
+                        "body": {
+                            "en": "<p>The paragraph goes here. Click and type.</p>",
+                            "hr": "<p>Ovdje ide tekst odlomka. Klikni i piši.</p>"
+                        }
+                    }
+                },
+                {
+                    "type": "quote",
+                    "layout": "plain",
+                    "column": 1,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "“The best decision we made.”",
+                            "hr": "„Najbolja odluka koju smo donijeli.”"
+                        },
+                        "attribution": {
+                            "en": "Name Surname, company",
+                            "hr": "Ime Prezime, tvrtka"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "call-to-action",
+            "name": {
+                "en": "A call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "banner",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Ready to start?",
+                            "hr": "Spremni za početak?"
+                        },
+                        "body": {
+                            "en": "Get in touch and we’ll agree the first step.",
+                            "hr": "Javite se i dogovorimo prvi korak."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Contact",
+                                "hr": "Kontakt"
+                            },
+                            "url": "/"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

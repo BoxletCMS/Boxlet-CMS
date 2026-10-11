@@ -114,14 +114,20 @@ function field_hint(string $key, string $id = ''): string
  * @param array<array-key, string> $labels value => what it is called
  * @param string $labelledBy the id of the element naming this group, for aria-labelledby
  * @param string $idPrefix each radio's id is this plus its value, so a <label for> can find it
+ * @param string $form the form the radios belong to, when it is not the one they stand in:
+ *        the Appearance screen's Quick start repeats a few questions for a script to mirror,
+ *        and two groups of one name in one form are one group (D-157)
+ * @param string $emptyId what the radio for '' is called in its id: `none` where '' means
+ *        none, `auto` where it means the character's answer and `none` is a value of its own
+ *        (a section's edge, D-165)
  */
-function segmented_group(string $name, array $labels, string $current, string $labelledBy, string $idPrefix): string
+function segmented_group(string $name, array $labels, string $current, string $labelledBy, string $idPrefix, string $form = '', string $emptyId = 'none'): string
 {
     $html = '<div class="segmented-choice" role="radiogroup" aria-labelledby="' . e($labelledBy) . '">';
     foreach ($labels as $value => $label) {
         $value = (string) $value;
-        $html .= '<label class="segment"><input type="radio" id="' . e($idPrefix . ($value === '' ? 'none' : $value)) . '"'
-            . ' name="' . e($name) . '" value="' . e($value) . '"' . ($value === $current ? ' checked' : '') . '>'
+        $html .= '<label class="segment"><input type="radio" id="' . e($idPrefix . ($value === '' ? $emptyId : $value)) . '"'
+            . ' name="' . e($name) . '" value="' . e($value) . '"' . ($form !== '' ? ' form="' . e($form) . '"' : '') . ($value === $current ? ' checked' : '') . '>'
             . '<span>' . e($label) . '</span></label>';
     }
 
@@ -150,23 +156,74 @@ function short_label(string $prefix, string $value): string
  * English: a language added from the admin that Boxlet has no words for falls back the way
  * a translation's missing alt text does (D-043), and English is the last resort because it
  * is the one set that is always complete.
+ *
+ * $file names the set: `site` for the site's own words, `samples` for the copy a new block
+ * starts with (D-176), which becomes the owner's words once it is on a page.
  */
-function site_t(string $key, string $locale): string
+function site_t(string $key, string $locale, string $file = 'site'): string
 {
     static $loaded = [];
     foreach ([$locale, \App\Support\Url::primaryLocale(), 'en'] as $code) {
         if (preg_match('~^[a-z]{2,3}$~', $code) !== 1) {
             continue;
         }
-        if (!array_key_exists($code, $loaded)) {
-            $file = dirname(__DIR__, 2) . '/lang/' . $code . '/site.php';
-            $strings = is_file($file) ? require $file : [];
-            $loaded[$code] = is_array($strings) ? $strings : [];
+        $set = $code . '/' . $file;
+        if (!array_key_exists($set, $loaded)) {
+            $path = dirname(__DIR__, 2) . '/lang/' . $set . '.php';
+            $strings = is_file($path) ? require $path : [];
+            $loaded[$set] = is_array($strings) ? $strings : [];
         }
-        if (is_string($loaded[$code][$key] ?? null)) {
-            return $loaded[$code][$key];
+        if (is_string($loaded[$set][$key] ?? null)) {
+            return $loaded[$set][$key];
         }
     }
 
     return $key;
+}
+
+/**
+ * The builder's mark on the element that shows a field (PLAN.md D-178, README 1.4): nothing on
+ * a visitor's page; in the canvas `data-bx-field="heading"`, or for a repeater item's field
+ * `data-bx-field="items.2.heading"`, and the words a placeholder says while it is empty
+ * ("Add subheading"), which canvas-marks.css shows on an empty element only.
+ */
+function edit_attr(string $field, ?int $item = null, ?string $sub = null): string
+{
+    if (!\App\Support\Editing::on()) {
+        return '';
+    }
+    $path = $item === null ? $field : $field . '.' . $item . '.' . (string) $sub;
+    $label = t('block.' . \App\Support\Editing::type() . '.' . $field . ($sub === null ? '' : '.' . $sub));
+
+    return ' data-bx-field="' . e($path) . '" data-bx-placeholder="' . e(t('builder.inline.add', ['field' => mb_strtolower($label)])) . '"';
+}
+
+/**
+ * Whether to draw a field's element: when it has something to show, and in the canvas always,
+ * where an empty one is the place to type it (README 4.4: "+ Add subheading").
+ */
+function edit_show(bool $hasValue): bool
+{
+    return $hasValue || \App\Support\Editing::on();
+}
+
+/** A repeater item's wrapper, named for the canvas's item tools: `data-bx-item="items.2"`. */
+function edit_item(string $field, int $item): string
+{
+    return \App\Support\Editing::on() ? ' data-bx-item="' . e($field . '.' . $item) . '"' : '';
+}
+
+/**
+ * The canvas's "+" at the end of a repeater (README 4.4): a button standing where the next
+ * item would, drawn in the canvas only. $class is the item's own, so it takes an item's place
+ * in the grid.
+ */
+function edit_add(string $field, string $class, string $tag = 'div'): string
+{
+    if (!\App\Support\Editing::on()) {
+        return '';
+    }
+
+    return '<' . $tag . ' class="' . e($class) . ' bx-add-item-cell"><button type="button" class="bx-add-item" data-bx-add-item="' . e($field) . '">'
+        . e(t('builder.inline.add_item', ['item' => t('block.' . \App\Support\Editing::type() . '.' . $field . '.item')])) . '</button></' . $tag . '>';
 }

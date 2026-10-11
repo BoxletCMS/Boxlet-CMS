@@ -95,7 +95,7 @@ final class Search
             [t('admin.nav.dashboard'), Url::admin(), 'dashboard home start'],
             [t('admin.nav.pages'), Url::admin('pages'), ''],
             [t('admin.nav.media'), Url::admin('media'), 'pictures images photos library'],
-            [t('admin.nav.menus'), Url::admin('menus'), 'navigation'],
+            [t('admin.nav.menus'), Url::admin('navigation'), 'menus menu header footer button small print'],
             [t('admin.nav.forms'), Url::admin('forms'), 'contact messages'],
             [t('admin.nav.appearance'), Url::admin('appearance'), 'design character colours colors fonts type header footer chrome'],
             [t('admin.nav.settings'), Url::admin('settings'), ''],
@@ -113,7 +113,7 @@ final class Search
         foreach ([
             [t('pages.new'), Url::admin('pages', 'new'), 'create add page'],
             [t('media.upload'), Url::admin('media'), 'add pictures images documents pdf download'],
-            [t('menus.new'), Url::admin('menus'), 'create add menu'],
+            [t('menus.new'), Url::admin('navigation'), 'create add menu'],
             [t('forms.new'), Url::admin('forms'), 'create add form'],
             [t('admin.view_site'), Url::asset(''), 'open live site'],
         ] as [$label, $href, $words]) {

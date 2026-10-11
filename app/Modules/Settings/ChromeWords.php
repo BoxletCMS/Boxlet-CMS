@@ -29,8 +29,8 @@ final class ChromeWords
         'button_label' => 'header_button_label',
         'button_url' => 'header_button_url',
         'button_page' => 'header_button_page',
-        // The footer's columns (D-115): column 1's words keep the field the footer's text
-        // always had, so a scenario or a test that typed into it still does.
+        // The footer's columns (D-115). Form field names, not stored keys: they move with
+        // the words to Navigation (the rebuild's phase 6).
         'title' => 'footer_title',
         'text' => 'footer_text',
         'col2_title' => 'footer_col2_title',
@@ -141,32 +141,6 @@ final class ChromeWords
     public static function cleanText(string $raw): string
     {
         return RichText::sanitize($raw, RichText::INLINE);
-    }
-
-    /**
-     * The footer's text as HTML, whatever version stored it. Text stored before D-113 is
-     * plain, with line breaks; handed to an HTML editor — or to the block machinery, which
-     * cleans a rich text field as HTML — as it is, its breaks would collapse into one
-     * paragraph. So a plain text becomes one paragraph with its breaks kept, which is exactly
-     * what the page drew for it, and both the editor and the page are handed that.
-     */
-    public static function asHtml(string $stored): string
-    {
-        if ($stored === '' || self::isHtml($stored)) {
-            return $stored;
-        }
-
-        return '<p>' . nl2br(htmlspecialchars($stored, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), false) . '</p>';
-    }
-
-    /**
-     * Whether a stored footer text is HTML (saved since D-113) or plain (saved before). One
-     * rule, read by the template too, so what the page draws and what the editor is handed
-     * can never disagree about the same string.
-     */
-    public static function isHtml(string $stored): bool
-    {
-        return str_contains($stored, '<');
     }
 
     /**

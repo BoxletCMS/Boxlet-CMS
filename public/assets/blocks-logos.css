@@ -1,0 +1,181 @@
+/* Logos (PLAN.md D-105, D-188). Split from blocks-media.css with the even grid (D-188), under
+   blocks.css's rule: only custom properties from tokens.css and the --section-* properties
+   each section sets in sections.css. No literal colours, pixel values, fonts or shadows.
+   Linked after blocks-media.css.
+
+   NEVER CROPPED, which is the whole reason this is not a Gallery: one height, each mark's
+   own width, contained inside its box. A mark with no picture shows its name in the site's
+   own type, which is a legitimate way to run the block and not a fallback. */
+
+.logos-heading {
+  margin: 0 0 var(--space-l);
+}
+
+.logos-row {
+  display: flex;
+  flex-wrap: wrap;
+  /* Rows closer than the marks across (D-125): the spacing scale's largest step between
+     rows left a mark that wrapped standing alone a screen's worth further down. */
+  gap: var(--space-m) var(--space-xl);
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The row stands where the section's words stand (D-188, the owner): from the left edge in a
+   section set left, centred only in one set centred. It was centred always, under a heading
+   at the left. */
+.align-center .logos-row {
+  justify-content: center;
+}
+
+/* AN EVEN GRID, NEVER ONE LEFT ALONE (D-188, the owner): as many across as leave no mark by
+   itself in the last row, by how many there are — five are three and two, six three and
+   three, seven four and three, up to eighteen, six by three. auto-fit made six logos five and
+   one. The "+" a selected block shows is not counted, so selecting it moves nothing. */
+.logos {
+  container-type: inline-size;
+}
+
+.layout-grid .logos-row {
+  --logos-across: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--logos-across), minmax(0, 1fr));
+  gap: var(--space-l);
+}
+
+.layout-grid .logos-row:has(> :nth-child(2 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 2;
+}
+
+.layout-grid .logos-row:has(> :nth-child(3 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 3;
+}
+
+.layout-grid .logos-row:has(> :nth-child(4 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 4;
+}
+
+.layout-grid .logos-row:has(> :nth-child(5 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 3;
+}
+
+.layout-grid .logos-row:has(> :nth-child(7 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 4;
+}
+
+.layout-grid .logos-row:has(> :nth-child(9 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 3;
+}
+
+.layout-grid .logos-row:has(> :nth-child(10 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 5;
+}
+
+.layout-grid .logos-row:has(> :nth-child(11 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 4;
+}
+
+.layout-grid .logos-row:has(> :nth-child(13 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 5;
+}
+
+.layout-grid .logos-row:has(> :nth-child(16 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 4;
+}
+
+.layout-grid .logos-row:has(> :nth-child(17 of .logos-item:not(.bx-add-item-cell))) {
+  --logos-across: 6;
+}
+
+/* Where five or six would fall under 8rem each, four at most; under 34rem, two; under 16rem,
+   one. Here a number that no count across divides — thirteen, an odd one in two columns —
+   leaves one in the last row, and it takes the row's whole width: centred under the rest in
+   a centred section, at the start of the row in one set left. */
+@container (max-width: 52rem) {
+  .layout-grid .logos-row:has(> :nth-child(10 of .logos-item:not(.bx-add-item-cell))) {
+    --logos-across: 4;
+  }
+
+  .layout-grid .logos-row:has(> :nth-child(10 of .logos-item:not(.bx-add-item-cell))) > :nth-child(4n + 1 of .logos-item:not(.bx-add-item-cell)):nth-last-child(1 of .logos-item:not(.bx-add-item-cell)) {
+    grid-column: 1 / -1;
+  }
+}
+
+@container (max-width: 34rem) {
+  .layout-grid .logos-row:has(> :nth-child(3 of .logos-item:not(.bx-add-item-cell))) {
+    --logos-across: 2;
+  }
+
+  .layout-grid .logos-item:nth-child(odd of .logos-item:not(.bx-add-item-cell)):nth-last-child(1 of .logos-item:not(.bx-add-item-cell)) {
+    grid-column: 1 / -1;
+  }
+}
+
+@container (max-width: 16rem) {
+  .layout-grid .logos-row:has(> :nth-child(2 of .logos-item:not(.bx-add-item-cell))) {
+    --logos-across: 1;
+  }
+}
+
+/* ONE HEIGHT FOR EVERY MARK, AND NOT THE SPACING SCALE'S (PLAN.md D-125). It was
+   --space-2xl, so a character with generous air drew its logos 120 pixels tall (Editorial,
+   7.5rem) — a size for space between things, not for a row of marks. A mark carrying only a
+   name is as tall as its words. */
+.logos-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 3.5rem;
+  color: var(--section-muted);
+  text-decoration: none;
+}
+
+/* In a grid each mark stands where the section's words do (D-189, the owner): at the start of
+   its cell in a section set left, so the first column is on the heading's edge; centred in
+   its cell only in a section set centred. */
+.layout-grid .logos-mark {
+  justify-content: flex-start;
+}
+
+.align-center .layout-grid .logos-mark {
+  justify-content: center;
+}
+
+/* THE <picture> STEPS ASIDE (PLAN.md D-117). The img's height is a share of the mark's,
+   and a share needs a parent of known height; the picture element between them is an
+   inline box of no height at all, so the share came to nothing and every logo drew at its
+   natural size — measured, 107 and 160 pixels tall in a mark of 84, spilling over the block
+   above and below it. With the picture laid out as its contents, the img's parent IS the
+   mark. */
+.logos-mark:has(> .logos-name) {
+  block-size: auto;
+}
+
+.logos-mark picture {
+  display: contents;
+}
+
+.logos-mark img {
+  inline-size: auto;
+  max-inline-size: 10rem;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.logos-mark .media-placeholder {
+  inline-size: 8rem;
+  block-size: 100%;
+}
+
+.logos-name {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+}
+
+a.logos-mark:hover,
+a.logos-mark:focus-visible {
+  color: var(--section-link);
+}
+

@@ -1,0 +1,221 @@
+/* A section's own spacing, height, visibility and motion (PLAN.md D-165).
+
+   The owner's padding and height are numbers on a step, and every step has its class here,
+   so a section never needs a style attribute and a number can never be a free length.
+   SectionStyle::classes() writes a class only for a value the owner set; a section without
+   one keeps the design's section gap (--space-section), the character's answer.
+
+   Written out rather than generated: CSS is not built from PHP in this project, and the
+   lists are held to SectionStyle::NUMBERS by sections_test. Linked after sections.css, which
+   sets the defaults these replace at the same specificity. */
+
+/* Room above */
+
+.pad-t-0 { --section-pad-top: 0rem; }
+.pad-t-4 { --section-pad-top: 0.25rem; }
+.pad-t-8 { --section-pad-top: 0.5rem; }
+.pad-t-12 { --section-pad-top: 0.75rem; }
+.pad-t-16 { --section-pad-top: 1rem; }
+.pad-t-20 { --section-pad-top: 1.25rem; }
+.pad-t-24 { --section-pad-top: 1.5rem; }
+.pad-t-28 { --section-pad-top: 1.75rem; }
+.pad-t-32 { --section-pad-top: 2rem; }
+.pad-t-36 { --section-pad-top: 2.25rem; }
+.pad-t-40 { --section-pad-top: 2.5rem; }
+.pad-t-44 { --section-pad-top: 2.75rem; }
+.pad-t-48 { --section-pad-top: 3rem; }
+.pad-t-52 { --section-pad-top: 3.25rem; }
+.pad-t-56 { --section-pad-top: 3.5rem; }
+.pad-t-60 { --section-pad-top: 3.75rem; }
+.pad-t-64 { --section-pad-top: 4rem; }
+.pad-t-68 { --section-pad-top: 4.25rem; }
+.pad-t-72 { --section-pad-top: 4.5rem; }
+.pad-t-76 { --section-pad-top: 4.75rem; }
+.pad-t-80 { --section-pad-top: 5rem; }
+.pad-t-84 { --section-pad-top: 5.25rem; }
+.pad-t-88 { --section-pad-top: 5.5rem; }
+.pad-t-92 { --section-pad-top: 5.75rem; }
+.pad-t-96 { --section-pad-top: 6rem; }
+.pad-t-100 { --section-pad-top: 6.25rem; }
+.pad-t-104 { --section-pad-top: 6.5rem; }
+.pad-t-108 { --section-pad-top: 6.75rem; }
+.pad-t-112 { --section-pad-top: 7rem; }
+.pad-t-116 { --section-pad-top: 7.25rem; }
+.pad-t-120 { --section-pad-top: 7.5rem; }
+.pad-t-124 { --section-pad-top: 7.75rem; }
+.pad-t-128 { --section-pad-top: 8rem; }
+.pad-t-132 { --section-pad-top: 8.25rem; }
+.pad-t-136 { --section-pad-top: 8.5rem; }
+.pad-t-140 { --section-pad-top: 8.75rem; }
+.pad-t-144 { --section-pad-top: 9rem; }
+.pad-t-148 { --section-pad-top: 9.25rem; }
+.pad-t-152 { --section-pad-top: 9.5rem; }
+.pad-t-156 { --section-pad-top: 9.75rem; }
+.pad-t-160 { --section-pad-top: 10rem; }
+.pad-t-164 { --section-pad-top: 10.25rem; }
+.pad-t-168 { --section-pad-top: 10.5rem; }
+.pad-t-172 { --section-pad-top: 10.75rem; }
+.pad-t-176 { --section-pad-top: 11rem; }
+.pad-t-180 { --section-pad-top: 11.25rem; }
+.pad-t-184 { --section-pad-top: 11.5rem; }
+.pad-t-188 { --section-pad-top: 11.75rem; }
+.pad-t-192 { --section-pad-top: 12rem; }
+.pad-t-196 { --section-pad-top: 12.25rem; }
+.pad-t-200 { --section-pad-top: 12.5rem; }
+
+/* Room below */
+
+.pad-b-0 { --section-pad-bottom: 0rem; }
+.pad-b-4 { --section-pad-bottom: 0.25rem; }
+.pad-b-8 { --section-pad-bottom: 0.5rem; }
+.pad-b-12 { --section-pad-bottom: 0.75rem; }
+.pad-b-16 { --section-pad-bottom: 1rem; }
+.pad-b-20 { --section-pad-bottom: 1.25rem; }
+.pad-b-24 { --section-pad-bottom: 1.5rem; }
+.pad-b-28 { --section-pad-bottom: 1.75rem; }
+.pad-b-32 { --section-pad-bottom: 2rem; }
+.pad-b-36 { --section-pad-bottom: 2.25rem; }
+.pad-b-40 { --section-pad-bottom: 2.5rem; }
+.pad-b-44 { --section-pad-bottom: 2.75rem; }
+.pad-b-48 { --section-pad-bottom: 3rem; }
+.pad-b-52 { --section-pad-bottom: 3.25rem; }
+.pad-b-56 { --section-pad-bottom: 3.5rem; }
+.pad-b-60 { --section-pad-bottom: 3.75rem; }
+.pad-b-64 { --section-pad-bottom: 4rem; }
+.pad-b-68 { --section-pad-bottom: 4.25rem; }
+.pad-b-72 { --section-pad-bottom: 4.5rem; }
+.pad-b-76 { --section-pad-bottom: 4.75rem; }
+.pad-b-80 { --section-pad-bottom: 5rem; }
+.pad-b-84 { --section-pad-bottom: 5.25rem; }
+.pad-b-88 { --section-pad-bottom: 5.5rem; }
+.pad-b-92 { --section-pad-bottom: 5.75rem; }
+.pad-b-96 { --section-pad-bottom: 6rem; }
+.pad-b-100 { --section-pad-bottom: 6.25rem; }
+.pad-b-104 { --section-pad-bottom: 6.5rem; }
+.pad-b-108 { --section-pad-bottom: 6.75rem; }
+.pad-b-112 { --section-pad-bottom: 7rem; }
+.pad-b-116 { --section-pad-bottom: 7.25rem; }
+.pad-b-120 { --section-pad-bottom: 7.5rem; }
+.pad-b-124 { --section-pad-bottom: 7.75rem; }
+.pad-b-128 { --section-pad-bottom: 8rem; }
+.pad-b-132 { --section-pad-bottom: 8.25rem; }
+.pad-b-136 { --section-pad-bottom: 8.5rem; }
+.pad-b-140 { --section-pad-bottom: 8.75rem; }
+.pad-b-144 { --section-pad-bottom: 9rem; }
+.pad-b-148 { --section-pad-bottom: 9.25rem; }
+.pad-b-152 { --section-pad-bottom: 9.5rem; }
+.pad-b-156 { --section-pad-bottom: 9.75rem; }
+.pad-b-160 { --section-pad-bottom: 10rem; }
+.pad-b-164 { --section-pad-bottom: 10.25rem; }
+.pad-b-168 { --section-pad-bottom: 10.5rem; }
+.pad-b-172 { --section-pad-bottom: 10.75rem; }
+.pad-b-176 { --section-pad-bottom: 11rem; }
+.pad-b-180 { --section-pad-bottom: 11.25rem; }
+.pad-b-184 { --section-pad-bottom: 11.5rem; }
+.pad-b-188 { --section-pad-bottom: 11.75rem; }
+.pad-b-192 { --section-pad-bottom: 12rem; }
+.pad-b-196 { --section-pad-bottom: 12.25rem; }
+.pad-b-200 { --section-pad-bottom: 12.5rem; }
+
+/* Height: at least this share of the window. svh where the browser has it, so a phone's
+   collapsing address bar does not push the content below the fold; vh before it. */
+
+.min-h-5 { min-block-size: 5vh; min-block-size: 5svh; }
+.min-h-10 { min-block-size: 10vh; min-block-size: 10svh; }
+.min-h-15 { min-block-size: 15vh; min-block-size: 15svh; }
+.min-h-20 { min-block-size: 20vh; min-block-size: 20svh; }
+.min-h-25 { min-block-size: 25vh; min-block-size: 25svh; }
+.min-h-30 { min-block-size: 30vh; min-block-size: 30svh; }
+.min-h-35 { min-block-size: 35vh; min-block-size: 35svh; }
+.min-h-40 { min-block-size: 40vh; min-block-size: 40svh; }
+.min-h-45 { min-block-size: 45vh; min-block-size: 45svh; }
+.min-h-50 { min-block-size: 50vh; min-block-size: 50svh; }
+.min-h-55 { min-block-size: 55vh; min-block-size: 55svh; }
+.min-h-60 { min-block-size: 60vh; min-block-size: 60svh; }
+.min-h-65 { min-block-size: 65vh; min-block-size: 65svh; }
+.min-h-70 { min-block-size: 70vh; min-block-size: 70svh; }
+.min-h-75 { min-block-size: 75vh; min-block-size: 75svh; }
+.min-h-80 { min-block-size: 80vh; min-block-size: 80svh; }
+.min-h-85 { min-block-size: 85vh; min-block-size: 85svh; }
+.min-h-90 { min-block-size: 90vh; min-block-size: 90svh; }
+.min-h-95 { min-block-size: 95vh; min-block-size: 95svh; }
+.min-h-100 { min-block-size: 100vh; min-block-size: 100svh; }
+
+/* Where the content sits in a band taller than it. Only written with a height: without one
+   the band is as tall as its content and there is nowhere to move it. */
+.v-top,
+.v-center,
+.v-bottom {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The band's content keeps the band's measure: in a flex column the container's auto margins
+   would otherwise shrink it to its words, and a heading and its paragraph stood 179 pixels
+   wide in a band 960 across (D-182, measured on the demo's page of every block). */
+.v-top > .container,
+.v-center > .container,
+.v-bottom > .container {
+  box-sizing: border-box;
+  inline-size: 100%;
+  /* The same measure as any band's: the section's width, and the container's own padding. */
+  max-inline-size: calc(var(--section-width) + 2 * var(--space-l));
+}
+
+.v-center {
+  justify-content: center;
+}
+
+.v-bottom {
+  justify-content: flex-end;
+}
+
+/* Hidden on a kind of screen: the same two widths the columns stack at (40rem and 64rem).
+   The editor's canvas shows every section whatever it says (a hidden one is marked there,
+   not removed), because a section that vanished while being edited could not be found. */
+@media (max-width: 39.99rem) {
+  .hide-mobile {
+    display: none;
+  }
+}
+
+@media (min-width: 40rem) and (max-width: 63.99rem) {
+  .hide-tablet {
+    display: none;
+  }
+}
+
+@media (min-width: 64rem) {
+  .hide-desktop {
+    display: none;
+  }
+}
+
+.bx-canvas :is(.hide-mobile, .hide-tablet, .hide-desktop) {
+  display: block;
+}
+
+.bx-canvas :is(.hide-mobile, .hide-tablet, .hide-desktop):is(.v-top, .v-center, .v-bottom) {
+  display: flex;
+}
+
+/* Arriving as it is scrolled to (data-anim, anim.js). Nothing is hidden until the script has
+   said it runs — `anim-ready` on <html> — so a page whose script never runs shows every
+   section, and a visitor who asked for less motion is never given any. */
+@media (prefers-reduced-motion: no-preference) {
+  .anim-ready [data-anim] {
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .anim-ready [data-anim]:not(.anim-in) {
+    opacity: 0;
+  }
+
+  .anim-ready [data-anim="up"]:not(.anim-in) {
+    transform: translateY(1.5rem);
+  }
+
+  .anim-ready [data-anim="zoom"]:not(.anim-in) {
+    transform: scale(0.96);
+  }
+}

@@ -1,0 +1,1308 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "boxlet-design-set-v2",
+    "title": "Boxlet design set (v2)",
+    "description": "A portable Boxlet design: decisions, header and footer look, and optionally a composition, which makes it a character. Generated from the code that validates it; Boxlet's own validator decides. Keys left out of decisions take the neutral defaults. A key Boxlet does not know is left out with a warning.",
+    "type": "object",
+    "required": [
+        "format",
+        "version",
+        "id",
+        "name",
+        "decisions"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "format": {
+            "const": "boxlet-design-set"
+        },
+        "version": {
+            "const": 2
+        },
+        "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{0,31}$"
+        },
+        "name": {
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": {
+                "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+            },
+            "additionalProperties": {
+                "type": "string",
+                "maxLength": 80
+            }
+        },
+        "description": {
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": {
+                "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+            },
+            "additionalProperties": {
+                "type": "string",
+                "maxLength": 300
+            }
+        },
+        "author": {
+            "type": "string",
+            "maxLength": 80
+        },
+        "tags": {
+            "type": "array",
+            "description": "The first 12 are read.",
+            "items": {
+                "type": "string",
+                "maxLength": 32
+            }
+        },
+        "decisions": {
+            "type": "object",
+            "required": [
+                "seed"
+            ],
+            "properties": {
+                "seed": {
+                    "type": "string",
+                    "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$",
+                    "description": "The main colour: buttons, links and the start of a gradient; the rest of the palette is worked out from it."
+                },
+                "secondary": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|none)?$",
+                    "description": "A second colour for contrast bands; without one, a deep shade of the main colour is used.",
+                    "default": ""
+                },
+                "mode": {
+                    "enum": [
+                        "",
+                        "light",
+                        "dark"
+                    ],
+                    "description": "Whether the page is light with dark words or dark with light words; every derived colour follows.",
+                    "default": "light"
+                },
+                "surface_contrast": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How far the tinted surface and cards stand from the page, from none to strong. (number %, 0 – 100, step 1)",
+                    "default": 20
+                },
+                "color_background": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The page colour set by hand instead of worked out; the contrast check measures what is read on it.",
+                    "default": ""
+                },
+                "color_card": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "A card's colour set by hand instead of half a step from the page.",
+                    "default": ""
+                },
+                "color_surface": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The tinted surface set by hand instead of a step from the page.",
+                    "default": ""
+                },
+                "color_border": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The colour of rules and outlines set by hand.",
+                    "default": ""
+                },
+                "color_text": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The text colour set by hand; it must read at 4.5:1 on the page, a card and the tinted surface.",
+                    "default": ""
+                },
+                "color_muted": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The quieter text (leads, captions, a card's lines) set by hand; it must read at 4.5:1 on the page, a card and the tinted surface.",
+                    "default": ""
+                },
+                "color_link": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The colour of links in running text, set by hand instead of the main colour.",
+                    "default": ""
+                },
+                "page_background_colour": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "Any colour around a boxed page, instead of the one Around the page names.",
+                    "default": ""
+                },
+                "header_colour": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "Any colour for the header bar, instead of its surface; its words are worked out from it.",
+                    "default": ""
+                },
+                "footer_colour": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "Any colour for the footer, instead of its surface; its words are worked out from it.",
+                    "default": ""
+                },
+                "heading_font": {
+                    "enum": [
+                        "",
+                        "playfair-display",
+                        "source-serif-4",
+                        "instrument-serif",
+                        "young-serif",
+                        "cormorant-garamond",
+                        "bodoni-moda",
+                        "newsreader",
+                        "eb-garamond",
+                        "libre-caslon-text",
+                        "inter",
+                        "space-grotesk",
+                        "nunito",
+                        "hanken-grotesk",
+                        "figtree",
+                        "manrope",
+                        "outfit",
+                        "archivo",
+                        "schibsted-grotesk",
+                        "bricolage-grotesque",
+                        "ibm-plex-sans",
+                        "big-shoulders-display",
+                        "unbounded",
+                        "syne",
+                        "baloo-2",
+                        "ibm-plex-mono",
+                        "jetbrains-mono",
+                        "space-mono"
+                    ],
+                    "description": "The family headings are set in, from the font library; its own weight, letter spacing, line height and capitals apply unless set.",
+                    "default": "inter"
+                },
+                "body_font": {
+                    "enum": [
+                        "",
+                        "playfair-display",
+                        "source-serif-4",
+                        "instrument-serif",
+                        "young-serif",
+                        "cormorant-garamond",
+                        "bodoni-moda",
+                        "newsreader",
+                        "eb-garamond",
+                        "libre-caslon-text",
+                        "inter",
+                        "space-grotesk",
+                        "nunito",
+                        "hanken-grotesk",
+                        "figtree",
+                        "manrope",
+                        "outfit",
+                        "archivo",
+                        "schibsted-grotesk",
+                        "bricolage-grotesque",
+                        "ibm-plex-sans",
+                        "big-shoulders-display",
+                        "unbounded",
+                        "syne",
+                        "baloo-2",
+                        "ibm-plex-mono",
+                        "jetbrains-mono",
+                        "space-mono"
+                    ],
+                    "description": "The family running text is set in, from the font library; its own line height applies unless set.",
+                    "default": "inter"
+                },
+                "text_size": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The size of running text, in pixels; headings are measured from it by the scale. (number px, 14 – 20, step 0.5)",
+                    "default": 16
+                },
+                "scale": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How much larger each heading step is than the one below it. (number, 1.1 – 1.6, step 0.005)",
+                    "default": 1.2
+                },
+                "line_height": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The space between lines of running text, as a multiple of its size; '' takes the text family's. (number, 1.3 – 1.9, step 0.05)",
+                    "default": ""
+                },
+                "heading_weight": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How heavy headings are, the nearest weight the heading family has; '' takes the family's. (number, 300 – 900, step 100)",
+                    "default": ""
+                },
+                "tracking": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The space between a heading's letters, in em; '' takes the heading family's. (number em, -0.05 – 0.1, step 0.005)",
+                    "default": ""
+                },
+                "caps": {
+                    "enum": [
+                        "",
+                        "no",
+                        "yes"
+                    ],
+                    "description": "Whether headings are set in capitals; '' takes the heading family's.",
+                    "default": ""
+                },
+                "nudge_h1": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "Pixels added to the largest heading after the scale has set it. (number px, -30 – 40, step 1)",
+                    "default": 0
+                },
+                "nudge_h2": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "Pixels added to a section's heading after the scale has set it. (number px, -12 – 20, step 1)",
+                    "default": 0
+                },
+                "nudge_sm": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "Pixels added to small print after the scale has set it. (number px, -3 – 5, step 1)",
+                    "default": 0
+                },
+                "spacing": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The unit every space inside a section is a multiple of, in rem. (number rem, 0.75 – 1.75, step 0.05)",
+                    "default": 1
+                },
+                "section_gap": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The room above and below each section, in pixels, unless a section sets its own. (number px, 32 – 160, step 4)",
+                    "default": 80
+                },
+                "radius": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The corners of cards, pictures and fields, in pixels. (number px, 0 – 32, step 1)",
+                    "default": 4
+                },
+                "border_width": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The width of every rule and outline, in pixels. (number px, 0 – 4, step 0.5)",
+                    "default": 1
+                },
+                "shadow": {
+                    "enum": [
+                        "",
+                        "none",
+                        "soft",
+                        "hard",
+                        "layered"
+                    ],
+                    "description": "How cards are lifted from the page: not at all, softly, with a hard offset edge, or in layers.",
+                    "default": "none"
+                },
+                "shadow_strength": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How dark the shadow is, in percent. (number %, 0 – 100, step 1)",
+                    "default": 40
+                },
+                "container": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How wide the content runs on a large screen, in rem; narrow and wide sections are measured from it. (number rem, 36 – 88, step 2)",
+                    "default": 60
+                },
+                "boxed": {
+                    "enum": [
+                        "",
+                        "no",
+                        "yes"
+                    ],
+                    "description": "Whether the page is a sheet standing in a background of its own.",
+                    "default": "no"
+                },
+                "sheet_width": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How wide the boxed sheet is, in rem. (number rem, 40 – 120, step 2)",
+                    "default": 80
+                },
+                "frame": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The room between a boxed sheet and the window's edge when the window is narrower than the sheet, in rem. (number rem, 0 – 6, step 0.25)",
+                    "default": 3
+                },
+                "sheet_gap": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The room above and below a boxed sheet, in steps of the spacing unit. (number, 0 – 8, step 1)",
+                    "default": 3
+                },
+                "sheet_radius": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The corners of a boxed sheet, in pixels. (number px, 0 – 32, step 1)",
+                    "default": 0
+                },
+                "sheet_shadow": {
+                    "enum": [
+                        "",
+                        "none",
+                        "shadow",
+                        "hairline"
+                    ],
+                    "description": "How a boxed sheet is lifted from its background: not at all, a shadow, or a hairline.",
+                    "default": "none"
+                },
+                "page_background": {
+                    "enum": [
+                        "",
+                        "surface",
+                        "border",
+                        "contrast"
+                    ],
+                    "description": "What stands around a boxed sheet: the tinted surface, the border colour, or the contrast colour.",
+                    "default": "surface"
+                },
+                "header_bleed": {
+                    "enum": [
+                        "",
+                        "sheet",
+                        "full"
+                    ],
+                    "description": "Whether the header bar stays on a boxed sheet or runs the window's whole width.",
+                    "default": "sheet"
+                },
+                "header_width": {
+                    "enum": [
+                        "",
+                        "content",
+                        "sheet",
+                        "window"
+                    ],
+                    "description": "What the header's contents line up with: the text, the sheet, or the window.",
+                    "default": "content"
+                },
+                "footer_bleed": {
+                    "enum": [
+                        "",
+                        "sheet",
+                        "full"
+                    ],
+                    "description": "Whether the footer bar stays on a boxed sheet or runs the window's whole width.",
+                    "default": "sheet"
+                },
+                "footer_width": {
+                    "enum": [
+                        "",
+                        "content",
+                        "sheet",
+                        "window"
+                    ],
+                    "description": "What the footer's contents line up with: the text, the sheet, or the window.",
+                    "default": "content"
+                },
+                "button_style": {
+                    "enum": [
+                        "",
+                        "filled",
+                        "outline",
+                        "soft"
+                    ],
+                    "description": "How a button is drawn: filled with its colour, outlined in it, or a soft tint of it.",
+                    "default": "filled"
+                },
+                "button_radius": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "A button's corners, in pixels; the largest values make a pill. (number px, 0 – 28, step 1)",
+                    "default": 6
+                },
+                "button_height": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "A button's height, in pixels. (number px, 32 – 60, step 2)",
+                    "default": 44
+                },
+                "button_caps": {
+                    "enum": [
+                        "",
+                        "no",
+                        "yes"
+                    ],
+                    "description": "Whether a button's words are set in capitals.",
+                    "default": "no"
+                }
+            }
+        },
+        "dark": {
+            "type": "object",
+            "description": "The set's dark version (D-185): in dark mode these stand for the light ones. A colour left out is worked out by the palette; anything else left out is the light version's. With it, both versions are checked for contrast.",
+            "properties": {
+                "seed": {
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "type": "string",
+                    "description": "The main colour: buttons, links and the start of a gradient; the rest of the palette is worked out from it."
+                },
+                "secondary": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})|none)?$",
+                    "description": "A second colour for contrast bands; without one, a deep shade of the main colour is used.",
+                    "default": ""
+                },
+                "surface_contrast": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How far the tinted surface and cards stand from the page, from none to strong. (number %, 0 – 100, step 1)",
+                    "default": 20
+                },
+                "color_background": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The page colour set by hand instead of worked out; the contrast check measures what is read on it.",
+                    "default": ""
+                },
+                "color_card": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "A card's colour set by hand instead of half a step from the page.",
+                    "default": ""
+                },
+                "color_surface": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The tinted surface set by hand instead of a step from the page.",
+                    "default": ""
+                },
+                "color_border": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The colour of rules and outlines set by hand.",
+                    "default": ""
+                },
+                "color_text": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The text colour set by hand; it must read at 4.5:1 on the page, a card and the tinted surface.",
+                    "default": ""
+                },
+                "color_muted": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The quieter text (leads, captions, a card's lines) set by hand; it must read at 4.5:1 on the page, a card and the tinted surface.",
+                    "default": ""
+                },
+                "color_link": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "The colour of links in running text, set by hand instead of the main colour.",
+                    "default": ""
+                },
+                "header_colour": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "Any colour for the header bar, instead of its surface; its words are worked out from it.",
+                    "default": ""
+                },
+                "footer_colour": {
+                    "type": "string",
+                    "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}))?$",
+                    "description": "Any colour for the footer, instead of its surface; its words are worked out from it.",
+                    "default": ""
+                },
+                "shadow_strength": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How dark the shadow is, in percent. (number %, 0 – 100, step 1)",
+                    "default": 40
+                }
+            }
+        },
+        "look": {
+            "type": "object",
+            "description": "'' or a choice left out follows the character.",
+            "properties": {
+                "header_arrangement": {
+                    "enum": [
+                        "",
+                        "left",
+                        "inline",
+                        "centred",
+                        "split",
+                        "masthead"
+                    ],
+                    "description": "Where the logo, the menu and the button stand in the header.",
+                    "default": "left"
+                },
+                "header_behaviour": {
+                    "enum": [
+                        "",
+                        "static",
+                        "sticky",
+                        "over"
+                    ],
+                    "description": "Whether the header scrolls away, stays at the top, or lies over the first section.",
+                    "default": "static"
+                },
+                "header_opacity": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How solid the header's background is, in percent, when it is sticky or lies over the first section. (number %, 0 – 100, step 1)",
+                    "default": 100
+                },
+                "header_blur": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "How much the page under a see-through header is blurred, in pixels. (number px, 0 – 24, step 1)",
+                    "default": 0
+                },
+                "header_surface": {
+                    "enum": [
+                        "",
+                        "plain",
+                        "tinted",
+                        "contrast",
+                        "gradient"
+                    ],
+                    "description": "The header's background: plain, tinted, contrast or gradient.",
+                    "default": "plain"
+                },
+                "header_edge": {
+                    "enum": [
+                        "",
+                        "none",
+                        "line",
+                        "shadow"
+                    ],
+                    "description": "What divides the header from the page: nothing, a line, or a shadow.",
+                    "default": "none"
+                },
+                "header_height": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The header's height on a large screen, in pixels. (number px, 48 – 120, step 2)",
+                    "default": 72
+                },
+                "logo_size": {
+                    "type": [
+                        "string",
+                        "number"
+                    ],
+                    "description": "The logo's height, in pixels. (number px, 20 – 72, step 1)",
+                    "default": 32
+                },
+                "brand": {
+                    "enum": [
+                        "",
+                        "logo",
+                        "name",
+                        "both"
+                    ],
+                    "description": "Whether the header shows the logo, the site's name, or both.",
+                    "default": "logo"
+                },
+                "nav_style": {
+                    "enum": [
+                        "",
+                        "plain",
+                        "caps",
+                        "pills",
+                        "bar",
+                        "chips"
+                    ],
+                    "description": "How the menu's items are drawn: plain, in capitals, as pills, on a bar, or as chips.",
+                    "default": "plain"
+                },
+                "nav_ink": {
+                    "enum": [
+                        "",
+                        "accent",
+                        "ink"
+                    ],
+                    "description": "Whether the menu's words take the main colour or the text colour.",
+                    "default": "ink"
+                },
+                "header_button": {
+                    "enum": [
+                        "",
+                        "filled",
+                        "outline",
+                        "text",
+                        "none"
+                    ],
+                    "description": "How the header's button is drawn, or none.",
+                    "default": "filled"
+                },
+                "footer_layout": {
+                    "enum": [
+                        "",
+                        "simple",
+                        "centred",
+                        "columns",
+                        "menu_first",
+                        "three"
+                    ],
+                    "description": "How the footer is arranged: one column, centred, two columns, the menu first, or three columns.",
+                    "default": "simple"
+                },
+                "footer_columns": {
+                    "enum": [
+                        "",
+                        "2",
+                        "3",
+                        "4"
+                    ],
+                    "description": "How a long menu in a footer column is listed when the footer is in columns: 2 one list, 3 two lists side by side, 4 three.",
+                    "default": "3"
+                },
+                "footer_links": {
+                    "enum": [
+                        "",
+                        "auto",
+                        "list"
+                    ],
+                    "description": "Whether a column's menu follows the arrangement or stands one item under another.",
+                    "default": "auto"
+                },
+                "small_print_row": {
+                    "enum": [
+                        "",
+                        "left",
+                        "split",
+                        "centred"
+                    ],
+                    "description": "How the last row is laid out: stacked, split to both sides, or centred.",
+                    "default": "split"
+                },
+                "footer_surface": {
+                    "enum": [
+                        "",
+                        "plain",
+                        "tinted",
+                        "contrast",
+                        "gradient"
+                    ],
+                    "description": "The footer's background: plain, tinted, contrast or gradient.",
+                    "default": "plain"
+                },
+                "footer_edge": {
+                    "enum": [
+                        "",
+                        "none",
+                        "line",
+                        "slant",
+                        "curve"
+                    ],
+                    "description": "What divides the footer from the page above it: nothing, a line, a slant or a curve.",
+                    "default": "none"
+                }
+            }
+        },
+        "patterns": {
+            "type": "array",
+            "description": "Starter sections, the one place a set carries words: per language ({\"en\": …, \"hr\": …}, or one string), English the fallback. No pictures, files or forms. The first 12 are read.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "blocks"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{0,31}$"
+                    },
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "minProperties": 1,
+                                "propertyNames": {
+                                    "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                                },
+                                "additionalProperties": {
+                                    "type": "string",
+                                    "maxLength": 80
+                                }
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 80
+                            }
+                        ]
+                    },
+                    "section": {
+                        "type": "object",
+                        "properties": {
+                            "layout": {
+                                "type": "string"
+                            },
+                            "style": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "blocks": {
+                        "type": "array",
+                        "minItems": 1,
+                        "description": "The first 4 are read.",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "type"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "composition": {
+            "type": "object",
+            "description": "Present: the set can be a character. Block types this site does not have, and layouts a block does not offer, are left out with a warning.",
+            "required": [
+                "section"
+            ],
+            "properties": {
+                "section": {
+                    "type": "object",
+                    "properties": {
+                        "surface": {
+                            "enum": [
+                                "plain",
+                                "tinted",
+                                "contrast",
+                                "gradient"
+                            ],
+                            "description": "The band's background: the page, the tinted surface, the contrast colour, a picture under a veil of it, or the gradient."
+                        },
+                        "width": {
+                            "enum": [
+                                "narrow",
+                                "normal",
+                                "wide",
+                                "full"
+                            ],
+                            "description": "How wide the band's content runs: narrow (two thirds of the content width), normal, wide (seven sixths), or the window's."
+                        },
+                        "align": {
+                            "enum": [
+                                "left",
+                                "center"
+                            ],
+                            "description": "Whether the band's content stands at the start or in the middle."
+                        },
+                        "divider": {
+                            "enum": [
+                                "none",
+                                "line",
+                                "slant",
+                                "curve"
+                            ],
+                            "description": "What divides the band from the one above: nothing, a line, a slant or a curve."
+                        },
+                        "v_align": {
+                            "enum": [
+                                "top",
+                                "center",
+                                "bottom"
+                            ],
+                            "description": "Where the content stands in a band taller than it: top, middle or bottom."
+                        },
+                        "animation": {
+                            "enum": [
+                                "none",
+                                "fade",
+                                "up",
+                                "zoom"
+                            ],
+                            "description": "How the band's content arrives as it scrolls into view; never for a visitor who asked for less motion."
+                        },
+                        "pad_top": {
+                            "type": [
+                                "string",
+                                "number"
+                            ],
+                            "description": "The room above the content, in pixels; '' is the design's section gap. (number px, 0 – 200, step 4)"
+                        },
+                        "pad_bottom": {
+                            "type": [
+                                "string",
+                                "number"
+                            ],
+                            "description": "The room below the content, in pixels; '' is the design's section gap. (number px, 0 – 200, step 4)"
+                        },
+                        "min_height": {
+                            "type": [
+                                "string",
+                                "number"
+                            ],
+                            "description": "The band's least height, in percent of the window; 0 is as tall as its content. (number %, 0 – 100, step 5)"
+                        }
+                    }
+                },
+                "surfaces": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "enum": [
+                            "plain",
+                            "tinted",
+                            "contrast",
+                            "gradient"
+                        ]
+                    }
+                },
+                "dividers": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "enum": [
+                            "none",
+                            "line",
+                            "slant",
+                            "curve"
+                        ]
+                    }
+                },
+                "layouts": {
+                    "type": "object",
+                    "properties": {
+                        "accordion": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "list",
+                                        "cards"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "cards": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "grid",
+                                        "list"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "cta": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "banner",
+                                        "beside"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "divider": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "space",
+                                        "line"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "downloads": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "list",
+                                        "cards"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "embed": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "full",
+                                        "inset"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "form": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "stacked",
+                                        "beside"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "gallery": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "two",
+                                        "three",
+                                        "four"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "hero": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "left",
+                                        "center",
+                                        "split",
+                                        "cover-center",
+                                        "cover-left",
+                                        "cover-right",
+                                        "cover-low"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "image_text": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "image-left",
+                                        "image-right"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "logos": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "row",
+                                        "grid"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "picture": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "full",
+                                        "inset"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "quote": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "plain",
+                                        "big",
+                                        "card"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "stats": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "three",
+                                        "four"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "text": {
+                            "anyOf": [
+                                {
+                                    "enum": [
+                                        "single",
+                                        "columns"
+                                    ]
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "options": {
+                    "type": "object",
+                    "properties": {
+                        "accordion": {
+                            "type": "object",
+                            "properties": {
+                                "measure": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "comfortable",
+                                                "wide",
+                                                "full"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "cards": {
+                            "type": "object",
+                            "properties": {
+                                "per_row": {
+                                    "type": [
+                                        "string",
+                                        "number"
+                                    ],
+                                    "description": "number, 2 – 4, step 1"
+                                },
+                                "image_shape": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "wide",
+                                                "square",
+                                                "round",
+                                                "none"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "gallery": {
+                            "type": "object",
+                            "properties": {
+                                "shape": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "square",
+                                                "wide",
+                                                "natural",
+                                                "round"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "hero": {
+                            "type": "object",
+                            "properties": {
+                                "height": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "auto",
+                                                "tall",
+                                                "screen"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "veil": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "light",
+                                                "medium",
+                                                "strong"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "picture": {
+                            "type": "object",
+                            "properties": {
+                                "shape": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "natural",
+                                                "wide",
+                                                "square",
+                                                "round"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "quote": {
+                            "type": "object",
+                            "properties": {
+                                "measure": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "comfortable",
+                                                "wide",
+                                                "full"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "text": {
+                            "type": "object",
+                            "properties": {
+                                "measure": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "comfortable",
+                                                "wide",
+                                                "full"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    }
+}

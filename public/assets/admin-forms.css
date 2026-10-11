@@ -83,6 +83,15 @@
   align-content: start;
 }
 
+/* A field's hidden control stays hidden: `.field input` below outranks `.visually-hidden`,
+   and the SVG logo's file input took the field's whole width past the window's edge on a
+   phone (measured: 431px in a 390px window, PLAN.md D-173). */
+.field input.visually-hidden {
+  inline-size: 1em;
+  min-block-size: 0;
+  padding: 0;
+}
+
 .field > label,
 .field > .field-label {
   font-weight: 600;

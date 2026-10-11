@@ -32,6 +32,10 @@ return [
     ],
     // A row runs across and wraps; a grid gives every mark the same cell, which suits marks
     // of very different widths.
-    'layouts' => ['row', 'grid'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'row' => ['image' => [[6, 10, 7, 4], [16, 10, 7, 4], [26, 10, 7, 4], [36, 10, 7, 4]]],
+        'grid' => ['image' => [[6, 6, 7, 4], [16, 6, 7, 4], [26, 6, 7, 4], [36, 6, 7, 4], [6, 14, 7, 4], [16, 14, 7, 4], [26, 14, 7, 4], [36, 14, 7, 4]]],
+    ],
     'defaults' => ['layout' => 'row'],
 ];

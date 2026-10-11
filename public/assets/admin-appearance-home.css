@@ -1,0 +1,223 @@
+/* THE INSPECTOR'S HOME on the Appearance screen (PLAN.md D-157): the characters as tiles,
+ * Quick start, how much is the owner's own, the list of sections, and Your designs.
+ *
+ * It was the rail — a column of its own down the left, holding the characters and the
+ * library — and the room it took was the room the picture needed. The same things live here
+ * now, at the top and the foot of the inspector. Admin tokens only (--ui-*). */
+
+/* ---- how much is the owner's own -------------------------------------------------------- */
+
+.overrides {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  margin-block: var(--ui-3);
+  padding: var(--ui-2) var(--ui-3);
+  background: var(--ui-accent-soft);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font-size: var(--ui-text-sm);
+}
+
+.overrides[hidden] {
+  display: none;
+}
+
+.overrides .control-changed {
+  display: inline-block;
+}
+
+.overrides .button {
+  margin-inline-start: auto;
+  white-space: nowrap;
+}
+
+/* ---- the sections ----------------------------------------------------------------------- */
+
+/* A group's heading, as Quick start's is. `.admin` because `.admin h2` (admin.css) outranks a
+   lone class: measured, "Detailed" stood at 15px over its 11px neighbours. */
+.admin .inspector-heading {
+  margin: var(--ui-4) 0 var(--ui-1);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.section-list {
+  display: grid;
+  margin: 0 0 var(--ui-3);
+  padding: 0;
+  list-style: none;
+  border-block-end: var(--ui-border) solid var(--ui-line);
+}
+
+/* A row is a link that reads as one at rest: an icon, a name, what is in it, and a chevron. */
+.section-link {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-3);
+  padding: var(--ui-2) var(--ui-1);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  text-decoration: none;
+}
+
+.section-link:hover {
+  background: var(--ui-panel-sunken);
+}
+
+.section-link > .icon {
+  flex: 0 0 auto;
+  color: var(--ui-accent);
+}
+
+.section-link-text {
+  display: grid;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.section-link-name {
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+}
+
+.section-link-summary {
+  overflow: hidden;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-count {
+  display: none;
+  min-inline-size: 1.25rem;
+  padding: 0 var(--ui-1);
+  background: var(--ui-accent-soft);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink);
+  font-size: var(--ui-text-xs);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.section-link.has-changes .section-count {
+  display: inline-block;
+}
+
+/* The chevron points forward: the sprite has the one that points back, so it is turned. */
+.section-link-go .icon {
+  transform: scaleX(-1);
+  color: var(--ui-ink-muted);
+}
+
+/* ---- your designs ----------------------------------------------------------------------- */
+
+.design-rows {
+  display: grid;
+  gap: var(--ui-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.design-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-1);
+  padding: var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.design-row .design-chips {
+  margin-inline-end: var(--ui-1);
+}
+
+.design-row-text {
+  display: grid;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.design-row-name {
+  overflow: hidden;
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.design-row-from {
+  overflow: hidden;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The name and the button on one line; an input carries an intrinsic width of about twenty
+   characters, which is wider than this column would like, so it may shrink. */
+.design-keep {
+  display: flex;
+  align-items: start;
+  gap: var(--ui-2);
+}
+
+.design-keep .field {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.design-keep input {
+  min-inline-size: 0;
+}
+
+.design-import {
+  display: grid;
+  gap: var(--ui-2);
+  font-size: var(--ui-text-sm);
+}
+
+.design-import .button {
+  justify-content: center;
+}
+
+/* What a notice and a question list: a file left out and why, a reason a file was refused,
+   a key left out on the way in. */
+.import-list {
+  margin: var(--ui-1) 0 0;
+  padding-inline-start: var(--ui-4);
+}
+
+/* The design an import brings, in the question that asks what to do with it. */
+.design-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ui-1) var(--ui-2);
+  padding: var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+}
+
+.design-card-name {
+  overflow: hidden;
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.design-card-shape {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}

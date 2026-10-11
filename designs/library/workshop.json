@@ -1,0 +1,333 @@
+{
+  "$schema": "https://boxlet.dev/schema/design-set-v2.json",
+  "format": "boxlet-design-set",
+  "version": 2,
+  "id": "workshop",
+  "name": {
+    "en": "Workshop",
+    "hr": "Workshop"
+  },
+  "description": {
+    "en": "Earthy tones, a tall condensed display face and thick rules. For craftsmen, builders and breweries.",
+    "hr": "Zemljani tonovi, visoko usko pismo i debele crte. Za obrtnike, graditelje i pivovare."
+  },
+  "author": "Boxlet",
+  "tags": [
+    "earthy",
+    "bold",
+    "condensed",
+    "craft"
+  ],
+  "decisions": {
+    "mode": "light",
+    "seed": "#8a4a12",
+    "secondary": "#2b2620",
+    "heading_font": "big-shoulders-display",
+    "body_font": "archivo",
+    "text_size": 17,
+    "scale": 1.4,
+    "nudge_h1": 16,
+    "caps": "yes",
+    "spacing": 1.05,
+    "section_gap": 88,
+    "radius": 2,
+    "border_width": 3,
+    "shadow": "hard",
+    "shadow_strength": 70,
+    "container": 68,
+    "color_background": "#efe9e1",
+    "button_style": "filled",
+    "button_radius": 0,
+    "button_height": 52,
+    "button_caps": "yes",
+    "surface_contrast": 30
+  },
+  "dark": {
+    "seed": "#e09a52",
+    "color_background": "#1e1a16",
+    "secondary": "#2b2620",
+    "surface_contrast": 30,
+    "shadow_strength": 80
+  },
+  "look": {
+    "header_opacity": 100,
+    "header_blur": 0,
+    "logo_size": 32,
+    "footer_columns": "3",
+    "footer_links": "auto",
+    "header_arrangement": "left",
+    "header_behaviour": "static",
+    "header_surface": "contrast",
+    "header_edge": "none",
+    "header_height": 80,
+    "brand": "name",
+    "nav_style": "caps",
+    "nav_ink": "ink",
+    "header_button": "outline",
+    "footer_layout": "columns",
+    "small_print_row": "split",
+    "footer_surface": "contrast",
+    "footer_edge": "none"
+  },
+  "composition": {
+    "section": {
+      "surface": "plain",
+      "width": "normal",
+      "align": "left",
+      "divider": "line",
+      "v_align": "top",
+      "animation": "none",
+      "pad_top": "",
+      "pad_bottom": "",
+      "min_height": 0
+    },
+    "surfaces": {
+      "stats": "contrast",
+      "cta": "tinted"
+    },
+    "dividers": {},
+    "layouts": {
+      "hero": "cover-left",
+      "cards": "grid",
+      "stats": "three",
+      "quote": "big",
+      "cta": "beside",
+      "image_text": "image-left",
+      "gallery": "three"
+    },
+    "options": {
+      "hero": {
+        "height": "tall",
+        "veil": "strong"
+      },
+      "cards": {
+        "image_shape": "square"
+      },
+      "gallery": {
+        "shape": "square"
+      }
+    }
+  },
+  "patterns": [
+    {
+      "id": "workshop-welcome",
+      "name": {
+        "en": "Welcome",
+        "hr": "Dobrodošlica"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "hero",
+          "layout": "left",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Built square, built once",
+              "hr": "Napravljeno ravno, napravljeno jednom"
+            },
+            "subheading": {
+              "en": "Joinery, roofs and renovations for houses that should stand another hundred years.",
+              "hr": "Stolarija, krovovi i obnove za kuće koje trebaju stajati još sto godina."
+            },
+            "cta": {
+              "label": {
+                "en": "Ask for a quote",
+                "hr": "Zatražite ponudu"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "workshop-offer",
+      "name": {
+        "en": "What we offer",
+        "hr": "Što nudimo"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "cards",
+          "layout": "grid",
+          "column": 0,
+          "options": {
+            "per_row": 3
+          },
+          "content": {
+            "heading": {
+              "en": "Our trades",
+              "hr": "Naši zanati"
+            },
+            "intro": {
+              "en": "One crew from foundation to roof.",
+              "hr": "Jedna ekipa od temelja do krova."
+            },
+            "items": [
+              {
+                "heading": {
+                  "en": "Joinery",
+                  "hr": "Stolarija"
+                },
+                "body": {
+                  "en": "<p>Windows, doors and stairs in solid wood.</p>",
+                  "hr": "<p>Prozori, vrata i stepenice od punog drva.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Roofs",
+                  "hr": "Krovovi"
+                },
+                "body": {
+                  "en": "<p>Timber frames, tiles and gutters.</p>",
+                  "hr": "<p>Drvene konstrukcije, crijep i oluci.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Renovation",
+                  "hr": "Obnova"
+                },
+                "body": {
+                  "en": "<p>Old stone houses made dry and warm.</p>",
+                  "hr": "<p>Stare kamene kuće, suhe i tople.</p>"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "workshop-numbers",
+      "name": {
+        "en": "In numbers",
+        "hr": "U brojkama"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "tinted"
+        }
+      },
+      "blocks": [
+        {
+          "type": "stats",
+          "layout": "three",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "On the job",
+              "hr": "Na terenu"
+            },
+            "items": [
+              {
+                "value": "38",
+                "label": {
+                  "en": "years",
+                  "hr": "godina"
+                }
+              },
+              {
+                "value": "600+",
+                "label": {
+                  "en": "houses",
+                  "hr": "kuća"
+                }
+              },
+              {
+                "value": "9",
+                "label": {
+                  "en": "in the crew",
+                  "hr": "u ekipi"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "workshop-voice",
+      "name": {
+        "en": "A client's words",
+        "hr": "Riječi klijenta"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "quote",
+          "layout": "big",
+          "column": 0,
+          "options": {},
+          "content": {
+            "quote": {
+              "en": "They finished a week early and swept up after themselves.",
+              "hr": "Završili su tjedan ranije i za sobom pomeli."
+            },
+            "attribution": {
+              "en": "Josip M.",
+              "hr": "Josip M."
+            },
+            "role": {
+              "en": "Client, Samobor",
+              "hr": "Klijent, Samobor"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "workshop-call",
+      "name": {
+        "en": "Call to action",
+        "hr": "Poziv na akciju"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "contrast"
+        }
+      },
+      "blocks": [
+        {
+          "type": "cta",
+          "layout": "beside",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Got a house that needs work?",
+              "hr": "Imate kuću kojoj treba posla?"
+            },
+            "body": {
+              "en": "We come and look, free.",
+              "hr": "Dođemo pogledati, besplatno."
+            },
+            "action": {
+              "label": {
+                "en": "Ask for a quote",
+                "hr": "Zatražite ponudu"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -4,8 +4,6 @@ namespace App\Modules\Pages;
 
 use App\Core\Blocks;
 use App\Modules\Design\SectionStyle;
-use App\Support\RichText;
-use App\Support\SafeUrl;
 
 /**
  * Reads the page editor's blocks[n][field] input. All validation lives here, on the
@@ -42,15 +40,9 @@ final class BlockForm
      * its stored type whatever the form claims. A layout the block does not declare
      * falls back to its default rather than being stored.
      *
-     * A BLOCK MAY SEND ITS SKELETON INSTEAD OF ITS FIELDS (PLAN.md D-081). A group the
-     * author never touched posts its id, the marker _unchanged, and nothing else; its
-     * content, style and layout are taken from $stored. The result is the same block this
-     * would have returned had the browser sent every field, so nothing downstream — the
-     * canvas, a rejected save, the write — needs to know which blocks did that.
-     *
-     * @param array<int, array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string}> $stored
+     * @param array<int, array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string}> $stored
      *        block id => the block as stored, for this page's blocks
-     * @return array{blocks: list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string, section?: string, column?: int}>, errors: array<string, string>}
+     * @return array{blocks: list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string, section?: string, column?: int}>, errors: array<string, string>}
      */
     public static function parse(Blocks $registry, mixed $posted, array $stored): array
     {
@@ -89,18 +81,6 @@ final class BlockForm
                         : 0,
                 ];
             }
-            if (($raw['_unchanged'] ?? '') === '1') {
-                // Nothing to restore it from, so there is nothing it can mean. Adding an
-                // empty block here would turn a lost id into content the author never wrote.
-                if ($id !== null) {
-                    // ITS FIELDS COME FROM STORAGE, BUT NOT ITS PLACE (D-081 meets D-098).
-                    // builder-save.js lets an untouched block send a skeleton; the block may
-                    // be untouched and still have been moved, so where it stands is read
-                    // from what was sent and only the content is restored.
-                    $blocks[] = $where === [] ? $stored[$id] : $where + $stored[$id];
-                }
-                continue;
-            }
             $type = $id !== null ? $stored[$id]['type'] : (is_string($raw['type'] ?? null) ? $raw['type'] : '');
 
             if (!$registry->has($type)) {
@@ -113,7 +93,7 @@ final class BlockForm
             $name = $key ?? self::key($id, $ordinal++);
             $content = [];
             foreach ($registry->get($type)['fields'] as $field => $declared) {
-                [$value, $error] = self::field($declared, $raw[$field] ?? null);
+                [$value, $error] = BlockValues::field($declared, $raw[$field] ?? null);
                 $content[$field] = $value;
                 if ($error !== null) {
                     // Keyed by the BLOCK, not by where it sits: a position cannot name a
@@ -121,13 +101,16 @@ final class BlockForm
                     $errors["{$name}.{$field}"] = $error;
                 }
             }
-            $layout = $registry->layout($type, $raw['layout'] ?? null);
+            $layout = $registry->own($type, $raw['layout'] ?? null);
             $blocks[] = $where + [
                 'key' => $name,
                 'id' => $id,
                 'type' => $type,
-                'content' => self::fillRows($registry, $type, $content, $layout),
+                'content' => $content,
                 'style' => SectionStyle::normalize($raw['style'] ?? null),
+                // How it is presented, typed at blocks[key][options][name]; '' or a missing
+                // one is the character's (D-166).
+                'options' => \App\Core\BlockOptions::normalize($registry->get($type)['options'], $raw['options'] ?? null),
                 'layout' => $layout,
             ];
         }
@@ -136,38 +119,26 @@ final class BlockForm
     }
 
     /**
-     * A repeater that says how many items its block's layout wants gets them (D-091).
+     * A block's content from a DOCUMENT (PLAN.md D-173) — a draft's JSON, the autosave's body —
+     * through the very checks a form's fields pass: rich text sanitised to its field's list,
+     * a line kept to one printable line, a choice to its options. The store is the security
+     * boundary; templates trust what it holds, so a document must not be a way around it.
      *
-     * "Four in a row" with three columns left an empty cell in the grid and no obvious way
-     * to fill it. The block declares what each row size asks for, so this has no idea that
-     * "four" means four; it reads the number the block wrote down.
-     *
-     * TOPS UP, NEVER TRIMS. Going back to a smaller row keeps every column: a row size is a
-     * choice about arrangement, and throwing away what somebody wrote is not one of its
-     * consequences. Only a row that is not even filled once is topped up — seven items in
-     * rows of four is a full row and a short one, which is ordinary and left alone.
-     *
-     * Here rather than in the save alone, because the canvas redraws through this same
-     * parser: the column appears as the row size is chosen, not after the page is saved.
+     * A document may be unfinished, so nothing is refused: an address that is no link is
+     * emptied rather than kept, and a required field may be empty until Publish asks.
      *
      * @param array<string, mixed> $content
      * @return array<string, mixed>
      */
-    private static function fillRows(Blocks $registry, string $type, array $content, string $layout): array
+    public static function clean(Blocks $registry, string $type, array $content): array
     {
-        foreach ($registry->get($type)['fields'] as $name => $field) {
-            $wanted = is_array($field['per_layout'] ?? null) ? ($field['per_layout'][$layout] ?? null) : null;
-            if (!is_int($wanted) || !is_array($content[$name] ?? null)) {
-                continue;
-            }
-            $items = array_values($content[$name]);
-            while (count($items) < $wanted) {
-                $items[] = Blocks::emptyItem($field);
-            }
-            $content[$name] = $items;
+        $clean = [];
+        foreach ($registry->get($type)['fields'] as $name => $declared) {
+            [$value] = BlockValues::field($declared, BlockValues::asSent($declared, $content[$name] ?? null));
+            $clean[$name] = BlockValues::linked($declared, $value);
         }
 
-        return $content;
+        return $clean;
     }
 
     /**
@@ -178,7 +149,7 @@ final class BlockForm
      * that slot since. A key that names nothing does nothing, which is the honest answer to
      * a stale button.
      *
-     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string}> $blocks
+     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string}> $blocks
      */
     private static function at(array $blocks, string $key): ?int
     {
@@ -192,8 +163,8 @@ final class BlockForm
     }
 
     /**
-     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string}> $blocks
-     * @return list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string}>
+     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string}> $blocks
+     * @return list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string}>
      */
     public static function move(array $blocks, string $key, string $direction): array
     {
@@ -213,8 +184,8 @@ final class BlockForm
      * One repeater item moved within its block — D-011's pattern one level down, where the
      * same route serves the drag and the buttons a browser without JavaScript uses.
      *
-     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string}> $blocks
-     * @return list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string}>
+     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string}> $blocks
+     * @return list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string}>
      */
     public static function moveItem(Blocks $registry, array $blocks, string $key, string $field, int $item, string $direction): array
     {
@@ -247,8 +218,8 @@ final class BlockForm
      * it: the button that cannot do anything should do nothing, not hand back an error
      * for something the editor itself just did.
      *
-     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string}> $blocks
-     * @return list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string}>
+     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string}> $blocks
+     * @return list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string}>
      */
     public static function addItem(Blocks $registry, array $blocks, string $key, string $field): array
     {
@@ -279,7 +250,7 @@ final class BlockForm
      * one. An action naming a field the block does not declare moves nothing rather than
      * reaching into stored content with whatever was posted.
      *
-     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, layout: string}> $blocks
+     * @param list<array{key: string, id: int|null, type: string, content: array<string, mixed>|null, style: array<string, string|int|null>, options?: array<string, string>, layout: string}> $blocks
      * @return array{0: array<string, mixed>|null, 1: array<string, mixed>|null}
      */
     private static function repeaterAt(Blocks $registry, array $blocks, int $position, string $field): array
@@ -294,142 +265,5 @@ final class BlockForm
         }
 
         return [$block['content'], $declared];
-    }
-
-    /**
-     * @param array<string, mixed> $field
-     * @return array{0: mixed, 1: string|null} the cleaned value and an error, if any
-     */
-    private static function field(array $field, mixed $raw): array
-    {
-        $required = $field['required'] === true;
-
-        /*
-         * A REPEATER IS THE SAME QUESTION, ONCE PER ITEM (PLAN.md O-11).
-         *
-         * Each item's fields go through this very method, so a media field inside an item
-         * is validated as a media field and a richtext field is sanitised per item — no
-         * special case, and nothing here has to know which types exist.
-         *
-         * Over the maximum is REFUSED rather than trimmed, unlike on render: here somebody
-         * typed those items, and silently dropping the last one is how an owner loses work
-         * without being told. Blocks::normalize() trims instead, because a page must still
-         * draw when a definition's maximum shrinks under it.
-         */
-        if ($field['type'] === 'repeater') {
-            $rows = is_array($raw) ? array_values($raw) : [];
-            $items = [];
-            $itemError = null;
-            foreach ($rows as $row) {
-                if (($row['_delete'] ?? '') === '1') {
-                    continue;
-                }
-                $item = [];
-                foreach ($field['fields'] as $itemName => $itemField) {
-                    [$value, $error] = self::field($itemField, is_array($row) ? ($row[$itemName] ?? null) : null);
-                    $item[$itemName] = $value;
-                    // The first thing wrong, named once: a message per item per field would
-                    // bury the block's own errors under a list nobody reads.
-                    $itemError ??= $error;
-                }
-                $items[] = $item;
-            }
-
-            if (count($items) > $field['max']) {
-                return [array_slice($items, 0, $field['max']), t('pages.field.repeater_max', ['max' => $field['max']])];
-            }
-            if ($items === [] && $required) {
-                return [[], t('pages.field.required')];
-            }
-
-            return [$items, $itemError];
-        }
-
-        switch ($field['type']) {
-            case 'link':
-                $label = is_array($raw) ? self::line($raw['label'] ?? null) : '';
-                // A bare email or phone number becomes the link it was meant to be (D-039).
-                $url = SafeUrl::normalize(is_array($raw) ? self::line($raw['url'] ?? null) : '');
-                // A chosen page wins over a typed address (PLAN.md D-034): the address input
-                // is hidden while a page is chosen, so whatever it still holds is stale.
-                $page = is_array($raw) ? self::line($raw['page'] ?? null) : '';
-                if (preg_match('~^[1-9][0-9]{0,9}$~', $page) === 1) {
-                    $url = PageLinks::to((int) $page);
-                }
-                $value = ['label' => $label, 'url' => $url];
-                if ($label === '' && $url === '') {
-                    return [$value, $required ? t('pages.field.required') : null];
-                }
-                if ($url === '') {
-                    return [$value, t('pages.field.link_url_missing')];
-                }
-                if (!SafeUrl::isLink($url)) {
-                    return [$value, t('pages.field.link_url')];
-                }
-                // A page supplies its own title when the text is left empty; an address
-                // has nothing to say about itself.
-                if ($label === '' && PageLinks::reference($url) === null) {
-                    return [$value, t('pages.field.link_label')];
-                }
-
-                return [$value, null];
-
-            case 'media':
-            case 'file':
-            case 'form':
-                $text = self::line($raw);
-                if ($text === '') {
-                    return [null, $required ? t('pages.field.required') : null];
-                }
-
-                return ctype_digit($text) && (int) $text > 0 ? [(int) $text, null] : [null, t('pages.field.media')];
-
-            case 'select':
-                $options = $field['options'];
-                if (is_string($raw) && in_array($raw, $options, true)) {
-                    return [$raw, null];
-                }
-                /* NOT SENT IS NOT WRONG (PLAN.md D-118). A form that has never heard of a
-                   choice — an editor opened before the block gained it, a save written
-                   before it existed — says nothing about it, and the choice takes its first
-                   option, as a stored block without it does (Blocks::normalize). A value that
-                   IS sent and is not one of the options is still refused. Adding two choices
-                   to the hero failed every such save with "Choose one of the options" against
-                   fields the author could not see. */
-                if ($raw === null) {
-                    return [$options[0], null];
-                }
-
-                return [$options[0], t('pages.field.select')];
-
-            case 'richtext':
-                $html = RichText::sanitize(is_string($raw) ? $raw : '');
-                $empty = trim(html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8')) === '';
-
-                return [$empty ? '' : $html, $empty && $required ? t('pages.field.required') : null];
-
-            case 'textarea':
-                $text = is_string($raw) ? trim(self::printable(str_replace("\r\n", "\n", $raw))) : '';
-
-                return [$text, $text === '' && $required ? t('pages.field.required') : null];
-
-            default: // text
-                $text = self::line($raw);
-
-                return [$text, $text === '' && $required ? t('pages.field.required') : null];
-        }
-    }
-
-    /**
-     * A single-line string: valid UTF-8, no control characters, no line breaks.
-     */
-    private static function line(mixed $raw): string
-    {
-        return is_string($raw) ? trim(self::printable(str_replace(["\r", "\n"], ' ', $raw))) : '';
-    }
-
-    private static function printable(string $text): string
-    {
-        return (string) preg_replace('~[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]~', '', mb_scrub($text, 'UTF-8'));
     }
 }

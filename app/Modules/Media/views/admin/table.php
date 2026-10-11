@@ -15,6 +15,7 @@ use App\Support\Url;
             <table class="table media-table">
                 <thead>
                     <tr>
+                        <th scope="col" class="col-pick"><input type="checkbox" class="js-only" data-bulk-all form="media-bulk" aria-label="<?= e(t('media.bulk.all')) ?>" title="<?= e(t('media.bulk.all')) ?>"></th>
                         <th scope="col" class="col-thumb"><span class="visually-hidden"><?= e(t('media.col.picture')) ?></span></th>
                         <th scope="col"><?= e(t('media.col.file')) ?></th>
                         <th scope="col" class="col-dimensions"><?= e(t('media.col.dimensions')) ?></th>
@@ -30,6 +31,7 @@ use App\Support\Url;
     $name = $row['filename'] . ($row['ext'] !== '' ? '.' . $row['ext'] : '');
     ?>
                     <tr class="media-row" data-media-id="<?= e((string) $row['id']) ?>">
+                        <td class="col-pick"><input type="checkbox" name="ids[]" value="<?= e((string) $row['id']) ?>" form="media-bulk" data-bulk-pick aria-label="<?= e(t('media.bulk.pick', ['name' => $name])) ?>"></td>
                         <td class="media-row-thumb">
 <?php if ($row['kind'] === 'file'): ?>
                             <span class="media-row-file" aria-hidden="true"><?= icon(\App\Modules\Media\MediaFileType::icon($row['ext'])) ?><span class="media-row-file-ext"><?= e(strtoupper($row['ext'])) ?></span></span>

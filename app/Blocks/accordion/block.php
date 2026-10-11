@@ -30,6 +30,15 @@ return [
         // showing says "here is how this works". Both are right, on different pages.
         'start' => ['type' => 'select', 'options' => ['closed', 'first-open']],
     ],
-    'layouts' => ['list', 'cards'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'list' => ['line' => [[6, 4, 28, 2], [6, 10, 28, 2], [6, 16, 28, 2]], 'logo' => [[39, 4, 3, 2], [39, 10, 3, 2], [39, 16, 3, 2]]],
+        'cards' => ['image' => [[4, 2, 40, 6], [4, 9, 40, 6], [4, 16, 40, 6]], 'line' => [[7, 4, 24, 2], [7, 11, 24, 2], [7, 18, 24, 2]]],
+    ],
     'defaults' => ['layout' => 'list'],
+    'options' => [
+        // How wide its lines run (D-188, the owner, as the Text block's): its answers were held to
+        // 38em whatever the section's Width. The heading keeps the same edge.
+        'measure' => ['values' => ['comfortable', 'wide', 'full'], 'default' => 'comfortable'],
+    ],
 ];

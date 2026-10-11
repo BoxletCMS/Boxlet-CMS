@@ -51,6 +51,97 @@ body {
   padding-inline: var(--space-l);
 }
 
+/* THE BLOCK LANGUAGE (README 1.6, PLAN.md D-168): one type scale, one lead, one body and one
+   kind of text link for every block, so a block nobody has looked at yet still belongs to the
+   page. In tokens throughout — the numbers README 1.6 gives are what they come to under the
+   default set — so a character still changes all of it. A block's own stylesheet places its
+   parts; it does not size them again. */
+
+:is(.text-heading, .image-text-heading, .cards-heading, .cta-heading, .form-block-heading, .accordion-heading, .stats-heading, .gallery-heading, .logos-heading, .downloads-heading) {
+  margin: 0 0 var(--space-m);
+  font-size: var(--text-2xl);
+  text-wrap: balance;
+}
+
+:is(.hero-subheading, .cards-intro, .form-block-intro, .cta-body) {
+  max-inline-size: 34em;
+  color: var(--section-muted);
+  font-size: var(--text-lead);
+  line-height: 1.6;
+}
+
+.block .richtext {
+  color: var(--section-muted);
+}
+
+.block .richtext :is(h2, h3, h4, strong, b) {
+  color: var(--section-text);
+}
+
+.block .richtext > :is(p, ul, ol) {
+  max-inline-size: 38em;
+}
+
+.align-center .richtext > :is(p, ul, ol) {
+  margin-inline: auto;
+}
+
+/* A paragraph's or heading's own alignment (D-217): its words, and its box with them, so a
+   paragraph held to 38em stands where its words do rather than centring inside a column at
+   the left. */
+:is(.richtext, .site-footer-text) > .text-center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+:is(.richtext, .site-footer-text) > .text-right {
+  margin-inline-start: auto;
+  text-align: right;
+}
+
+/* A BLOCK'S MEASURE (D-187, D-188, the owner): how wide the lines of a Text block, Questions or
+   a Quote run, their own option rather than the 38em above, which held every paragraph to one
+   width whatever the section's — and Width looked broken. On the block, so the heading keeps
+   the body's edge; in ch of the body's own face, so a line holds about as many letters in every
+   character. */
+:is(.text, .accordion, .quote)[class*="measure-"] .richtext > :is(p, ul, ol) {
+  max-inline-size: none;
+}
+
+:is(.text, .accordion, .quote).measure-comfortable {
+  max-inline-size: 65ch;
+}
+
+:is(.text, .accordion, .quote).measure-wide {
+  max-inline-size: 85ch;
+}
+
+/* In two columns the measure is each column's (D-191, the owner): the block as wide as two
+   lines of it and the gap between them, which is the gap blocks.css sets. */
+.layout-columns .text.measure-comfortable {
+  max-inline-size: calc(2 * 65ch + var(--space-xl));
+}
+
+.layout-columns .text.measure-wide {
+  max-inline-size: calc(2 * 85ch + var(--space-xl));
+}
+
+.align-center :is(.text, .accordion, .quote)[class*="measure-"] {
+  margin-inline: auto;
+}
+
+/* A link standing on its own under a block's words: bold, in the accent, the arrow its own. */
+.text-link a {
+  color: var(--section-link);
+  font-weight: 700;
+  /* Unlined, unless the link has the text's own colour (--link-line, D-185). */
+  text-decoration: var(--link-line, none);
+}
+
+.text-link a:is(:hover, :focus-visible) {
+  text-decoration: underline;
+}
+
 h1,
 h2,
 h3,
@@ -93,21 +184,37 @@ code {
 }
 
 .locale-switcher [aria-current] {
-  color: var(--color-text);
+  /* The section's text, not the page's: the switcher stands in the footer, whose surface may
+     be dark or a gradient, where the page's text colour cannot be read. */
+  color: var(--section-text, var(--color-text));
   text-decoration: none;
 }
 
 /* Shared parts of blocks */
 
 .button {
-  display: inline-block;
-  padding: var(--space-s) var(--space-l);
-  color: var(--section-button-text);
-  background: var(--section-button-bg);
-  border: var(--border-card) solid var(--section-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-block-size: var(--button-height);
+  padding: 0 calc(var(--button-height) * 0.48);
+  /* The character's style (D-164), as numbers the root can carry: a share of the button
+     colour as the fill, and the words in the colour on it or in the button colour. On a
+     dark surface the section turns the button colours round, so a button there is light
+     with dark words (README 1.6). */
+  --button-ink: color-mix(in srgb, var(--section-button-text) calc(var(--button-filled, 1) * 100%), var(--section-button-bg));
+  --button-surface: color-mix(in srgb, var(--section-button-bg) calc(var(--button-fill, 1) * 100%), transparent);
+  --button-text-size: calc(var(--text-base) * 0.9375);
+  color: var(--button-ink);
+  background: var(--button-surface);
+  border: var(--border-width) solid var(--section-button-bg);
   border-radius: var(--radius-button);
   box-shadow: var(--shadow-s);
-  font-weight: var(--heading-weight);
+  font-size: var(--button-text-size);
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: var(--button-transform, none);
   text-decoration: none;
 }
 
@@ -118,10 +225,11 @@ code {
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 3;
-  background: var(--section-placeholder);
-  border: var(--border-width) solid var(--section-placeholder-edge);
+  /* A soft wash from the accent's tint to the card, never an empty hole (README 1.6). From
+     the section's own colours, so it sits on any surface. */
+  --placeholder-wash: linear-gradient(135deg, color-mix(in srgb, var(--section-link) 20%, var(--section-card)), var(--section-card));
+  background: var(--placeholder-wash);
   border-radius: var(--radius-l);
-  box-shadow: var(--shadow-m);
 }
 
 /* A FLAT RECTANGLE READS AS DAMAGE; A RECTANGLE WITH A PICTURE IN IT READS AS A PICTURE
@@ -133,7 +241,9 @@ code {
    glyph then takes the colour of whatever surface it lands on, which is the rule the whole
    front end follows. One declaration serves the page, the canvas and the library preview,
    because all three render the same block through this same class. */
-.media-placeholder::before {
+/* The picture glyph, only where someone is editing: the builder's canvas, the block library
+   and the Appearance preview. A visitor sees the wash alone (owner's review of phase 1). */
+:is(.bx-canvas, .bx-preview, .bx-design-preview) .media-placeholder::before {
   content: "";
   position: absolute;
   inset: 50% auto auto 50%;

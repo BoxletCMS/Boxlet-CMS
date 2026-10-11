@@ -13,6 +13,7 @@ use App\Modules\Auth\TwoFactor;
 use App\Modules\Languages\Locales;
 use App\Modules\Mailer\MailController;
 use App\Modules\Mailer\MailSettings;
+use App\Modules\Pages\LlmsTxt;
 use App\Modules\Media\MediaReference;
 use App\Modules\Stats\Geo;
 use App\Modules\Stats\GeoDownload;
@@ -91,9 +92,8 @@ final class SettingsController
         foreach ($values as $key => $value) {
             Settings::set($db, $key, $value);
         }
-        // The logo field shows the one the header draws, which may still be the header's
-        // older setting; once saved here, this is the only one (D-038).
-        SiteChrome::retireHeaderLogo($db);
+        // llms.txt opens with the site's name (D-151).
+        LlmsTxt::publish($db, $this->publicPath());
         Activity::record($db, 'settings', 'saved', null, '');
 
         $this->container->get('session')->set(
@@ -164,7 +164,7 @@ final class SettingsController
             'nav' => 'settings',
             // The picker's own stylesheets and script, the same set the page editor loads.
             'styles' => ['admin-media.css', 'admin-picker.css', 'admin-browser.css', 'vendor/cropper.min.css', 'admin-crop.css', 'admin-two-step.css', 'admin-settings.css'],
-            'scripts' => ['vendor/cropper.min.js', 'media-browser-upload.js', 'media-browser.js', 'media-picker.js', 'mail-settings.js', 'settings-nav.js', 'auto-continue.js', 'logo-svg.js'],
+            'scripts' => ['vendor/cropper.min.js', 'media-browser-upload.js', 'media-browser.js', 'media-picker.js', 'mail-settings.js', 'settings-nav.js', 'auto-continue.js', 'file-sends.js'],
             'values' => $values,
             'errors' => $errors,
             'notice' => $notice,
@@ -173,6 +173,12 @@ final class SettingsController
             'maintenanceOn' => $this->container->get('maintenance')->isOn(),
             // The page cache (D-053): on unless switched off, and how many pages it holds.
             'pageCache' => ['on' => Settings::get($this->db(), 'page_cache', '1') !== '0', 'count' => PageCache::count()],
+            // llms.txt (D-151): on unless switched off, and whether the owner has one of their own.
+            'llms' => [
+                'on' => LlmsTxt::on($this->db()),
+                'ownersOwn' => LlmsTxt::ownersOwn($this->publicPath()),
+                'exists' => is_file($this->publicPath() . '/llms.txt'),
+            ],
             // The SVG logos (D-142), shown under the pickers they stand in for.
             'logoSvg' => LogoSvg::all($this->db()),
             'languages' => Locales::all($this->db()),
@@ -246,6 +252,11 @@ final class SettingsController
         $row = $this->db()->one("SELECT occurred_at FROM activity WHERE kind = 'settings' AND action = 'saved' ORDER BY occurred_at DESC LIMIT 1");
 
         return $row === null ? null : Dates::local((string) $row['occurred_at'], Dates::zone($this->db()));
+    }
+
+    private function publicPath(): string
+    {
+        return (string) (($this->container->get('config')->get('app', []))['public_path'] ?? '');
     }
 
     private function db(): Db

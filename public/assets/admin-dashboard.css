@@ -99,7 +99,8 @@
   list-style: none;
 }
 
-.admin a.issue {
+/* A link to where it is mended, or, for what is mended at the host, the same box without one. */
+.admin .issue {
   display: flex;
   align-items: flex-start;
   gap: var(--ui-2);

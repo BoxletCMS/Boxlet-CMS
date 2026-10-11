@@ -33,7 +33,7 @@ final class DesignLibrary
     /**
      * Every saved design, newest change first, ready for the strip that lists them.
      *
-     * @return list<array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>}>
+     * @return list<array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, dark: array<string, string>}>
      */
     public static function all(Db $db): array
     {
@@ -50,7 +50,7 @@ final class DesignLibrary
      * written by an older version — or edited by hand — can never reach the screen as
      * something the design layer does not accept.
      *
-     * @return array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>}|null
+     * @return array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, dark: array<string, string>}|null
      */
     public static function find(Db $db, int $id): ?array
     {
@@ -68,29 +68,32 @@ final class DesignLibrary
      *
      * @param array<string, string> $decisions
      * @param array<string, string> $look
+     * @param array<string, string> $dark the owner's dark colours (D-187)
      * @return int the row's id
      */
-    public static function save(Db $db, string $name, array $decisions, array $look, string $character = ''): int
+    public static function save(Db $db, string $name, array $decisions, array $look, string $character = '', array $dark = []): int
     {
         $name = self::cleanName($name);
         $now = gmdate('Y-m-d H:i:s');
         $existing = $db->one('SELECT id FROM design_library WHERE name = ?', [$name]);
-        $decisionsJson = json_encode(Tokens::validate($decisions)['decisions'], JSON_THROW_ON_ERROR);
+        // The owner's values only (D-164): the decisions half, '' for what follows.
+        $decisionsJson = json_encode(self::decisionsOnly(Tokens::validate($decisions)['decisions']), JSON_THROW_ON_ERROR);
         $lookJson = json_encode(self::cleanLook($look), JSON_THROW_ON_ERROR);
+        $darkJson = json_encode(array_filter(Tokens::darkOwn($dark), static fn (string $v): bool => $v !== ''), JSON_THROW_ON_ERROR | JSON_FORCE_OBJECT);
         $character = Presets::exists($character) ? $character : '';
 
         if ($existing !== null) {
             $db->query(
-                'UPDATE design_library SET decisions_json = ?, look_json = ?, character_name = ?, updated_at = ? WHERE id = ?',
-                [$decisionsJson, $lookJson, $character, $now, (int) $existing['id']],
+                'UPDATE design_library SET decisions_json = ?, look_json = ?, dark_json = ?, character_name = ?, updated_at = ? WHERE id = ?',
+                [$decisionsJson, $lookJson, $darkJson, $character, $now, (int) $existing['id']],
             );
 
             return (int) $existing['id'];
         }
 
         $db->query(
-            'INSERT INTO design_library (name, character_name, decisions_json, look_json, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-            [$name, $character, $decisionsJson, $lookJson, $now, $now],
+            'INSERT INTO design_library (name, character_name, decisions_json, look_json, dark_json, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [$name, $character, $decisionsJson, $lookJson, $darkJson, $now, $now],
         );
 
         return (int) $db->lastInsertId();
@@ -122,21 +125,24 @@ final class DesignLibrary
 
     /**
      * @param array<string, mixed> $row
-     * @return array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>}
+     * @return array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, dark: array<string, string>}
      */
     private static function shape(array $row): array
     {
         $decisions = json_decode((string) $row['decisions_json'], true);
         $look = json_decode((string) $row['look_json'], true);
+        // NULL in a row kept before D-187: no dark colours.
+        $dark = json_decode((string) ($row['dark_json'] ?? ''), true);
 
         return [
             'id' => (int) $row['id'],
             'name' => (string) $row['name'],
             'character' => (string) $row['character_name'],
-            // Validated on the way out: a row from an older version is filled in with the
-            // default preset's values rather than rendering as a broken screen.
-            'decisions' => Tokens::validate(is_array($decisions) ? $decisions : [])['decisions'],
+            // Validated on the way out, as everything read from storage is: a value that is
+            // not one the screen can show is filled in rather than drawn broken.
+            'decisions' => self::decisionsOnly(Tokens::validate(is_array($decisions) ? $decisions : [])['decisions']),
             'look' => self::cleanLook(is_array($look) ? $look : []),
+            'dark' => Tokens::darkOwn(is_array($dark) ? $dark : []),
         ];
     }
 
@@ -149,8 +155,18 @@ final class DesignLibrary
      */
     private static function cleanLook(array $look): array
     {
-        // A row kept before D-112 names the header's arrangement and behaviour as one
-        // choice; modernise() reads it as this version's two, exactly as the settings are.
-        return ChromeLook::modernise($look);
+        return ChromeLook::clean($look);
+    }
+
+    /**
+     * The decisions half of a design: everything but the header and footer, which a kept
+     * design holds in its look (D-164).
+     *
+     * @param array<string, string> $values
+     * @return array<string, string>
+     */
+    private static function decisionsOnly(array $values): array
+    {
+        return array_diff_key($values, array_flip(ChromeLook::keys()));
     }
 }

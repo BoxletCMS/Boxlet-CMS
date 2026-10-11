@@ -10,8 +10,11 @@
  * colour rather than by fading a picture towards its background (D-012).
  */
 
+/* One column as wide as the field and never wider (D-183): nothing in it — a long page's name
+   in the link panel, the toolbar — may widen the inspector it stands in. */
 .richtext {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--ui-2);
 }
 
@@ -26,9 +29,10 @@
 
 /* Toolbar */
 
+/* Breaks onto a second row where the field is narrower than its groups (D-183). */
 .richtext-toolbar {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: var(--ui-2);
   align-items: center;
 }
@@ -87,9 +91,19 @@
 /* Drawn at the size of the letters beside it, and in the same ink: the icon takes
    currentColor, so it carries the button's own colour and contrast rather than a value of
    its own. */
-.rt-icon {
+.rt-icon,
+.rt-button .icon {
   inline-size: 1em;
   block-size: 1em;
+}
+
+/* A paragraph's alignment (D-217), as the page will draw it. */
+.richtext-editor .text-center {
+  text-align: center;
+}
+
+.richtext-editor .text-right {
+  text-align: right;
 }
 
 /* The link row, in the flow between the toolbar and the editor so it never covers the
@@ -106,11 +120,27 @@
   border-radius: var(--ui-radius-m);
 }
 
-/* A page first, an address second (PLAN.md D-034): each takes a full row in the narrow
-   inspector, and the address is hidden while a page is chosen. */
+/* The link's words, then a page, then an address (PLAN.md D-034, D-182), each named above
+   it as in the canvas's popover (D-183): each takes a full row in the narrow inspector, and
+   the address is hidden while a page is chosen. */
+.rt-link-field {
+  display: grid;
+  flex: 1 1 100%;
+  gap: var(--ui-1);
+  min-inline-size: 0;
+}
+
+.rt-link-label {
+  color: var(--ui-ink);
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+}
+
+.rt-link-text,
 .rt-link-page,
 .rt-link-input {
-  flex: 1 1 100%;
+  box-sizing: border-box;
+  inline-size: 100%;
   min-inline-size: 0;
   padding: var(--ui-2) var(--ui-3);
   background: var(--ui-panel);
@@ -122,12 +152,18 @@
   font-size: var(--ui-text-sm);
 }
 
-.richtext-link:has(.rt-link-page option:checked:not([value=""])) .rt-link-input {
+.richtext-link:has(.rt-link-page option:checked:not([value=""])) .rt-link-address {
   display: none;
 }
 
 .richtext-link .button {
   font-size: var(--ui-text-sm);
+}
+
+/* Link waits for words and an address (D-182): faint ink, not faded. */
+.richtext-link .button[disabled] {
+  color: var(--ui-ink-faint);
+  cursor: default;
 }
 
 /* The editor itself, matching every other field on the panel. TipTap renders into a child

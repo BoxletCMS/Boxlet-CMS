@@ -1,0 +1,316 @@
+{
+  "$schema": "https://boxlet.dev/schema/design-set-v2.json",
+  "format": "boxlet-design-set",
+  "version": 2,
+  "id": "terminal",
+  "name": {
+    "en": "Terminal",
+    "hr": "Terminal"
+  },
+  "description": {
+    "en": "Green on black, all monospace, like a terminal. For hackers, security firms and developer tools.",
+    "hr": "Zeleno na crnom, sve u monospaceu, kao terminal. Za hakere, sigurnosne tvrtke i developerske alate."
+  },
+  "author": "Boxlet",
+  "tags": [
+    "unusual",
+    "dark",
+    "mono",
+    "developer"
+  ],
+  "decisions": {
+    "mode": "dark",
+    "seed": "#1d7a3a",
+    "heading_font": "jetbrains-mono",
+    "body_font": "jetbrains-mono",
+    "text_size": 15,
+    "scale": 1.2,
+    "spacing": 1,
+    "section_gap": 72,
+    "radius": 0,
+    "border_width": 1,
+    "shadow": "none",
+    "container": 64,
+    "button_style": "outline",
+    "button_radius": 0,
+    "button_height": 40,
+    "surface_contrast": 16
+  },
+  "dark": {
+    "seed": "#4ade80",
+    "color_background": "#0a0f0b",
+    "surface_contrast": 16,
+    "shadow_strength": 40
+  },
+  "look": {
+    "header_opacity": 100,
+    "header_blur": 0,
+    "logo_size": 32,
+    "footer_columns": "3",
+    "footer_links": "auto",
+    "header_arrangement": "left",
+    "header_behaviour": "static",
+    "header_surface": "plain",
+    "header_edge": "line",
+    "header_height": 52,
+    "brand": "name",
+    "nav_style": "plain",
+    "nav_ink": "accent",
+    "header_button": "none",
+    "footer_layout": "simple",
+    "small_print_row": "left",
+    "footer_surface": "plain",
+    "footer_edge": "line"
+  },
+  "composition": {
+    "section": {
+      "surface": "plain",
+      "width": "normal",
+      "align": "left",
+      "divider": "line",
+      "v_align": "top",
+      "animation": "none",
+      "pad_top": "",
+      "pad_bottom": "",
+      "min_height": 0
+    },
+    "surfaces": {},
+    "dividers": {},
+    "layouts": {
+      "hero": "left",
+      "cards": "list",
+      "stats": "three",
+      "quote": "plain",
+      "cta": "beside",
+      "accordion": "list",
+      "text": "single"
+    },
+    "options": {
+      "cards": {
+        "image_shape": "none"
+      }
+    }
+  },
+  "patterns": [
+    {
+      "id": "terminal-welcome",
+      "name": {
+        "en": "Welcome",
+        "hr": "Dobrodošlica"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "hero",
+          "layout": "left",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "$ audit --everything",
+              "hr": "$ audit --everything"
+            },
+            "subheading": {
+              "en": "Penetration tests and code reviews for teams who would rather hear it from us first.",
+              "hr": "Penetracijski testovi i pregledi koda za timove koji bi radije prvo čuli od nas."
+            },
+            "cta": {
+              "label": {
+                "en": "Request an audit",
+                "hr": "Zatražite reviziju"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "terminal-offer",
+      "name": {
+        "en": "What we offer",
+        "hr": "Što nudimo"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "cards",
+          "layout": "grid",
+          "column": 0,
+          "options": {
+            "per_row": 3
+          },
+          "content": {
+            "heading": {
+              "en": "Services",
+              "hr": "Usluge"
+            },
+            "intro": {
+              "en": "Reports in plain words, fixes included.",
+              "hr": "Izvještaji jednostavnim riječima, s popravcima."
+            },
+            "items": [
+              {
+                "heading": {
+                  "en": "pentest",
+                  "hr": "pentest"
+                },
+                "body": {
+                  "en": "<p>Web, API and network, black and white box.</p>",
+                  "hr": "<p>Web, API i mreža, black i white box.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "review",
+                  "hr": "review"
+                },
+                "body": {
+                  "en": "<p>Line by line, before release.</p>",
+                  "hr": "<p>Red po red, prije izdanja.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "retainer",
+                  "hr": "retainer"
+                },
+                "body": {
+                  "en": "<p>On call when something looks wrong.</p>",
+                  "hr": "<p>Na pozivu kad nešto izgleda čudno.</p>"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "terminal-numbers",
+      "name": {
+        "en": "In numbers",
+        "hr": "U brojkama"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "tinted"
+        }
+      },
+      "blocks": [
+        {
+          "type": "stats",
+          "layout": "three",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Found so far",
+              "hr": "Dosad pronađeno"
+            },
+            "items": [
+              {
+                "value": "1,340",
+                "label": {
+                  "en": "issues",
+                  "hr": "propusta"
+                }
+              },
+              {
+                "value": "96",
+                "label": {
+                  "en": "critical",
+                  "hr": "kritičnih"
+                }
+              },
+              {
+                "value": "0",
+                "label": {
+                  "en": "leaks after us",
+                  "hr": "curenja nakon nas"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "terminal-voice",
+      "name": {
+        "en": "A client's words",
+        "hr": "Riječi klijenta"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "quote",
+          "layout": "plain",
+          "column": 0,
+          "options": {},
+          "content": {
+            "quote": {
+              "en": "They found in two days what we missed in two years.",
+              "hr": "U dva dana su našli ono što smo mi propustili u dvije godine."
+            },
+            "attribution": {
+              "en": "CTO, a Zagreb fintech",
+              "hr": "CTO, zagrebački fintech"
+            },
+            "role": {
+              "en": "Client",
+              "hr": "Klijent"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "terminal-call",
+      "name": {
+        "en": "Call to action",
+        "hr": "Poziv na akciju"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "contrast"
+        }
+      },
+      "blocks": [
+        {
+          "type": "cta",
+          "layout": "beside",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Ship with fewer surprises",
+              "hr": "Izdajte s manje iznenađenja"
+            },
+            "body": {
+              "en": "PGP key on the contact page.",
+              "hr": "PGP ključ je na stranici za kontakt."
+            },
+            "action": {
+              "label": {
+                "en": "Request an audit",
+                "hr": "Zatražite reviziju"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+/* Numbers (PLAN.md D-105, D-125, D-188). Split from blocks-words.css with the rule that the
+   number gives way before the row does (D-188), under blocks.css's rule: only custom
+   properties from tokens.css and the --section-* properties each section sets in
+   sections.css. No literal colours, pixel values, fonts or shadows. Linked after
+   blocks-words.css.
+
+   The number is the content, so it is set at display size and the word under it is not.
+   That relationship is the block: three Text blocks in a row cannot have it, because a
+   heading is sized as a heading. */
+
+.stats-heading {
+  margin: 0 0 var(--space-l);
+}
+
+/* THE BLOCK MEASURES ITS OWN ROOM, not the window's (D-125). Three or four numbers side by
+   side need a width a narrow column does not have: measured, three in a column of 211 pixels,
+   "120+" 110 wide in a track of 70, running into its neighbour. The rule for a narrow window
+   could not see that — the window was wide. */
+.stats {
+  container-type: inline-size;
+}
+
+.stats-grid {
+  --stats-across: 3;
+  display: grid;
+  grid-template-columns: repeat(var(--stats-across), minmax(0, 1fr));
+  gap: var(--space-l);
+  margin: 0;
+}
+
+.layout-four .stats-grid {
+  --stats-across: 4;
+}
+
+.stats-item {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+/* THE NUMBER GIVES WAY BEFORE THE ROW DOES (D-188, the owner): as wide as a share of the
+   block's own room allows — "200+" is about 2.6 of its own size wide — between the
+   character's display size and --text-xl. Not the 16rem a column of words keeps: a number is
+   short. Only below --text-xl does the row break, and then evenly. */
+.stats-value {
+  font-family: var(--font-heading);
+  --stats-size: clamp(var(--text-xl), calc((100cqi - (var(--stats-across) - 1) * var(--space-l)) / var(--stats-across) / 2.6), var(--text-3xl));
+  font-size: var(--stats-size);
+  font-weight: var(--heading-weight);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--heading-tracking);
+}
+
+.stats-label {
+  margin: 0;
+  color: var(--section-muted);
+  font-size: var(--text-sm);
+}
+
+/* WHERE THE ROW BREAKS, EVENLY (D-188): four become two and two, never three and one; three
+   become one column, never two and one; an even number of them stays two by two down to
+   14rem. The widths are the least at which each number still has 2.6 × --text-xl (about
+   5rem, Bold's) with the widest gap a design can have. The "+" a selected block shows is not
+   counted. */
+@container (max-width: 28rem) {
+  .layout-four .stats-grid {
+    --stats-across: 2;
+  }
+}
+
+@container (max-width: 20rem) {
+  .stats-grid,
+  .layout-four .stats-grid {
+    --stats-across: 1;
+  }
+}
+
+@container (14rem < width <= 20rem) {
+  .stats-grid:has(> :nth-child(even of .stats-item:not(.bx-add-item-cell)):nth-last-child(1 of .stats-item:not(.bx-add-item-cell))) {
+    --stats-across: 2;
+  }
+}

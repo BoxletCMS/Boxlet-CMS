@@ -31,6 +31,10 @@ return [
     ],
     // A list reads down, one file under another; cards set them side by side, for a few
     // files of equal weight.
-    'layouts' => ['list', 'cards'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'list' => ['image' => [[4, 4, 4, 4], [4, 10, 4, 4], [4, 16, 4, 4]], 'line' => [[10, 5, 24, 2], [10, 11, 24, 2], [10, 17, 24, 2]]],
+        'cards' => ['image' => [[4, 4, 12, 10], [18, 4, 12, 10], [32, 4, 12, 10]], 'line' => [[4, 16, 10, 2], [18, 16, 10, 2], [32, 16, 10, 2]]],
+    ],
     'defaults' => ['layout' => 'list'],
 ];

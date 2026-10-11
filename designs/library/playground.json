@@ -1,0 +1,332 @@
+{
+  "$schema": "https://boxlet.dev/schema/design-set-v2.json",
+  "format": "boxlet-design-set",
+  "version": 2,
+  "id": "playground",
+  "name": {
+    "en": "Playground",
+    "hr": "Playground"
+  },
+  "description": {
+    "en": "Bright colours, big round corners and a cheerful rounded face. For kindergartens, play centres and children's clubs.",
+    "hr": "Žive boje, veliki zaobljeni kutovi i veselo zaobljeno pismo. Za vrtiće, igraonice i dječje klubove."
+  },
+  "author": "Boxlet",
+  "tags": [
+    "playful",
+    "colourful",
+    "rounded",
+    "children"
+  ],
+  "decisions": {
+    "mode": "light",
+    "seed": "#c2185b",
+    "secondary": "#1d4ed8",
+    "heading_font": "baloo-2",
+    "body_font": "nunito",
+    "text_size": 18,
+    "scale": 1.3,
+    "nudge_h1": 6,
+    "spacing": 1.15,
+    "section_gap": 96,
+    "radius": 28,
+    "border_width": 2,
+    "shadow": "hard",
+    "shadow_strength": 30,
+    "container": 64,
+    "button_style": "filled",
+    "button_radius": 28,
+    "button_height": 54,
+    "surface_contrast": 34
+  },
+  "dark": {
+    "seed": "#ff7fae",
+    "secondary": "#304cc8",
+    "surface_contrast": 30,
+    "shadow_strength": 60
+  },
+  "look": {
+    "header_opacity": 100,
+    "header_blur": 0,
+    "logo_size": 44,
+    "footer_columns": "3",
+    "footer_links": "auto",
+    "header_arrangement": "left",
+    "header_behaviour": "sticky",
+    "header_surface": "tinted",
+    "header_edge": "none",
+    "header_height": 80,
+    "brand": "both",
+    "nav_style": "chips",
+    "nav_ink": "accent",
+    "header_button": "filled",
+    "footer_layout": "three",
+    "small_print_row": "centred",
+    "footer_surface": "contrast",
+    "footer_edge": "curve"
+  },
+  "composition": {
+    "section": {
+      "surface": "plain",
+      "width": "normal",
+      "align": "left",
+      "divider": "none",
+      "v_align": "top",
+      "animation": "zoom",
+      "pad_top": "",
+      "pad_bottom": "",
+      "min_height": 0
+    },
+    "surfaces": {
+      "stats": "tinted",
+      "cta": "contrast",
+      "accordion": "tinted"
+    },
+    "dividers": {
+      "stats": "curve",
+      "cta": "curve"
+    },
+    "layouts": {
+      "hero": "split",
+      "cards": "grid",
+      "stats": "three",
+      "quote": "card",
+      "cta": "banner",
+      "gallery": "three",
+      "accordion": "cards"
+    },
+    "options": {
+      "cards": {
+        "image_shape": "round"
+      },
+      "gallery": {
+        "shape": "round"
+      },
+      "hero": {
+        "height": "tall"
+      }
+    }
+  },
+  "patterns": [
+    {
+      "id": "playground-welcome",
+      "name": {
+        "en": "Welcome",
+        "hr": "Dobrodošlica"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "hero",
+          "layout": "split",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Where play is the lesson",
+              "hr": "Gdje je igra lekcija"
+            },
+            "subheading": {
+              "en": "A small kindergarten with a big garden, for children from one to six.",
+              "hr": "Mali vrtić s velikim vrtom, za djecu od jedne do šest godina."
+            },
+            "cta": {
+              "label": {
+                "en": "Come for a visit",
+                "hr": "Dođite u posjet"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "playground-offer",
+      "name": {
+        "en": "What we offer",
+        "hr": "Što nudimo"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "cards",
+          "layout": "grid",
+          "column": 0,
+          "options": {
+            "per_row": 3
+          },
+          "content": {
+            "heading": {
+              "en": "A day with us",
+              "hr": "Dan kod nas"
+            },
+            "intro": {
+              "en": "Outside every day, whatever the weather.",
+              "hr": "Vani svaki dan, po svakom vremenu."
+            },
+            "items": [
+              {
+                "heading": {
+                  "en": "Garden time",
+                  "hr": "Vrijeme u vrtu"
+                },
+                "body": {
+                  "en": "<p>Digging, planting, puddles.</p>",
+                  "hr": "<p>Kopanje, sadnja, lokve.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Music and stories",
+                  "hr": "Glazba i priče"
+                },
+                "body": {
+                  "en": "<p>Songs, books and little plays.</p>",
+                  "hr": "<p>Pjesme, knjige i male predstave.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Good food",
+                  "hr": "Dobra hrana"
+                },
+                "body": {
+                  "en": "<p>Cooked here, every morning.</p>",
+                  "hr": "<p>Kuhano ovdje, svako jutro.</p>"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "playground-numbers",
+      "name": {
+        "en": "In numbers",
+        "hr": "U brojkama"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "tinted"
+        }
+      },
+      "blocks": [
+        {
+          "type": "stats",
+          "layout": "three",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Our groups",
+              "hr": "Naše grupe"
+            },
+            "items": [
+              {
+                "value": "4",
+                "label": {
+                  "en": "groups",
+                  "hr": "grupe"
+                }
+              },
+              {
+                "value": "1:6",
+                "label": {
+                  "en": "teachers to children",
+                  "hr": "odgajatelj na djecu"
+                }
+              },
+              {
+                "value": "900 m²",
+                "label": {
+                  "en": "of garden",
+                  "hr": "vrta"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "playground-voice",
+      "name": {
+        "en": "A client's words",
+        "hr": "Riječi klijenta"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "quote",
+          "layout": "card",
+          "column": 0,
+          "options": {},
+          "content": {
+            "quote": {
+              "en": "Every evening she tells us about a new beetle.",
+              "hr": "Svaku večer nam priča o novoj bubi."
+            },
+            "attribution": {
+              "en": "Ana, mum of Lucija",
+              "hr": "Ana, Lucijina mama"
+            },
+            "role": {
+              "en": "Parent",
+              "hr": "Roditelj"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "playground-call",
+      "name": {
+        "en": "Call to action",
+        "hr": "Poziv na akciju"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "contrast"
+        }
+      },
+      "blocks": [
+        {
+          "type": "cta",
+          "layout": "banner",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Enrolment is open",
+              "hr": "Upisi su otvoreni"
+            },
+            "body": {
+              "en": "Visit us on a Friday morning.",
+              "hr": "Posjetite nas petkom ujutro."
+            },
+            "action": {
+              "label": {
+                "en": "Book a visit",
+                "hr": "Dogovorite posjet"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

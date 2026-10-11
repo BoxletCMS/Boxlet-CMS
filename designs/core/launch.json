@@ -1,0 +1,325 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "launch",
+    "name": {
+        "en": "Launch",
+        "hr": "Launch"
+    },
+    "description": {
+        "en": "Dark first, a sharp grotesque and a violet gradient. For apps, startups and product launches.",
+        "hr": "Prvo tamno, oštar grotesk i ljubičasti gradijent. Za aplikacije, startupe i lansiranja proizvoda."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#5b3fd6",
+        "secondary": "#0e0b24",
+        "surface_contrast": "24",
+        "heading_font": "space-grotesk",
+        "body_font": "manrope",
+        "scale": "1.3",
+        "nudge_h1": "8",
+        "spacing": "1.05",
+        "section_gap": "104",
+        "radius": "14",
+        "shadow": "layered",
+        "shadow_strength": "50",
+        "container": "70",
+        "button_radius": "10",
+        "button_height": "48"
+    },
+    "dark": {
+        "seed": "#a594ff",
+        "secondary": "#1a1440",
+        "surface_contrast": "24",
+        "shadow_strength": "60"
+    },
+    "look": {
+        "header_arrangement": "inline",
+        "header_behaviour": "sticky",
+        "header_opacity": "80",
+        "header_blur": "12",
+        "header_surface": "plain",
+        "header_edge": "line",
+        "header_height": "68",
+        "logo_size": "32",
+        "brand": "both",
+        "nav_style": "plain",
+        "nav_ink": "ink",
+        "header_button": "filled",
+        "footer_layout": "columns",
+        "footer_columns": "3",
+        "footer_links": "auto",
+        "small_print_row": "split",
+        "footer_surface": "tinted",
+        "footer_edge": "line"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "wide",
+            "align": "left",
+            "divider": "none",
+            "animation": "up"
+        },
+        "surfaces": {
+            "hero": "gradient",
+            "cta": "gradient",
+            "stats": "tinted"
+        },
+        "dividers": {},
+        "layouts": {
+            "hero": "center",
+            "cards": "grid",
+            "stats": "three",
+            "quote": "card",
+            "cta": "banner",
+            "logos": "row",
+            "accordion": "cards",
+            "image_text": "image-right"
+        },
+        "options": {
+            "hero": {
+                "height": "tall"
+            },
+            "cards": {
+                "per_row": "3",
+                "image_shape": "none"
+            }
+        }
+    },
+    "patterns": [
+        {
+            "id": "launch-welcome",
+            "name": {
+                "en": "Welcome",
+                "hr": "Dobrodošlica"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "gradient"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "center",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Ship the release notes before the release",
+                            "hr": "Objavite bilješke o izdanju prije izdanja"
+                        },
+                        "subheading": {
+                            "en": "Changelog turns merged pull requests into notes your users read.",
+                            "hr": "Changelog pretvara spojene pull requestove u bilješke koje korisnici čitaju."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "Start free",
+                                "hr": "Počnite besplatno"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "launch-offer",
+            "name": {
+                "en": "What we offer",
+                "hr": "Što nudimo"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {
+                        "per_row": "3"
+                    },
+                    "content": {
+                        "heading": {
+                            "en": "Built for small teams",
+                            "hr": "Napravljeno za male timove"
+                        },
+                        "intro": {
+                            "en": "Set up in an afternoon.",
+                            "hr": "Postavljeno u jedno popodne."
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "From Git",
+                                    "hr": "Iz Gita"
+                                },
+                                "body": {
+                                    "en": "<p>Reads your merges, drafts the notes.</p>",
+                                    "hr": "<p>Čita vaše mergeove i piše nacrt bilješki.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Review",
+                                    "hr": "Pregled"
+                                },
+                                "body": {
+                                    "en": "<p>Edit, approve and schedule in one place.</p>",
+                                    "hr": "<p>Uredite, odobrite i zakažite na jednom mjestu.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Publish",
+                                    "hr": "Objava"
+                                },
+                                "body": {
+                                    "en": "<p>Web page, email and in-app, at once.</p>",
+                                    "hr": "<p>Web, e-mail i aplikacija, odjednom.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "launch-numbers",
+            "name": {
+                "en": "In numbers",
+                "hr": "U brojkama"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "tinted"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "stats",
+                    "layout": "three",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Teams using it",
+                            "hr": "Timovi koji ga koriste"
+                        },
+                        "items": [
+                            {
+                                "value": {
+                                    "en": "1,800"
+                                },
+                                "label": {
+                                    "en": "teams",
+                                    "hr": "timova"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "40k"
+                                },
+                                "label": {
+                                    "en": "notes a month",
+                                    "hr": "bilješki mjesečno"
+                                }
+                            },
+                            {
+                                "value": {
+                                    "en": "3 min"
+                                },
+                                "label": {
+                                    "en": "to set up",
+                                    "hr": "za postavljanje"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "launch-voice",
+            "name": {
+                "en": "A client's words",
+                "hr": "Riječi klijenta"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "quote",
+                    "layout": "card",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "Our users finally know what changed.",
+                            "hr": "Naši korisnici napokon znaju što se promijenilo."
+                        },
+                        "attribution": {
+                            "en": "Petra V.",
+                            "hr": "Petra V."
+                        },
+                        "role": {
+                            "en": "Head of product, Tidal",
+                            "hr": "Voditeljica proizvoda, Tidal"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "launch-call",
+            "name": {
+                "en": "Call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "banner",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Try it on your next release",
+                            "hr": "Isprobajte na sljedećem izdanju"
+                        },
+                        "body": {
+                            "en": "Free for teams under five.",
+                            "hr": "Besplatno za timove do pet ljudi."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Start free",
+                                "hr": "Počnite besplatno"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

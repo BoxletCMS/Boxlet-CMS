@@ -1,0 +1,269 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "gallery",
+    "name": {
+        "en": "Gallery",
+        "hr": "Gallery"
+    },
+    "description": {
+        "en": "Black and white, pictures edge to edge, a quiet serif. For photographers, architects and galleries.",
+        "hr": "Crno-bijelo, slike od ruba do ruba, tihi serif. Za fotografe, arhitekte i galerije."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#1a1a1a",
+        "surface_contrast": "10",
+        "heading_font": "instrument-serif",
+        "body_font": "hanken-grotesk",
+        "scale": "1.335",
+        "nudge_h1": "12",
+        "spacing": "1.2",
+        "section_gap": "120",
+        "radius": "0",
+        "container": "72",
+        "button_style": "outline",
+        "button_radius": "0",
+        "button_caps": "yes"
+    },
+    "dark": {
+        "seed": "#ededed",
+        "surface_contrast": "12",
+        "shadow_strength": "40"
+    },
+    "look": {
+        "header_arrangement": "split",
+        "header_behaviour": "over",
+        "header_opacity": "0",
+        "header_blur": "0",
+        "header_surface": "plain",
+        "header_edge": "none",
+        "header_height": "80",
+        "logo_size": "32",
+        "brand": "name",
+        "nav_style": "caps",
+        "nav_ink": "ink",
+        "header_button": "none",
+        "footer_layout": "simple",
+        "footer_columns": "3",
+        "footer_links": "auto",
+        "small_print_row": "split",
+        "footer_surface": "plain",
+        "footer_edge": "line"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "wide",
+            "align": "left",
+            "divider": "none",
+            "animation": "none"
+        },
+        "surfaces": {
+            "cta": "plain"
+        },
+        "dividers": {
+            "cta": "line"
+        },
+        "layouts": {
+            "hero": "cover-low",
+            "gallery": "two",
+            "picture": "full",
+            "quote": "plain",
+            "cards": "grid",
+            "image_text": "image-left",
+            "cta": "beside"
+        },
+        "options": {
+            "gallery": {
+                "shape": "natural"
+            },
+            "picture": {
+                "shape": "natural"
+            },
+            "hero": {
+                "height": "screen",
+                "veil": "light"
+            },
+            "cards": {
+                "image_shape": "wide"
+            }
+        }
+    },
+    "patterns": [
+        {
+            "id": "gallery-welcome",
+            "name": {
+                "en": "Welcome",
+                "hr": "Dobrodošlica"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "left",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Light, kept",
+                            "hr": "Svjetlo, sačuvano"
+                        },
+                        "subheading": {
+                            "en": "Portraits, interiors and buildings, photographed in natural light.",
+                            "hr": "Portreti, interijeri i zgrade, snimljeni u prirodnom svjetlu."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "See the work",
+                                "hr": "Pogledajte radove"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "gallery-offer",
+            "name": {
+                "en": "What we offer",
+                "hr": "Što nudimo"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {
+                        "per_row": "3"
+                    },
+                    "content": {
+                        "heading": {
+                            "en": "Commissions",
+                            "hr": "Narudžbe"
+                        },
+                        "intro": {
+                            "en": "Three kinds of work.",
+                            "hr": "Tri vrste posla."
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "Architecture",
+                                    "hr": "Arhitektura"
+                                },
+                                "body": {
+                                    "en": "<p>Buildings and interiors for studios and publishers.</p>",
+                                    "hr": "<p>Zgrade i interijeri za studije i izdavače.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Portraits",
+                                    "hr": "Portreti"
+                                },
+                                "body": {
+                                    "en": "<p>People at work, at home, unposed.</p>",
+                                    "hr": "<p>Ljudi na poslu i kod kuće, bez poziranja.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Editions",
+                                    "hr": "Izdanja"
+                                },
+                                "body": {
+                                    "en": "<p>Signed prints in small runs.</p>",
+                                    "hr": "<p>Potpisani printovi u malim nakladama.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "gallery-voice",
+            "name": {
+                "en": "A client's words",
+                "hr": "Riječi klijenta"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "quote",
+                    "layout": "plain",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "He saw the house the way we hoped people would.",
+                            "hr": "Vidio je kuću onako kako smo se nadali da će je ljudi vidjeti."
+                        },
+                        "attribution": {
+                            "en": "Ivana R.",
+                            "hr": "Ivana R."
+                        },
+                        "role": {
+                            "en": "Architect",
+                            "hr": "Arhitektica"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "gallery-call",
+            "name": {
+                "en": "Call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "beside",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Have a project?",
+                            "hr": "Imate projekt?"
+                        },
+                        "body": {
+                            "en": "Write with dates and a place.",
+                            "hr": "Pišite s datumom i mjestom."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Get in touch",
+                                "hr": "Javite se"
+                            },
+                            "url": "/contact"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -7,6 +7,8 @@ return [
     'translations.this_page' => 'this page',
     'translations.open' => 'Open',
     'translations.translate' => 'Translate',
+    // A published page with a draft is translated as it is published (D-163 point 6, D-173).
+    'translations.unpublished_stay' => 'A translation starts from the published page. Your unpublished changes are not included.',
     'translations.created' => 'The :language version was made as a draft with the original text in it. Replace the text with the translation, then publish it.',
     'translations.unknown_language' => 'That language is not switched on for this site.',
     'translations.stale' => 'This block changed in the :language original after it was translated.',

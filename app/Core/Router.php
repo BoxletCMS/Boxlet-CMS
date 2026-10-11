@@ -27,7 +27,7 @@ use function FastRoute\simpleDispatcher;
  *
  * Every non-GET request must carry a valid CSRF token; that is checked here so no
  * route can forget it. The one exception is declared by name, visitorPost(), for a form a
- * visitor sends: visitors have no session to hold a token, so such a route guards itself. /, /hr/ and other home pages 404 until Slice 3.
+ * visitor sends: visitors have no session to hold a token, so such a route guards itself.
  */
 final class Router
 {
@@ -107,10 +107,18 @@ final class Router
             $slug = $segments[1] ?? null;
 
             // Permanent: the primary locale is immutable, so these forms never change.
+            // The query goes with it (D-200), as with the nested-path redirect (SPEC §5.1).
             if ($locale === $this->primaryLocale || $slug === null) {
-                return Response::redirect(Url::page($locale, $slug ?? ''), 301);
+                return Response::redirect(Url::page($locale, $slug ?? '') . ($request->query !== [] ? '?' . http_build_query($request->query) : ''), 301);
             }
             $path = substr($path, strlen($locale) + 1);
+            // THE SYSTEM'S ROUTES CARRY NO LOCALE (SPEC §5.1, D-200): /admin/… is the admin's
+            // only, and so are the files' and the sitemap's addresses. Answered under /hr/ they
+            // were pages a visitor without a session could see — and /hr/admin/login went into
+            // the page cache with the first visitor's form token, served to the next.
+            if (in_array(explode('/', ltrim($path, '/'), 2)[0], self::UNPREFIXED, true)) {
+                return $this->notFound($request, $locale);
+            }
         }
 
         $result = $this->dispatcher()->dispatch($request->method, $path);
@@ -126,6 +134,9 @@ final class Router
         // so the page above it is exactly the page it would otherwise be.
         return UpdateGate::bar($this->container, $request, $response);
     }
+
+    /** The first segments of the system's own routes: Slug::SYSTEM's words and the forms' POST. */
+    private const UNPREFIXED = [...\App\Modules\Pages\Slug::SYSTEM, 'form'];
 
     private function dispatcher(): Dispatcher
     {
@@ -144,8 +155,10 @@ final class Router
     {
         [$handler, $middleware, $session] = $route;
 
+        // The token is a form's field, or for a JSON body its X-CSRF-Token header (D-173).
+        $token = $request->body['_csrf'] ?? $request->header('x-csrf-token');
         if ($session && $request->method !== 'GET' && $request->method !== 'HEAD'
-            && !$this->container->get('session')->validCsrf($request->body['_csrf'] ?? null)) {
+            && !$this->container->get('session')->validCsrf($token)) {
             // A post over post_max_size arrives with $_POST and $_FILES both empty, so the
             // token is missing for a reason that has nothing to do with the token. Saying
             // "this form has expired" would send someone to reload the page and send the

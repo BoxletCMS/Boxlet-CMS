@@ -22,9 +22,13 @@ return [
     'chrome.logo_where' => 'The logo is set with the site’s other pictures, under',
     'chrome.logo_where_link' => 'Settings → Branding.',
     'chrome.menu' => 'Menu',
-    'chrome.menu_hint' => 'Which menu the header and footer show. Menus are built under Menus; a menu with the same name in each language gives every translation its own words.',
+    'chrome.menu_hint' => 'Which menu the header shows. Menus are built at the foot of this page; a menu with the same name in each language gives every translation its own words.',
     'chrome.menu_none' => 'No menu',
-    'chrome.no_menus' => 'There are no menus yet. Build one under Menus and it will be offered here.',
+    'chrome.no_menus' => 'There are no menus yet. Build one at the foot of this page and it will be offered here.',
+    // Where the words went (D-180): Appearance keeps how they look.
+    'chrome.header_words_where' => 'Which menu the header shows, and the button’s words and address, are set in',
+    'chrome.footer_words_where' => 'The columns’ titles, words and menus and the small print are set in',
+    'chrome.navigation_link' => 'Navigation →',
     'chrome.menu_gone' => 'The menu you had chosen no longer exists, so it was cleared.',
 
     // "Button" alone read as a toggle or a section heading on the rendered screen, with
@@ -46,11 +50,8 @@ return [
     'chrome.look_intro' => 'Each choice follows the character until you pick something else. Colours come from the palette, so every combination stays readable.',
     // On the Appearance screen the follow state is a segment and a badge (D-065): the
     // segment names what the character gives, the badge says the choice is still its.
-    'chrome.look.follow_short' => 'Follow: :value',
-    'chrome.look.following' => 'following',
     'chrome.look.follow' => 'As the character has it: :value',
-    // Arrangement and behaviour are two choices since D-112; the old header_layout values
-    // are read as pairs of them (ChromeLook::LEGACY).
+    // Arrangement and behaviour are two choices since D-112.
     'chrome.look.header_arrangement' => 'Header arrangement',
     'chrome.look.header_arrangement.left' => 'Left',
     'chrome.look.header_arrangement.inline' => 'Inline',
@@ -60,14 +61,13 @@ return [
     'chrome.look.header_behaviour' => 'Header behaviour',
     'chrome.look.header_behaviour.static' => 'Stays put',
     'chrome.look.header_behaviour.sticky' => 'Sticky',
-    'chrome.look.header_behaviour.over' => 'Over the top',
+    'chrome.look.header_behaviour.over' => 'Over the hero',
     // The footer's columns (D-115).
     'chrome.footer_column' => 'Column :n',
     'chrome.footer_column_title' => 'Title',
-    'chrome.footer_column_menu' => 'Column :n menu',
     'chrome.footer_menu_same' => 'The header’s menu',
-    'chrome.footer_menu_hint' => 'None, the header’s menu again, or a menu of this column’s own — Privacy, Imprint, Terms. Built under Menus, chosen by name, so each language’s menu of that name is the column’s. Its title and words are under the footer’s words below.',
-    'chrome.footer_column_menu_hint' => 'Drawn only when the arrangement shows this column. Its title and words are under the footer’s words below.',
+    'chrome.footer_menu_hint' => 'None, the header’s menu again, or a menu of this column’s own — Privacy, Imprint, Terms. Built at the foot of this page, chosen by name, so each language’s menu of that name is the column’s. Its title and words are under Footer words below.',
+    'chrome.footer_column_menu_hint' => 'Drawn only when Appearance’s footer arrangement shows this column.',
     'chrome.look.footer_layout' => 'Footer arrangement',
     'chrome.look.footer_layout.simple' => 'One column',
     'chrome.look.footer_layout.centred' => 'Centred',
@@ -93,10 +93,6 @@ return [
     'chrome.look.footer_surface.tinted' => 'Tinted',
     'chrome.look.footer_surface.contrast' => 'Contrast',
     'chrome.look.footer_surface.gradient' => 'Gradient',
-    'chrome.look.density' => 'Density',
-    'chrome.look.density.compact' => 'Compact',
-    'chrome.look.density.normal' => 'Normal',
-    'chrome.look.density.roomy' => 'Roomy',
     'chrome.look.header_edge' => 'Header edge',
     'chrome.look.header_edge.none' => 'None',
     'chrome.look.header_edge.line' => 'Line',
@@ -134,4 +130,13 @@ return [
 
     'chrome.save' => 'Save header and footer',
     'chrome.saved' => 'Header and footer saved.',
+
+    // Global decisions v2 (D-164).
+    'chrome.look.header_opacity' => 'Background opacity',
+    'chrome.look.header_blur' => 'Background blur',
+    'chrome.look.header_height' => 'Header height',
+    'chrome.look.header_height.compact' => 'Compact',
+    'chrome.look.header_height.normal' => 'Normal',
+    'chrome.look.header_height.roomy' => 'Roomy',
+    'chrome.look.header_button.none' => 'None',
 ];

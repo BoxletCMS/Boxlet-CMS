@@ -25,6 +25,8 @@ use App\Support\Url;
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/admin.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/admin-ui.css')) ?>">
     <link rel="stylesheet" href="<?= e(Url::versioned('assets/admin-forms.css')) ?>">
+    <link rel="stylesheet" href="<?= e(Url::versioned('assets/admin-install.css')) ?>">
+    <script src="<?= e(Url::versioned('assets/install.js')) ?>" defer></script>
 </head>
 <body class="admin admin-centered">
     <main class="card">

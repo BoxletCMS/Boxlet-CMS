@@ -34,17 +34,31 @@
   --placeholder-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M5.5 3h13A2.5 2.5 0 0 1 21 5.5v13a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-13A2.5 2.5 0 0 1 5.5 3Zm0 1.6a.9.9 0 0 0-.9.9v13a.9.9 0 0 0 .9.9h13a.9.9 0 0 0 .9-.9v-13a.9.9 0 0 0-.9-.9Z'/%3E%3Ccircle cx='9' cy='9' r='1.9'/%3E%3Cpath d='M5.6 18.4h12.8l-4.6-6-3 3.8-1.8-2.1z'/%3E%3C/svg%3E");
 
   /* How much of the surface's own colour is washed over a background picture, so the
-     words on top stay readable whatever the photograph is (D-024). A token rather than a
-     number in a rule: a character that needs more of it says so in one place. */
-  --section-picture-veil: 0.55;
-  --section-rhythm: var(--space-xl);
+     words on top stay readable whatever the photograph is (D-024): the least that keeps them
+     at 4.5:1 over a pure white and a pure black picture, worked out from the palette
+     (--veil-least, O-33), never under the 0.55 it always was. */
+  --section-picture-veil: var(--veil-least, 0.55);
+  /* The room above and below: the design's section gap, unless the owner gave this
+     section its own (a pad-t-* or pad-b-* class, sections-steps.css, D-165). */
+  --section-gap: var(--space-section, var(--space-xl));
+  --section-pad-top: var(--section-gap);
+  --section-pad-bottom: var(--section-gap);
   --section-width: var(--container-width);
   --divider-depth: var(--space-xl);
 
   position: relative;
-  padding-block: var(--section-rhythm);
+  padding-block: var(--section-pad-top) var(--section-pad-bottom);
   color: var(--section-text);
   background: var(--section-bg);
+}
+
+/* On a phone the design's section gap is three fifths of itself: a band of air sized for a
+   wide screen is most of a small one. Only the default — a padding the owner set is theirs
+   (sections-steps.css, linked after this). */
+@media (max-width: 40rem) {
+  .block {
+    --section-gap: calc(var(--space-section, var(--space-xl)) * 0.6);
+  }
 }
 
 .block > .container {
@@ -62,12 +76,13 @@
    height is the owner's density choice (D-032), drawn by site.css on the bar itself. */
 .block-header,
 .block-footer {
-  /* 0rem, not 0: a shaped edge adds its depth to this (`calc(var(--section-rhythm) +
+  /* 0rem, not 0: a shaped edge adds its depth to this (`calc(var(--section-pad-top) +
      var(--divider-depth))`), and a unitless 0 added to a length is an invalid calc, which
      the browser throws out whole. The footer's slant and curve then had no room at all
      and covered its menu, from D-113 until it was measured on 2026-09-29 (D-143). A rem
      rather than a pixel, which the front end never writes (blocks_test). */
-  --section-rhythm: 0rem;
+  --section-pad-top: 0rem;
+  --section-pad-bottom: 0rem;
 }
 
 /* The header runs to the content's measure or edge to edge: its own decision, not the
@@ -197,20 +212,24 @@
 .focal-y-90 { --focal-y: 90%; }
 .focal-y-100 { --focal-y: 100%; }
 
-/* Rhythm */
-
-.rhythm-tight {
-  --section-rhythm: var(--space-l);
-}
-
-.rhythm-airy {
-  --section-rhythm: var(--space-3xl);
-}
-
 /* Width */
 
 .width-narrow {
   --section-width: var(--container-narrow);
+}
+
+/* NARROWER THAN THE PAGE, AND SET LEFT: on the page's own edge (D-190, the owner). A section
+   narrower than the page's content was centred whatever its alignment, so in a section set
+   left its words began further in than every other heading on the page: 272 pixels for Bold's
+   Questions at Narrow, 24 at Normal, Bold composing its sections wide. Set left, it starts
+   where the page's content does — the width the character composes its sections in (Bold
+   wide, Brutalist full); a section wider than that is still centred. The container is a
+   content box, its padding outside the width. The header and the footer keep their own, and
+   so does a band a cover hero shares, which reaches both its edges by measuring itself from
+   a centred column (blocks-hero.css, D-124). */
+.block:not(.block-header, .block-footer, :has(.section-column > * > .hero.is-cover)).align-left > .container {
+  margin-inline-start: max(0rem, calc((100% - max(var(--section-width), var(--page-content-width, var(--container-width)))) / 2 - var(--space-l)));
+  margin-inline-end: auto;
 }
 
 .width-wide {
@@ -240,57 +259,21 @@
   margin-inline: auto;
 }
 
+/* A list in centred words stands in the middle as one block, its markers in a column and its
+   items aligned at their start: not the markers at the left edge and the words in the middle
+   (the owner chose it over centring each item, D-216). */
+.align-center .richtext :is(ul, ol) {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding-inline-start: 1.25em;
+  text-align: start;
+}
+
 /* A rule down the left edge of a centred quote reads as detached from it. */
 .align-center .richtext blockquote {
   padding-inline-start: 0;
   border-inline-start: 0;
-}
-
-/* Divider: drawn on the top edge of the section it belongs to. */
-
-.divider-line {
-  border-top: var(--border-width) solid var(--color-border);
-}
-
-.divider-slant,
-.divider-curve {
-  margin-top: calc(var(--divider-depth) * -1);
-  padding-top: calc(var(--section-rhythm) + var(--divider-depth));
-}
-
-/* The section above a shaped edge keeps extra room at its bottom, so the edge never
-   covers its content, whatever that section's rhythm. */
-.block:has(+ .divider-slant),
-.block:has(+ .divider-curve) {
-  padding-bottom: calc(var(--section-rhythm) + var(--divider-depth));
-}
-
-.divider-slant {
-  clip-path: polygon(0 var(--divider-depth), 100% 0, 100% 100%, 0 100%);
-}
-
-.divider-curve {
-  border-top-left-radius: 50% var(--divider-depth);
-  border-top-right-radius: 50% var(--divider-depth);
-}
-
-/* The footer may carry a shaped edge too (D-113), and its neighbour is <main>, not a
-   section: the last section inside keeps the room the rule above gives a section above a
-   shaped edge, so the footer's slant never cuts into its words. */
-main:has(+ .block-footer:is(.divider-slant, .divider-curve)) > .block:last-child {
-  padding-bottom: calc(var(--section-rhythm) + var(--divider-depth));
-}
-
-/* A divider marks a transition between two sections. The first section has nothing to
-   transition from, and a shaped edge there is simply clipped by the top of the page, so
-   the first section never draws one whatever its stored style says. */
-main > .block:first-child {
-  margin-top: 0;
-  padding-top: var(--section-rhythm);
-  border-top: 0;
-  clip-path: none;
-  border-start-start-radius: 0;
-  border-start-end-radius: 0;
 }
 
 /* Columns (PLAN.md D-093 step 3)
@@ -357,8 +340,15 @@ main > .block:first-child {
 /* The section's own centring reaches into the columns. .align-center centres what is
    directly inside .container, which for a section with columns is the column container
    itself — centring that does nothing, because a grid track is already as wide as its
-   share. What the author meant is the content of each column. */
-.align-center .section-column > * {
+   share. What the author meant is the content of each column.
+
+   ONE LEVEL IN, AS A SECTION OF ONE BLOCK HAS IT (D-190): a block in a column keeps the
+   column's width, and what it draws is centred in it, as `.container > *` centres it where
+   the section is the block. Auto margins on the block itself, a grid item, sized it to its
+   content: measured in the canvas under Minimal, Numbers and Logos no width at all (their
+   own containment gives them no content width), a full-width video 117 pixels of 896, a
+   picture 174 (D-182 had mended four blocks one by one). */
+.align-center .section-column > * > * {
   margin-inline: auto;
 }
 

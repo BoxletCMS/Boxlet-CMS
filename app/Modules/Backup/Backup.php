@@ -5,9 +5,6 @@ namespace App\Modules\Backup;
 use App\Core\Db;
 use App\Support\Version;
 use App\Support\ZipWriter;
-use FilesystemIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use RuntimeException;
 
 /**
@@ -18,6 +15,7 @@ use RuntimeException;
  *   database/{table}.ndjson      every row of every table (BackupTables), one JSON per line
  *   storage/uploads/…            the originals
  *   public/m/…                   every size made from them
+ *   designs/custom/…             design sets the owner dropped in over FTP (D-155)
  *   .env                         the site's settings, among them the key that seals secrets
  *
  * Rows rather than SQL, so it restores on either driver, into code as new as or newer than
@@ -33,15 +31,19 @@ final class Backup
     /** How often a step writes down where it is, in rows or files. */
     private const CHECKPOINT_EVERY = 200;
 
+    private readonly BackupFolders $folders;
+
     public function __construct(
         private readonly Db $db,
         private readonly string $root,
         private readonly string $backups,
-        private readonly string $uploads,
-        private readonly string $media,
+        string $uploads,
+        string $media,
         private readonly string $env,
         private readonly string $key,
+        string $customDesigns = '',
     ) {
+        $this->folders = new BackupFolders($uploads, $media, $customDesigns);
     }
 
     /**
@@ -84,11 +86,9 @@ final class Backup
         // this is in the next backup; what is deleted before it is reached is skipped.
         $list = fopen($work . '/files.txt', 'wb') ?: throw new RuntimeException("Cannot write in {$work}.");
         $files = 0;
-        foreach (['storage/uploads' => $this->uploads, 'public/m' => $this->media] as $prefix => $directory) {
-            foreach (self::walk($directory) as $relative) {
-                fwrite($list, $prefix . '/' . $relative . "\n");
-                $files++;
-            }
+        foreach ($this->folders->files() as $entry) {
+            fwrite($list, $entry . "\n");
+            $files++;
         }
         fclose($list);
 
@@ -164,8 +164,9 @@ final class Backup
             while ($state['file'] < $state['files'] && (!$moved || microtime(true) < $until) && ($line = fgets($list)) !== false) {
                 $moved = true;
                 $relative = rtrim($line, "\n");
-                $absolute = $this->absolute($relative);
-                if (is_file($absolute)) {
+                // A line that is no longer a file of the site (a folder that went) is passed over.
+                $absolute = $this->folders->where($relative);
+                if ($absolute !== null && is_file($absolute)) {
                     $zip->addFile($relative, $absolute);
                 }
                 $state['file']++;
@@ -238,34 +239,6 @@ final class Backup
     public static function fingerprint(string $key): string
     {
         return substr(hash('sha256', 'boxlet-backup-key:' . $key), 0, 16);
-    }
-
-    /** Where an archive path lives on this site. */
-    private function absolute(string $relative): string
-    {
-        return str_starts_with($relative, 'storage/uploads/')
-            ? $this->uploads . '/' . substr($relative, strlen('storage/uploads/'))
-            : $this->media . '/' . substr($relative, strlen('public/m/'));
-    }
-
-    /**
-     * Every file under $directory, as paths relative to it, dot files left out (.gitkeep,
-     * .htaccess: the install brings its own).
-     *
-     * @return iterable<string>
-     */
-    private static function walk(string $directory): iterable
-    {
-        if (!is_dir($directory)) {
-            return;
-        }
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS));
-        foreach ($files as $file) {
-            /** @var \SplFileInfo $file */
-            if ($file->isFile() && !str_starts_with($file->getFilename(), '.')) {
-                yield substr($file->getPathname(), strlen($directory) + 1);
-            }
-        }
     }
 
     /**

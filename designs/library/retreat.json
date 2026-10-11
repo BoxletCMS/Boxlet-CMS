@@ -1,0 +1,275 @@
+{
+  "$schema": "https://boxlet.dev/schema/design-set-v2.json",
+  "format": "boxlet-design-set",
+  "version": 2,
+  "id": "retreat",
+  "name": {
+    "en": "Retreat",
+    "hr": "Retreat"
+  },
+  "description": {
+    "en": "Pastel and slow, an elegant serif and a soft round sans. For yoga, spas, wellness and retreats.",
+    "hr": "Pastelno i sporo, elegantan serif i mekan zaobljen sans. Za jogu, spa, wellness i retreatove."
+  },
+  "author": "Boxlet",
+  "tags": [
+    "pastel",
+    "calm",
+    "serif",
+    "wellness"
+  ],
+  "decisions": {
+    "mode": "light",
+    "seed": "#7a5a8c",
+    "heading_font": "cormorant-garamond",
+    "body_font": "nunito",
+    "text_size": 17,
+    "scale": 1.335,
+    "nudge_h1": 10,
+    "spacing": 1.25,
+    "section_gap": 128,
+    "radius": 24,
+    "shadow": "soft",
+    "shadow_strength": 16,
+    "container": 60,
+    "color_background": "#f6f1f7",
+    "button_style": "soft",
+    "button_radius": 28,
+    "button_height": 48,
+    "surface_contrast": 20
+  },
+  "dark": {
+    "seed": "#c9a9db",
+    "color_background": "#1c1820",
+    "surface_contrast": 22,
+    "shadow_strength": 40
+  },
+  "look": {
+    "header_opacity": 100,
+    "header_blur": 0,
+    "logo_size": 32,
+    "footer_columns": "3",
+    "footer_links": "auto",
+    "header_arrangement": "centred",
+    "header_behaviour": "static",
+    "header_surface": "plain",
+    "header_edge": "none",
+    "header_height": 88,
+    "brand": "name",
+    "nav_style": "plain",
+    "nav_ink": "ink",
+    "header_button": "text",
+    "footer_layout": "centred",
+    "small_print_row": "centred",
+    "footer_surface": "tinted",
+    "footer_edge": "curve"
+  },
+  "composition": {
+    "section": {
+      "surface": "plain",
+      "width": "normal",
+      "align": "center",
+      "divider": "none",
+      "v_align": "top",
+      "animation": "fade",
+      "pad_top": "",
+      "pad_bottom": "",
+      "min_height": 0
+    },
+    "surfaces": {
+      "quote": "tinted"
+    },
+    "dividers": {
+      "quote": "curve",
+      "cta": "curve"
+    },
+    "layouts": {
+      "hero": "center",
+      "cards": "grid",
+      "quote": "big",
+      "cta": "banner",
+      "image_text": "image-right",
+      "accordion": "cards"
+    },
+    "options": {
+      "hero": {
+        "height": "tall"
+      },
+      "cards": {
+        "image_shape": "round"
+      }
+    }
+  },
+  "patterns": [
+    {
+      "id": "retreat-welcome",
+      "name": {
+        "en": "Welcome",
+        "hr": "Dobrodošlica"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "hero",
+          "layout": "center",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Slow down, breathe out",
+              "hr": "Usporite, izdahnite"
+            },
+            "subheading": {
+              "en": "Weekend retreats on a quiet island: yoga at sunrise, long lunches, no phones.",
+              "hr": "Vikend retreatovi na mirnom otoku: joga u zoru, duga ručka, bez mobitela."
+            },
+            "cta": {
+              "label": {
+                "en": "See the dates",
+                "hr": "Pogledajte termine"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "retreat-offer",
+      "name": {
+        "en": "What we offer",
+        "hr": "Što nudimo"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "cards",
+          "layout": "grid",
+          "column": 0,
+          "options": {
+            "per_row": 3
+          },
+          "content": {
+            "heading": {
+              "en": "A weekend with us",
+              "hr": "Vikend s nama"
+            },
+            "intro": {
+              "en": "Everything is included.",
+              "hr": "Sve je uključeno."
+            },
+            "items": [
+              {
+                "heading": {
+                  "en": "Morning yoga",
+                  "hr": "Jutarnja joga"
+                },
+                "body": {
+                  "en": "<p>Gentle classes for every body.</p>",
+                  "hr": "<p>Nježni satovi za svako tijelo.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Garden kitchen",
+                  "hr": "Vrtna kuhinja"
+                },
+                "body": {
+                  "en": "<p>Meals from the garden behind the house.</p>",
+                  "hr": "<p>Obroci iz vrta iza kuće.</p>"
+                }
+              },
+              {
+                "heading": {
+                  "en": "Quiet hours",
+                  "hr": "Tihi sati"
+                },
+                "body": {
+                  "en": "<p>Afternoons for reading, walking, the sea.</p>",
+                  "hr": "<p>Popodneva za čitanje, šetnju i more.</p>"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "retreat-voice",
+      "name": {
+        "en": "A client's words",
+        "hr": "Riječi klijenta"
+      },
+      "section": {
+        "layout": "one",
+        "style": {}
+      },
+      "blocks": [
+        {
+          "type": "quote",
+          "layout": "big",
+          "column": 0,
+          "options": {},
+          "content": {
+            "quote": {
+              "en": "I came home lighter than I left.",
+              "hr": "Vratila sam se kući lakša nego što sam otišla."
+            },
+            "attribution": {
+              "en": "Maja",
+              "hr": "Maja"
+            },
+            "role": {
+              "en": "Guest",
+              "hr": "Gošća"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "retreat-call",
+      "name": {
+        "en": "Call to action",
+        "hr": "Poziv na akciju"
+      },
+      "section": {
+        "layout": "one",
+        "style": {
+          "surface": "contrast"
+        }
+      },
+      "blocks": [
+        {
+          "type": "cta",
+          "layout": "banner",
+          "column": 0,
+          "options": {},
+          "content": {
+            "heading": {
+              "en": "Next retreat in May",
+              "hr": "Sljedeći retreat u svibnju"
+            },
+            "body": {
+              "en": "Twelve places, two still free.",
+              "hr": "Dvanaest mjesta, dva su još slobodna."
+            },
+            "action": {
+              "label": {
+                "en": "Book a place",
+                "hr": "Rezervirajte mjesto"
+              },
+              "url": "/contact"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

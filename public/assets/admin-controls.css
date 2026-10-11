@@ -1,0 +1,305 @@
+/* THE ADMIN'S SHARED CONTROLS (PLAN.md D-157): a control's row with its name, its "changed"
+   dot, its readout and its reset; a slider's marks; a group that folds. The markup is
+   App\Support\Controls, and every admin page links this file, because the page builder will
+   draw the same parts the Appearance screen does. Admin tokens only (--ui-*).
+
+   Names start with `control-`: `.field-row` already means two different shapes in two
+   stylesheets (admin-choices.css says how that went), and a third meaning would be worse. */
+
+.control-row {
+  display: grid;
+  gap: var(--ui-1);
+  min-inline-size: 0;
+}
+
+.control-head {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  min-inline-size: 0;
+  min-block-size: 1.75rem;
+}
+
+.control-label {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  margin: 0;
+  color: var(--ui-ink);
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+}
+
+/* THE DOT: the value is the owner's, not the default (D-158). In the accent, beside the name,
+   and drawn only on a row that is changed — it is a fact about the row, not a control, so it
+   has no resting state to keep. Its words are in the markup for a screen reader. */
+.control-changed {
+  display: none;
+  flex: 0 0 auto;
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  background: var(--ui-accent);
+  border-radius: 50%;
+}
+
+.is-changed > .control-head > .control-changed,
+.is-changed > .control-changed {
+  display: inline-block;
+}
+
+/* The readout is admin-choices.css's own .readout; in a row it sits at the end, before the
+   reset, and gives way first (D-110), onto a second line rather than cut (D-195). */
+.control-head .readout {
+  margin-inline-start: auto;
+}
+
+/* A SLIDER LEFT TO THE CHARACTER SAYS SO (D-176): "80 px · character", the slider standing at
+   that value, and no dot. The word goes the moment the row is the owner's, with the dot. */
+.control-row:not(.is-changed) > .control-head > .readout[data-from]::after {
+  content: " · " attr(data-from);
+}
+
+/* THE WAY BACK, offered only where there is something to go back from: a reset beside a
+   value nobody changed would do nothing, and a button that does nothing teaches people not to
+   trust buttons. It is a whole control when it is there — an icon button at rest. */
+.control-reset {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  min-block-size: 0;
+  margin-inline-start: auto;
+  padding: 0;
+  background: transparent;
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink-muted);
+}
+
+.control-reset:hover {
+  border-color: var(--ui-accent);
+  color: var(--ui-ink);
+}
+
+/* After a readout, the readout has already taken the room on the left. */
+.control-head .readout + .control-reset {
+  margin-inline-start: 0;
+}
+
+/* A readout on a line of its own (D-196) leaves the reset at the end of the name's line. */
+.control-head .readout.readout-below + .control-reset {
+  margin-inline-start: auto;
+}
+
+.is-changed > .control-head > .control-reset {
+  display: inline-flex;
+}
+
+/* A slider is as wide as its row, and its marks are the width of the track: SVG text placed
+   at a share of the width (Controls::slider), inset by half a thumb so a mark stands under
+   the value it names. */
+.control-row input[type="range"] {
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  accent-color: var(--ui-accent);
+}
+
+.slider-marks {
+  display: block;
+  inline-size: calc(100% - 1rem);
+  margin-inline: 0.5rem;
+  overflow: visible;
+}
+
+.slider-marks text {
+  fill: var(--ui-ink-muted);
+  font-size: 0.6875rem;
+}
+
+/* ---- a group that folds ----------------------------------------------------------------- */
+
+.control-group {
+  border-block-end: var(--ui-border) solid var(--ui-line);
+}
+
+/* The head is a control at rest: a name, and a + or − that says which way it goes. */
+.control-group-head {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  padding-block: var(--ui-3);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  list-style: none;
+  cursor: pointer;
+}
+
+.control-group-head::-webkit-details-marker {
+  display: none;
+}
+
+.control-group-head:hover {
+  color: var(--ui-ink);
+}
+
+.control-group-title {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.control-group-changed {
+  display: none;
+  align-items: center;
+  gap: var(--ui-1);
+  color: var(--ui-ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: normal;
+}
+
+.control-group.has-changes > .control-group-head .control-group-changed {
+  display: inline-flex;
+}
+
+.control-group-changed .control-changed {
+  display: inline-block;
+}
+
+.control-group-toggle::before {
+  content: "+";
+  display: inline-block;
+  inline-size: 1em;
+  color: var(--ui-ink);
+  font-size: var(--ui-text-base);
+  font-weight: 500;
+  text-align: center;
+}
+
+.control-group[open] > .control-group-head .control-group-toggle::before {
+  content: "\2212";
+}
+
+.control-group-body {
+  display: grid;
+  gap: var(--ui-4);
+  padding-block-end: var(--ui-4);
+}
+
+/* ---- one of a few, as pictures (D-161) ----------------------------------------------------- */
+
+.tile-choice {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ui-2);
+}
+
+.tile-option {
+  position: relative;
+  display: grid;
+  gap: var(--ui-1);
+  min-inline-size: 0;
+  padding: var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  cursor: pointer;
+}
+
+.tile-option:hover {
+  border-color: var(--ui-accent);
+  color: var(--ui-ink);
+}
+
+/* The radio is the mechanism, clipped and never faded, as a segment's is (admin-choices.css). */
+.tile-option input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  clip-path: inset(50%);
+}
+
+.tile-option:has(input:checked) {
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 1px var(--ui-accent);
+  color: var(--ui-ink);
+  font-weight: 650;
+}
+
+.tile-option:has(input:focus-visible) {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+.tile-picture svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+/* The drawing in the admin's own colours: a strip, the mark that stands for the logo, the
+   lines that stand for words and links, the blocks that stand for pictures and the pill
+   that stands for a button (D-166). */
+.tile-picture .pict-ground {
+  fill: var(--ui-panel-sunken);
+}
+
+.tile-picture .pict-logo {
+  fill: var(--ui-accent);
+}
+
+.tile-picture .pict-line {
+  fill: var(--ui-ink-faint);
+}
+
+.tile-picture .pict-image {
+  fill: var(--ui-line-strong);
+}
+
+.tile-picture .pict-button {
+  fill: var(--ui-accent);
+}
+
+/* Two lines before it is cut (D-179): a short name — "Behind · bottom" — is read whole rather
+   than told from its neighbours by its first word. */
+.tile-label {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: var(--ui-leading-tight);
+  overflow-wrap: anywhere;
+}
+
+/* "DEFAULT" ON THE CHARACTER'S OWN TILE (D-195, the owner): a word, not a change, so no dot.
+   Said as the Appearance tiles say "Custom" (admin-appearance-tiles.css): small capitals in
+   the quiet ink inside an edge, on the panel. It sits on the tile's top edge, half in the gap
+   above it: inside the tile it covered the drawing — a Text's lines, a Split's picture. */
+.tile-tag {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: var(--ui-2);
+  transform: translateY(-50%);
+  padding: 0 var(--ui-1);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-line);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink-muted);
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  line-height: var(--ui-leading-tight);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Room above the first row of tiles for the tag on its edge, so it never touches the line
+   above it — a readout on a line of its own (D-196). */
+.tile-choice:has(.tile-tag) {
+  padding-block-start: var(--ui-2);
+}

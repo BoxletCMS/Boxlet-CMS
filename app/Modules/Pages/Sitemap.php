@@ -17,7 +17,8 @@ use App\Support\Url;
  * search engine instead.
  *
  * robots.txt is written beside it to point at it — but only a robots.txt this site wrote
- * itself, marked on its first line. One the owner put there is never touched.
+ * itself, marked on its first line. One the owner put there is never touched. llms.txt is
+ * written beside it too (LlmsTxt, D-151), by the same rule.
  */
 final class Sitemap
 {
@@ -26,11 +27,13 @@ final class Sitemap
     public static function xml(Db $db): string
     {
         $rows = $db->all(
-            "SELECT p.id, p.content_group_id, p.locale, p.slug, p.updated_at
+            "SELECT p.id, p.content_group_id, p.locale, p.slug, p.updated_at, p.seo_json
              FROM pages p JOIN locales l ON l.code = p.locale
              WHERE p.status = 'published' AND l.enabled = 1
              ORDER BY l.is_primary DESC, l.sort, p.locale, p.sort, p.id"
         );
+        // A page kept out of search engines is kept out of the map of the site (D-170).
+        $rows = array_values(array_filter($rows, static fn (array $row): bool => !PageSeo::of($row)['noindex']));
         $groups = [];
         foreach ($rows as $row) {
             $groups[(int) ($row['content_group_id'] ?? $row['id'])][(string) $row['locale']] = (string) $row['slug'];
@@ -67,6 +70,8 @@ final class Sitemap
         if ($current === '' || str_starts_with($current, self::MARK)) {
             self::write($robots, self::MARK . "\nUser-agent: *\nDisallow: /admin\n\nSitemap: " . Url::withOrigin(Url::asset('sitemap.xml')) . "\n");
         }
+        // llms.txt lists the same pages, so it is written whenever this is (D-151).
+        LlmsTxt::publish($db, $publicPath);
 
         return true;
     }

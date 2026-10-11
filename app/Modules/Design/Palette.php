@@ -3,23 +3,33 @@
 namespace App\Modules\Design;
 
 /**
- * Derives the whole palette from one or two seed colours, then checks every
- * text/background pair it produces against WCAG AA.
+ * Derives the whole palette from one or two seed colours. The inks that must be read on a
+ * colour are PaletteInks' to work out; every text/background pair is measured against WCAG
+ * AA by PalettePairs.
  *
- * Seeds are used as given and never nudged to pass: the seed is the accent, the button
- * colour and the link colour, so a seed too light to read as text fails, naming the
- * pair, instead of being silently turned into a different colour.
+ * On a light page seeds are used as given and never nudged to pass: the seed is the accent,
+ * the button colour and the link colour, so a seed too light to read as text fails, naming
+ * the pair, instead of being silently turned into a different colour. On a dark page the
+ * links and buttons take the seed's hue lifted until it reads (D-184, the owner): a seed is
+ * chosen for one page, and a dark page is the other.
  */
 final class Palette
 {
-    /** How far the tinted surface sits from the page background, in OKLCH lightness. */
-    public const SURFACE_STEPS = ['low' => 0.03, 'medium' => 0.065, 'high' => 0.11];
+    /**
+     * How far the tinted surface sits from the page background, in OKLCH lightness, at the
+     * points of the 0–100 surface contrast the step's old names stood for; between them it is
+     * interpolated (D-164).
+     */
+    private const SURFACE_CURVE = [0 => 0.0, 20 => 0.03, 50 => 0.065, 80 => 0.11, 100 => 0.14];
+
+    /** The page's lightness in each mode, when no background is set by hand. */
+    private const PAGE = ['light' => 0.99, 'dark' => 0.17];
 
     /** WCAG AA for normal-size text. Every pair below can hold body text, so all use it. */
     public const AA_BODY = 4.5;
 
     /**
-     * THE SIX ROLES AN OWNER MAY SET BY HAND (PLAN.md D-063), and no others.
+     * THE SEVEN ROLES AN OWNER MAY SET BY HAND (PLAN.md D-063, the link's since), and no others.
      *
      * These are the INDEPENDENT ones: the page's own colours and the ink on them. Everything
      * else is either already theirs — the accent and the contrast surface are the two seeds —
@@ -31,14 +41,44 @@ final class Palette
     public const BY_HAND = ['background', 'card', 'surface', 'border', 'text', 'muted', 'link'];
 
     /**
+     * The palette of a design with every key answered (Tokens::resolve()).
+     *
+     * @param array<string, string> $resolved
+     * @return array<string, string>
+     */
+    public static function forDecisions(array $resolved): array
+    {
+        return self::colors($resolved['seed'], $resolved['secondary'], (float) $resolved['surface_contrast'], Tokens::byHand($resolved), $resolved['mode'] ?? 'light');
+    }
+
+    /** The surface step for a surface contrast of 0–100: straight lines between the points. */
+    public static function surfaceStep(float $contrast): float
+    {
+        $contrast = max(0.0, min(100.0, $contrast));
+        $from = 0.0;
+        $step = 0.0;
+        foreach (self::SURFACE_CURVE as $at => $to) {
+            $at = (float) $at;
+            if ($contrast <= $at) {
+                return $at <= $from ? $to : $step + ($to - $step) * ($contrast - $from) / max(0.001, $at - $from);
+            }
+            $from = $at;
+            $step = $to;
+        }
+
+        return $step;
+    }
+
+    /**
      * @param array<string, string> $byHand role => #rrggbb for a role the owner set, '' or
      *        absent for one the palette works out
+     * @param string $mode light or dark (D-164): which way the page and its inks go
      * @return array<string, string> colour name => #rrggbb, emitted as --color-{name}
      */
-    public static function colors(string $seed, string $secondary, string $surfaceContrast, array $byHand = []): array
+    public static function colors(string $seed, string $secondary, float $surfaceContrast, array $byHand = [], string $mode = 'light'): array
     {
-        [$seedLightness, $seedChroma, $hue] = Color::toOklch($seed);
-        $step = self::SURFACE_STEPS[$surfaceContrast] ?? self::SURFACE_STEPS['low'];
+        [, $seedChroma, $hue] = Color::toOklch($seed);
+        $step = self::surfaceStep($surfaceContrast);
         // Neutrals carry a trace of the seed's hue, so greys belong to the palette.
         $tint = min($seedChroma, 0.14) * 0.1;
         $ink = min($seedChroma, 0.08) * 0.35;
@@ -53,9 +93,10 @@ final class Palette
          * then refuses. The page's own lightness decides the direction, so setting one
          * colour gives a coherent palette rather than a list of refusals.
          *
-         * Every character leaves the background alone, so all five are untouched by this.
+         * DARK MODE IS THE SAME BRANCH (D-164): the page starts dark instead of near-white,
+         * and every neutral and ink walks the other way, measured by the same pairs.
          */
-        $page = 0.99;
+        $page = self::PAGE[$mode] ?? self::PAGE['light'];
         if (($byHand['background'] ?? '') !== '') {
             [$page] = Color::toOklch($byHand['background']);
         }
@@ -93,231 +134,34 @@ final class Palette
             }
         }
 
-        $colors['on-accent'] = self::readableOn([$seed], $colors);
+        /*
+         * ON A DARK PAGE THE MAIN COLOUR IS LIFTED (D-184, the owner): a seed chosen for a light
+         * page — every character's — read at 1.9-3.1:1 as a link on a dark one, and Save
+         * refused dark mode under all five. The links and the buttons take a lighter variant,
+         * the same hue walked up in OKLCH until it reads at 4.5:1 on the page, a card and the
+         * tinted surface, as a muted ink is walked; a link colour set by hand the same. A seed
+         * that already reads is kept as it is; one with almost no hue takes the text's light
+         * ink instead (D-185). The gradient goes the other way (PaletteInks::gradient, D-194).
+         */
+        if ($dark) {
+            $grounds = [$colors['background'], $colors['card'], $colors['surface']];
+            $colors['accent'] = PaletteInks::lifted($colors['accent'], $grounds, $colors['text']);
+            $colors['link'] = PaletteInks::lifted($colors['link'], $grounds, $colors['text']);
+        }
+
+        $colors['on-accent'] = PaletteInks::readableOn([$colors['accent']], $colors);
 
         // The contrast surface is the second seed when given, else a deep shade of the first.
         $contrast = $secondary !== '' ? $secondary : Color::fromOklch(0.27, min($seedChroma, 0.1), $hue);
         $colors['contrast'] = $contrast;
-        $inks = self::inksOn($contrast, $colors);
+        $inks = PaletteInks::inksOn($contrast, $colors);
         $colors['on-contrast'] = $inks['text'];
         $colors['muted-on-contrast'] = $inks['muted'];
         $colors['contrast-raised'] = $inks['raised'];
 
-        $colors['gradient-start'] = $seed;
-        $colors['gradient-end'] = Color::fromOklch(max(0.2, $seedLightness - 0.1), $seedChroma, $hue + 45);
-        $colors['on-gradient'] = self::readableOn([$colors['gradient-start'], $colors['gradient-end']], $colors);
+        [$colors['gradient-start'], $colors['gradient-end']] = PaletteInks::gradient($seed, $dark ? $colors['text'] : '');
+        $colors['on-gradient'] = PaletteInks::readableOn([$colors['gradient-start'], $colors['gradient-end']], $colors);
 
         return $colors;
-    }
-
-    /**
-     * THE INK FOR A SURFACE THE PALETTE DID NOT CHOOSE (PLAN.md D-076).
-     *
-     * Whichever of the palette's two inks can be read on it, a muted version of that, and a
-     * raised version of the surface itself — the three a section needs beyond its background.
-     *
-     * WHICH INK WON IS MEASURED, NOT GUESSED FROM WHICH SLOT IT CAME FROM. This asked
-     * whether the ink was the BACKGROUND colour and took that to mean "light text" — true
-     * while every background was near-white, and wrong the moment one could be set by hand:
-     * on a dark page the background IS the dark ink, and the muted text beside it was then
-     * pushed the wrong way, to 1.40:1 (D-063).
-     *
-     * It was the contrast surface's own arithmetic, inline. The header and the footer may
-     * now carry a colour of their own (D-076) and need exactly the same three, so it is one
-     * function with three callers rather than three copies that would drift — the contrast
-     * surface included, which is what proves the move changed nothing.
-     *
-     * @param array<string, string> $colors the palette so far; needs `background` and `text`
-     * @return array{text: string, muted: string, raised: string}
-     */
-    public static function inksOn(string $surface, array $colors): array
-    {
-        [$lightness, $chroma, $hue] = Color::toOklch($surface);
-        $text = self::readableOn([$surface], $colors);
-        [$inkLightness] = Color::toOklch($text);
-        $lightText = $inkLightness > 0.5;
-
-        return [
-            'text' => $text,
-            'muted' => self::muted($surface, $lightness, min($chroma, 0.04), $hue, $lightText),
-            'raised' => Color::fromOklch($lightness + ($lightText ? 0.06 : -0.06), $chroma, $hue),
-        ];
-    }
-
-    /**
-     * The muted ink for a surface: the step the contrast surface has always taken, and
-     * further where that step is not enough to read (PLAN.md D-076).
-     *
-     * A FIXED STEP IS WRONG AT THE ENDS OF THE RANGE. 0.42 of lightness away is a comfortable
-     * muted tone for a surface somewhere in the middle, which every contrast surface the five
-     * characters ship is. Measured against a surface the OWNER picks it breaks at both ends:
-     * a pure black header put the muted text at 2.48:1 and a pure white one at 4.29:1, so
-     * Boxlet refused the two colours anybody is likeliest to choose. That was the derivation
-     * being weak, not the choice being bad.
-     *
-     * It walks further away until the pair reads, and stops at the first step that does. A
-     * surface already passing at 0.42 is returned at 0.42 — which is every contrast surface
-     * in use today, so nothing that works now moves.
-     *
-     * When the whole range is exhausted nothing is forced: the last value is returned, the
-     * pair fails and the check refuses it, naming the control (D-063). A colour neither of
-     * the palette's inks can be read on is a colour Boxlet should say no to.
-     */
-    private static function muted(string $surface, float $lightness, float $chroma, float $hue, bool $lighter): string
-    {
-        $limit = $lighter ? 1.0 : 0.0;
-        $muted = Color::fromOklch($lightness + ($lighter ? 0.42 : -0.42), $chroma, $hue);
-        for ($step = 0.42; $lighter ? $lightness + $step <= $limit : $lightness - $step >= $limit; $step += 0.02) {
-            $muted = Color::fromOklch($lightness + ($lighter ? $step : -$step), $chroma, $hue);
-            if (Color::contrast($muted, $surface) >= self::AA_BODY) {
-                break;
-            }
-        }
-
-        return $muted;
-    }
-
-    /**
-     * EVERY text/background pair the palette produces, with what it measures and what it
-     * needs. The gauge on the Design screen is this list; failures() is a filter over it.
-     *
-     * One list, because two would drift: for a while the screen could only say "this fails",
-     * which made a palette that passes by a hair look the same as one that passes easily —
-     * and a person cannot aim at a number they are never shown.
-     *
-     * $decision names the choice responsible, so a failure can point at the control that
-     * causes it rather than at the colour it produced.
-     *
-     * @param array<string, string> $colors
-     * @param array<string, string> $byHand the roles the owner set, so a failure names the
-     *        control that can fix it
-     * @param array<string, string> $ownChrome `header` and `footer` => the colour the owner
-     *        gave that part, absent for one still taking a shade of the palette (D-076)
-     * @return list<array{pair: string, decision: string, ratio: float, required: float, passes: bool, foreground: string, background: string}>
-     */
-    public static function pairs(array $colors, bool $hasSecondary, array $byHand = [], array $ownChrome = []): array
-    {
-        $contrastDecision = $hasSecondary ? 'secondary' : 'seed';
-        $defined = [
-            ['text_on_background', 'surface_contrast', 'text', 'background'],
-            ['muted_on_background', 'surface_contrast', 'muted', 'background'],
-            ['text_on_card', 'surface_contrast', 'text', 'card'],
-            ['text_on_surface', 'surface_contrast', 'text', 'surface'],
-            ['muted_on_surface', 'surface_contrast', 'muted', 'surface'],
-            ['links_on_background', 'seed', 'link', 'background'],
-            ['links_on_surface', 'seed', 'link', 'surface'],
-            ['button_text_on_accent', 'seed', 'on-accent', 'accent'],
-            ['text_on_contrast', $contrastDecision, 'on-contrast', 'contrast'],
-            ['muted_on_contrast', $contrastDecision, 'muted-on-contrast', 'contrast'],
-            ['text_on_gradient_start', 'seed', 'on-gradient', 'gradient-start'],
-            ['text_on_gradient_end', 'seed', 'on-gradient', 'gradient-end'],
-        ];
-
-        $pairs = [];
-        foreach ($defined as [$pair, $decision, $foreground, $background]) {
-            $ratio = Color::contrast($colors[$foreground], $colors[$background]);
-            $pairs[] = [
-                'pair' => $pair,
-                // A COLOUR SET BY HAND OWNS ITS OWN FAILURE. Otherwise "text on the
-                // background is 2.1:1" would point at surface contrast, a control that
-                // cannot fix it, while the control that can sits two fields above. The ink
-                // is named first, because it is usually the one to move.
-                'decision' => self::responsible($foreground, $background, $byHand) ?? $decision,
-                'ratio' => $ratio,
-                'required' => self::AA_BODY,
-                'passes' => $ratio >= self::AA_BODY,
-                // The two colours themselves, so the gauge can show the pair rather than
-                // only name it: a row that says 3.9:1 and shows nothing is a number.
-                'foreground' => $colors[$foreground],
-                'background' => $colors[$background],
-            ];
-        }
-
-        /*
-         * THE TWO SURFACES THE PALETTE DOES NOT OWN (D-076).
-         *
-         * While the header and the footer could only take `plain`, `tinted` or `contrast`,
-         * the twelve pairs above already covered them: each of those three is a palette role
-         * that is measured. A colour of their own is a surface nothing else measures, so it
-         * gets its own rows — one for the ink, one for the muted text beside it.
-         *
-         * Both are DERIVED from the colour (inksOn), so these can only fail for a colour
-         * neither of the palette's inks can be read on. That is rare and it is real, and a
-         * refusal naming the control is the whole reason the check exists (D-063).
-         */
-        foreach (['header', 'footer'] as $part) {
-            $surface = $ownChrome[$part] ?? '';
-            if ($surface === '') {
-                continue;
-            }
-            $inks = self::inksOn($surface, $colors);
-            foreach (['text' => 'text', 'muted' => 'muted'] as $which => $ink) {
-                $ratio = Color::contrast($inks[$ink], $surface);
-                $pairs[] = [
-                    'pair' => $which . '_on_' . $part,
-                    'decision' => $part . '_colour',
-                    'ratio' => $ratio,
-                    'required' => self::AA_BODY,
-                    'passes' => $ratio >= self::AA_BODY,
-                    'foreground' => $inks[$ink],
-                    'background' => $surface,
-                ];
-            }
-        }
-
-        return $pairs;
-    }
-
-    /**
-     * Every pair that falls below WCAG AA, with the decision responsible for it. What Save
-     * refuses on, and what the screen puts beside the control at fault.
-     *
-     * @param array<string, string> $colors
-     * @param array<string, string> $byHand
-     * @param array<string, string> $ownChrome
-     * @return list<array{pair: string, decision: string, ratio: float, required: float}>
-     */
-    public static function failures(array $colors, bool $hasSecondary, array $byHand = [], array $ownChrome = []): array
-    {
-        $failures = [];
-        foreach (self::pairs($colors, $hasSecondary, $byHand, $ownChrome) as $pair) {
-            if (!$pair['passes']) {
-                $failures[] = ['pair' => $pair['pair'], 'decision' => $pair['decision'], 'ratio' => $pair['ratio'], 'required' => $pair['required']];
-            }
-        }
-
-        return $failures;
-    }
-
-    /**
-     * Which control a failing pair belongs to, when one of its two colours was set by hand.
-     *
-     * @param array<string, string> $byHand
-     */
-    private static function responsible(string $foreground, string $background, array $byHand): ?string
-    {
-        foreach ([$foreground, $background] as $role) {
-            if (in_array($role, self::BY_HAND, true) && ($byHand[$role] ?? '') !== '') {
-                return 'color_' . $role;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * The palette's own light or dark text colour, whichever gives the higher worst-case
-     * contrast across all of $backgrounds.
-     *
-     * @param non-empty-list<string> $backgrounds
-     * @param array<string, string> $colors
-     */
-    private static function readableOn(array $backgrounds, array $colors): string
-    {
-        $worst = static function (string $text) use ($backgrounds): float {
-            return min(array_map(static fn (string $background): float => Color::contrast($text, $background), $backgrounds));
-        };
-
-        return $worst($colors['background']) >= $worst($colors['text']) ? $colors['background'] : $colors['text'];
     }
 }

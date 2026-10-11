@@ -1,0 +1,195 @@
+/* Cards (PLAN.md D-008, D-166, D-194). Split from blocks.css, already past the size limit,
+   when a card's picture became a shape and a last card stopped standing alone; under its rule:
+   only custom properties from tokens.css and the --section-* properties each section sets in
+   sections.css. No literal colours, pixel values, fonts or shadows. Linked straight after
+   blocks.css, the order these rules had in it. */
+
+/* Columns (PLAN.md D-008)
+
+   How many cards share a row is an option (D-166); more items start a new row on the same
+   grid. minmax(0, 1fr) rather than 1fr, so a long word or a picture's intrinsic width
+   cannot push one column wider than the others. */
+
+.cards-head {
+  margin-block-end: var(--space-l);
+}
+
+.cards-heading {
+  margin: 0;
+}
+
+.cards-intro {
+  margin: var(--space-s) 0 0;
+}
+
+.align-center .cards-intro {
+  margin-inline: auto;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(var(--space-m) * 1.25);
+}
+
+.per-row-2 .cards-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.per-row-4 .cards-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* A card (README 1.6): the card colour on the section's surface — raised on a dark one — a
+   hairline, the large corner, and its parts a little closer than its padding. */
+.cards-item {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-m) * 0.875);
+  padding: calc(var(--space-m) * 1.125);
+  background: var(--section-card);
+  border: var(--border-width) solid var(--section-border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-s);
+}
+
+/* A card's picture is a SHAPE, not a height (D-194, the owner): wide is 16:9 and square 1:1
+   of the card's width, so two to a row are as wide as three are and no strip, and a list's
+   picture beside the words keeps the shape too. Round is a circle, 1:1, at a portrait's size
+   rather than the card's width. */
+.cards-media img,
+.cards-media .media-placeholder {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  --card-media-radius: calc(var(--radius-l) * 0.7);
+  border-radius: var(--card-media-radius);
+}
+
+.shape-square .cards-media img,
+.shape-square .cards-media .media-placeholder {
+  aspect-ratio: 1;
+}
+
+.shape-round .cards-media img,
+.shape-round .cards-media .media-placeholder {
+  inline-size: calc(var(--space-m) * 5.5);
+  aspect-ratio: 1;
+  --card-media-radius: 50%;
+}
+
+.align-center .shape-round .cards-media img,
+.align-center .shape-round .cards-media .media-placeholder {
+  margin-inline: auto;
+}
+
+/* As a list: one card to a row, the picture beside the words. */
+.layout-list .cards-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.layout-list .cards-item {
+  display: grid;
+  grid-template-columns: calc(var(--space-m) * 9) minmax(0, 1fr);
+  column-gap: calc(var(--space-m) * 1.25);
+  align-items: start;
+}
+
+.layout-list .cards-item > :not(.cards-media) {
+  grid-column: 2;
+}
+
+.layout-list .cards-media {
+  grid-row: 1 / span 4;
+}
+
+/* A list of words, with no picture area (shape none): the words take the whole card. The
+   column for the picture stayed and stood empty, the words pushed into a strip on the right
+   (the demo's events, D-213). */
+.layout-list .shape-none .cards-item {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.layout-list .shape-none .cards-item > :not(.cards-media) {
+  grid-column: 1;
+}
+
+.cards-item-heading {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.cards-item .richtext {
+  font-size: var(--text-small);
+  line-height: 1.6;
+}
+
+.cards-link {
+  margin: auto 0 0;
+  padding-block-start: var(--space-xs);
+  font-weight: var(--heading-weight);
+}
+
+/* Four in a row needs more room than a tablet gives it: two rows of two instead. */
+@media (max-width: 64rem) {
+  .per-row-4 .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* NO CARD STANDS ALONE AT THE START OF A ROW (D-194, the owner): the last card of an odd two —
+   and, said as more than asked, of three and one, four and one — is set in the middle of its
+   row at a card's width. A Logos grid's last stands across its row (D-188); across, a card
+   would be twice as wide with a picture twice as tall. Counted among the cards only, never
+   the editor's cell for adding one; one card on its own is a block of one, and stays put.
+   Four to a row are two on a tablet, and the last of an odd number is the one alone there. */
+.layout-grid .per-row-2 .cards-item:nth-child(odd of .cards-item:not(.bx-add-item-cell)):nth-last-child(1 of .cards-item:not(.bx-add-item-cell)):not(:nth-child(1 of .cards-item:not(.bx-add-item-cell))),
+.layout-grid .per-row-3 .cards-item:nth-child(3n + 1 of .cards-item:not(.bx-add-item-cell)):nth-last-child(1 of .cards-item:not(.bx-add-item-cell)):not(:nth-child(1 of .cards-item:not(.bx-add-item-cell))),
+.layout-grid .per-row-4 .cards-item:nth-child(4n + 1 of .cards-item:not(.bx-add-item-cell)):nth-last-child(1 of .cards-item:not(.bx-add-item-cell)):not(:nth-child(1 of .cards-item:not(.bx-add-item-cell))) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  box-sizing: border-box;
+  --cards-across: 2;
+  /* A column's width, its padding and edge inside it, as the cards beside it are measured. */
+  inline-size: calc((100% - (var(--cards-across) - 1) * var(--space-m) * 1.25) / var(--cards-across));
+}
+
+.layout-grid .per-row-3 .cards-item:nth-child(3n + 1 of .cards-item:not(.bx-add-item-cell)):nth-last-child(1 of .cards-item:not(.bx-add-item-cell)):not(:nth-child(1 of .cards-item:not(.bx-add-item-cell))) {
+  --cards-across: 3;
+}
+
+.layout-grid .per-row-4 .cards-item:nth-child(4n + 1 of .cards-item:not(.bx-add-item-cell)):nth-last-child(1 of .cards-item:not(.bx-add-item-cell)):not(:nth-child(1 of .cards-item:not(.bx-add-item-cell))) {
+  --cards-across: 4;
+}
+
+@media (max-width: 64rem) {
+  .layout-grid .per-row-4 .cards-item:nth-child(n of .cards-item:not(.bx-add-item-cell)):nth-last-child(1 of .cards-item:not(.bx-add-item-cell)):not(:nth-child(1 of .cards-item:not(.bx-add-item-cell))) {
+    grid-column: auto;
+    justify-self: stretch;
+    inline-size: auto;
+  }
+
+  .layout-grid .per-row-4 .cards-item:nth-child(odd of .cards-item:not(.bx-add-item-cell)):nth-last-child(1 of .cards-item:not(.bx-add-item-cell)):not(:nth-child(1 of .cards-item:not(.bx-add-item-cell))) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    --cards-across: 2;
+    inline-size: calc((100% - var(--space-m) * 1.25) / 2);
+  }
+}
+
+/* On a phone every card is a row of its own, and the last one is as wide as the rest. */
+@media (max-width: 40rem) {
+  .cards-grid,
+  .per-row-2 .cards-grid,
+  .per-row-4 .cards-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .layout-grid .cards .cards-item:nth-child(n of .cards-item:not(.bx-add-item-cell)):nth-last-child(1 of .cards-item:not(.bx-add-item-cell)):not(:nth-child(1 of .cards-item:not(.bx-add-item-cell))) {
+    grid-column: auto;
+    justify-self: stretch;
+    inline-size: auto;
+  }
+}

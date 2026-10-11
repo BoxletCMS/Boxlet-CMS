@@ -1,0 +1,258 @@
+{
+    "format": "boxlet-design-set",
+    "version": 2,
+    "id": "brutalist",
+    "name": {
+        "en": "Brutalist"
+    },
+    "description": {
+        "en": "Monospace capitals, hard offset shadows, thick rules and stark colour."
+    },
+    "author": "Boxlet",
+    "decisions": {
+        "seed": "#1f1fd1",
+        "secondary": "#ffe600",
+        "surface_contrast": "80",
+        "footer_colour": "#111318",
+        "heading_font": "ibm-plex-mono",
+        "body_font": "ibm-plex-mono",
+        "scale": "1.415",
+        "spacing": "0.9",
+        "section_gap": "48",
+        "radius": "0",
+        "border_width": "3",
+        "shadow": "hard",
+        "shadow_strength": "50",
+        "container": "80",
+        "page_background": "border",
+        "header_width": "window",
+        "button_radius": "0",
+        "button_caps": "yes"
+    },
+    "look": {
+        "header_arrangement": "split",
+        "header_behaviour": "static",
+        "header_opacity": "100",
+        "header_blur": "0",
+        "header_surface": "contrast",
+        "header_edge": "shadow",
+        "header_height": "56",
+        "logo_size": "60",
+        "brand": "logo",
+        "nav_style": "caps",
+        "nav_ink": "accent",
+        "header_button": "outline",
+        "footer_layout": "menu_first",
+        "footer_columns": "3",
+        "footer_links": "auto",
+        "small_print_row": "left",
+        "footer_surface": "plain",
+        "footer_edge": "slant"
+    },
+    "composition": {
+        "section": {
+            "surface": "plain",
+            "pad_top": "",
+            "pad_bottom": "",
+            "min_height": "0",
+            "v_align": "top",
+            "width": "full",
+            "align": "left",
+            "divider": "none",
+            "animation": "none"
+        },
+        "surfaces": {
+            "hero": "contrast",
+            "text": "tinted"
+        },
+        "dividers": {},
+        "layouts": {
+            "hero": "split",
+            "image_text": "image-left",
+            "text": "columns"
+        },
+        "options": {}
+    },
+    "patterns": [
+        {
+            "id": "hero-button",
+            "name": {
+                "en": "Hero with a button",
+                "hr": "Hero s gumbom"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "tinted",
+                    "pad_top": "112",
+                    "pad_bottom": "112"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "hero",
+                    "layout": "center",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "A new heading",
+                            "hr": "Novi naslov"
+                        },
+                        "subheading": {
+                            "en": "A short line that explains the offer.",
+                            "hr": "Kratak tekst koji objašnjava ponudu."
+                        },
+                        "cta": {
+                            "label": {
+                                "en": "Find out more",
+                                "hr": "Saznaj više"
+                            },
+                            "url": "/"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "three-cards",
+            "name": {
+                "en": "Three cards",
+                "hr": "Tri kartice"
+            },
+            "section": {
+                "layout": "one",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "cards",
+                    "layout": "grid",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Cards",
+                            "hr": "Naslov kartica"
+                        },
+                        "items": [
+                            {
+                                "heading": {
+                                    "en": "First",
+                                    "hr": "Prva"
+                                },
+                                "body": {
+                                    "en": "<p>A short description.</p>",
+                                    "hr": "<p>Kratki opis.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Second",
+                                    "hr": "Druga"
+                                },
+                                "body": {
+                                    "en": "<p>A short description.</p>",
+                                    "hr": "<p>Kratki opis.</p>"
+                                }
+                            },
+                            {
+                                "heading": {
+                                    "en": "Third",
+                                    "hr": "Treća"
+                                },
+                                "body": {
+                                    "en": "<p>A short description.</p>",
+                                    "hr": "<p>Kratki opis.</p>"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "text-quote",
+            "name": {
+                "en": "Text and a quotation",
+                "hr": "Tekst + citat"
+            },
+            "section": {
+                "layout": "wide-left",
+                "style": {}
+            },
+            "blocks": [
+                {
+                    "type": "text",
+                    "layout": "single",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Heading",
+                            "hr": "Naslov"
+                        },
+                        "body": {
+                            "en": "<p>The paragraph goes here. Click and type.</p>",
+                            "hr": "<p>Ovdje ide tekst odlomka. Klikni i piši.</p>"
+                        }
+                    }
+                },
+                {
+                    "type": "quote",
+                    "layout": "plain",
+                    "column": 1,
+                    "options": {},
+                    "content": {
+                        "quote": {
+                            "en": "“The best decision we made.”",
+                            "hr": "„Najbolja odluka koju smo donijeli.”"
+                        },
+                        "attribution": {
+                            "en": "Name Surname, company",
+                            "hr": "Ime Prezime, tvrtka"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "call-to-action",
+            "name": {
+                "en": "A call to action",
+                "hr": "Poziv na akciju"
+            },
+            "section": {
+                "layout": "one",
+                "style": {
+                    "surface": "contrast"
+                }
+            },
+            "blocks": [
+                {
+                    "type": "cta",
+                    "layout": "banner",
+                    "column": 0,
+                    "options": {},
+                    "content": {
+                        "heading": {
+                            "en": "Ready to start?",
+                            "hr": "Spremni za početak?"
+                        },
+                        "body": {
+                            "en": "Get in touch and we’ll agree the first step.",
+                            "hr": "Javite se i dogovorimo prvi korak."
+                        },
+                        "action": {
+                            "label": {
+                                "en": "Contact",
+                                "hr": "Kontakt"
+                            },
+                            "url": "/"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

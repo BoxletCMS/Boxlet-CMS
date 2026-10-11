@@ -60,9 +60,9 @@ $button = $content['button'];
    becomes nothing (D-110). Never on a header laid over the first section: that behaviour
    exists to paint nothing and take the colours beneath it. */
 $ownColour = ($resolved['own'] ?? false) === true && $behaviour !== 'over';
-$classes = 'site-header density-' . ($look['density'] ?? 'normal')
-    . ' logo-' . ($look['logo_size'] ?? 'medium')
-    . ' behaviour-' . $behaviour
+// The bar's height and the logo's size are numbers since D-164, and reach the bar as tokens
+// (--chrome-header-height, --chrome-logo-size); only closed sets are classes.
+$classes = 'site-header behaviour-' . $behaviour
     . ' edge-' . ($look['header_edge'] ?? 'none')
     . ' nav-' . ($look['nav_style'] ?? 'plain')
     . ' nav-ink-' . ($look['nav_ink'] ?? 'accent')
@@ -136,7 +136,8 @@ $at = 0;
          than an empty button shape. Both halves are required — a label with no address is
          not a link, and an address with no label is nothing to click. Filled, outlined or a
          plain link, as the look says (D-112). */ ?>
-<?php if ($button['url'] !== '' && $button['label'] !== ''): ?>
+<?php /* `none` (D-164): the look says there is no button, whatever words it has. */ ?>
+<?php if ($button['url'] !== '' && $button['label'] !== '' && ($look['header_button'] ?? 'filled') !== 'none'): ?>
     <p class="site-header-action"><a class="<?= e(($look['header_button'] ?? 'filled') === 'text' ? 'site-header-link' : 'button' . (($look['header_button'] ?? 'filled') === 'outline' ? ' button-outline' : '')) ?>" href="<?= e($button['url']) ?>"><?= e($button['label']) ?></a></p>
 <?php endif; ?>
 </div>

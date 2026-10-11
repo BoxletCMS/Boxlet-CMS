@@ -84,7 +84,8 @@ final class MediaReference
 
     /**
      * The crop shape the media browser opens with for a block's picture (D-145): the shape
-     * the block draws it in, where that is fixed or chosen by one of the block's own fields.
+     * the block draws it in, where that is fixed or chosen by one of the block's own fields
+     * or options (D-166).
      * Anything else opens with Free. Named by MediaCrop::RATIOS.
      *
      * Kept here, beside the picker's other server half, rather than in each block's
@@ -96,7 +97,7 @@ final class MediaReference
         'quote' => 'thumb',
         'picture' => ['shape' => ['wide' => 'hero', 'square' => 'thumb', 'round' => 'thumb']],
         'gallery' => ['shape' => ['wide' => 'hero', 'square' => 'thumb', 'round' => 'thumb']],
-        'columns' => ['image_shape' => ['wide' => 'card', 'square' => 'thumb', 'round' => 'thumb']],
+        'cards' => ['image_shape' => ['wide' => 'card', 'square' => 'thumb', 'round' => 'thumb']],
     ];
 
     /**

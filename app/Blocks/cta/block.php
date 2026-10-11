@@ -21,6 +21,10 @@ return [
         'action' => ['type' => 'link', 'translatable' => true, 'sample' => 'preview.cta.action'],
         'second' => ['type' => 'link', 'translatable' => true, 'sample' => 'preview.cta.second'],
     ],
-    'layouts' => ['banner', 'beside'],
+    // Each layout with its drawing (D-166): part => [x, y, width, height] on 48 × 24.
+    'layouts' => [
+        'banner' => ['line' => [[12, 5, 24, 3], [16, 10, 16, 1]], 'button' => [[19, 14, 10, 4]]],
+        'beside' => ['line' => [[4, 8, 22, 3], [4, 13, 18, 1]], 'button' => [[33, 9, 11, 5]]],
+    ],
     'defaults' => ['layout' => 'banner'],
 ];

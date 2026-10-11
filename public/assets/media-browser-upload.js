@@ -125,7 +125,9 @@
       var name = select.getAttribute('data-picker-crop-field');
       var block = select.closest('[data-block]');
       if (name && block) {
-        var chooser = block.querySelector('select[name$="[' + name + ']"]');
+        // An option since D-166, a row of buttons: the one pressed. Auto names no shape here,
+        // so it opens on Free.
+        var chooser = block.querySelector('select[name$="[' + name + ']"], input[name$="[' + name + ']"]:checked');
         try {
           var map = JSON.parse(select.getAttribute('data-picker-crop-map') || '{}');
           if (chooser && map[chooser.value]) {

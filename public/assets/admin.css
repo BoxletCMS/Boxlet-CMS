@@ -154,7 +154,9 @@
   color: var(--ui-ink);
 }
 
-[data-hints-root][data-hints="off"] .hint {
+/* A hint that is part of a question or a verdict — what each answer does, why Publish is
+   blocked — is not teaching and does not go with the rest (D-157): `.hint-always`. */
+[data-hints-root][data-hints="off"] .hint:not(.hint-always) {
   display: none;
 }
 

@@ -22,7 +22,7 @@ $picture = is_int($content['image'] ?? null) ? ($media[$content['image']] ?? nul
 $tag = \App\Modules\Media\MediaPicture::tag($picture, ['card', 'wide'], '(max-width: 40rem) 100vw, 50vw', $eager);
 ?>
 <div class="image-text fit-<?= e($content['image_fit']) ?>">
-    <div class="image-text-media">
+    <div class="image-text-media"<?= edit_attr('image') ?>>
 <?php if ($tag !== ''): ?>
         <?= $tag ?>
 <?php else: ?>
@@ -30,12 +30,12 @@ $tag = \App\Modules\Media\MediaPicture::tag($picture, ['card', 'wide'], '(max-wi
 <?php endif; ?>
     </div>
     <div class="image-text-body">
-<?php if ($content['heading'] !== ''): ?>
-        <h2 class="image-text-heading"><?= e($content['heading']) ?></h2>
+<?php if (edit_show($content['heading'] !== '')): ?>
+        <h2 class="image-text-heading"<?= edit_attr('heading') ?>><?= e($content['heading']) ?></h2>
 <?php endif; ?>
-        <div class="richtext"><?= $content['body'] ?></div>
-<?php if ($content['link']['url'] !== '' && $content['link']['label'] !== ''): ?>
-        <p><a href="<?= e($content['link']['url']) ?>"><?= e($content['link']['label']) ?></a></p>
+        <div class="richtext"<?= edit_attr('body') ?>><?= $content['body'] ?></div>
+<?php if (edit_show($content['link']['url'] !== '' && $content['link']['label'] !== '')): ?>
+        <p class="text-link"><a href="<?= e($content['link']['url']) ?>"<?= edit_attr('link') ?>><?= e($content['link']['label']) ?></a></p>
 <?php endif; ?>
     </div>
 </div>

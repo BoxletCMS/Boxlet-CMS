@@ -1,0 +1,109 @@
+/* Where two sections meet (SPEC §5.4): a section's divider, drawn on its top edge, and the
+   join of two bands of one surface. Split from sections.css, past the size limit, when a shaped
+   edge between two bands of one surface stopped being drawn (D-194); under its rule, only
+   custom properties from tokens.css. Linked straight after it, the order these rules had. */
+
+/* Two bands of one surface read as one band, and two full gaps one after the other as a hole
+   in it: between them is HALF the space, the first's room below and the second's above each
+   half the gap (D-185: only the second's was halved, which left three quarters of the space
+   between Editorial's "Why us" and its call to action). Whatever edge the second carries,
+   as the last band and a footer of its surface are one (D-194, D-193, the owner): a shaped
+   one is not drawn (below), and a line, the one edge one colour shows on itself, stands in
+   the middle of the one gap. Only where the padding is the character's — a padding the
+   owner set is theirs (owner's review of phase 1). Not for pictures: two photographs are two
+   bands whatever they share. */
+:is(
+  .block.surface-plain + .block.surface-plain,
+  .block.surface-tinted + .block.surface-tinted,
+  .block.surface-contrast + .block.surface-contrast,
+  .block.surface-gradient + .block.surface-gradient
+):not([class*="pad-t-"]) {
+  --section-pad-top: calc(var(--section-gap) * 0.5);
+}
+
+:is(
+  .block.surface-plain:has(+ .block.surface-plain),
+  .block.surface-tinted:has(+ .block.surface-tinted),
+  .block.surface-contrast:has(+ .block.surface-contrast),
+  .block.surface-gradient:has(+ .block.surface-gradient)
+):not([class*="pad-b-"]) {
+  --section-pad-bottom: calc(var(--section-gap) * 0.5);
+}
+
+/* Divider: drawn on the top edge of the section it belongs to. */
+
+.divider-line {
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.divider-slant,
+.divider-curve {
+  margin-top: calc(var(--divider-depth) * -1);
+  padding-top: calc(var(--section-pad-top) + var(--divider-depth));
+}
+
+/* The section above a shaped edge keeps extra room at its bottom, so the edge never
+   covers its content, whatever that section's own padding. */
+.block:has(+ .divider-slant),
+.block:has(+ .divider-curve) {
+  padding-bottom: calc(var(--section-pad-bottom) + var(--divider-depth));
+}
+
+.divider-slant {
+  /* The low corner a hairline above the band it meets: placed exactly on the band's last
+     row, the clipped edge's anti-aliasing let the page behind show through as a light dash
+     at the left (owner's review of phase 1). */
+  clip-path: polygon(0 calc(var(--divider-depth) - 0.0625rem), 100% 0, 100% 100%, 0 100%);
+}
+
+.divider-curve {
+  border-top-left-radius: 50% var(--divider-depth);
+  border-top-right-radius: 50% var(--divider-depth);
+}
+
+/* A SHAPED EDGE BETWEEN TWO BANDS OF ONE SURFACE IS NOT DRAWN (D-194, the owner): one colour
+   on the same colour, the curve or the slant cannot be seen, and the depth it kept below the
+   band above and above its own words, with the two full gaps, was a hole: measured on the
+   demo's home under Retreat, "Why us" and the call to action, both plain and the call's edge
+   a curve, stood 336 px apart, against 128 between two plain bands with none. They are one
+   band, as two with no edge are. Not for pictures, as above. */
+:is(
+  .block.surface-plain + .block.surface-plain,
+  .block.surface-tinted + .block.surface-tinted,
+  .block.surface-contrast + .block.surface-contrast,
+  .block.surface-gradient + .block.surface-gradient
+):is(.divider-slant, .divider-curve) {
+  margin-top: 0;
+  padding-top: var(--section-pad-top);
+  clip-path: none;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+
+:is(
+  .block.surface-plain:has(+ .block.surface-plain:is(.divider-slant, .divider-curve)),
+  .block.surface-tinted:has(+ .block.surface-tinted:is(.divider-slant, .divider-curve)),
+  .block.surface-contrast:has(+ .block.surface-contrast:is(.divider-slant, .divider-curve)),
+  .block.surface-gradient:has(+ .block.surface-gradient:is(.divider-slant, .divider-curve))
+) {
+  padding-bottom: var(--section-pad-bottom);
+}
+
+/* The footer may carry a shaped edge too (D-113), and its neighbour is <main>, not a
+   section: the last section inside keeps the room the rule above gives a section above a
+   shaped edge, so the footer's slant never cuts into its words. */
+main:has(+ .block-footer:is(.divider-slant, .divider-curve)) > .block:last-child {
+  padding-bottom: calc(var(--section-pad-bottom) + var(--divider-depth));
+}
+
+/* A divider marks a transition between two sections. The first section has nothing to
+   transition from, and a shaped edge there is simply clipped by the top of the page, so
+   the first section never draws one whatever its stored style says. */
+main > .block:first-child {
+  margin-top: 0;
+  padding-top: var(--section-pad-top);
+  border-top: 0;
+  clip-path: none;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}

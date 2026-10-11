@@ -1,0 +1,146 @@
+/* NAVIGATION (PLAN.md D-180, D-183): what the header and footer say, in one column read
+   from top to bottom, and the menus under them. */
+
+.navigation-screen {
+  max-inline-size: 46rem;
+}
+
+.navigation-parts {
+  display: grid;
+  gap: var(--ui-4);
+}
+
+.navigation-part > h2 {
+  margin: 0;
+}
+
+.navigation-save {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.navigation-menus {
+  margin-block-start: var(--ui-6);
+}
+
+.navigation-menus > h2 {
+  margin: 0;
+}
+
+/* ---- the language, chosen once (D-182) ----------------------------------------------- */
+
+.navigation-language {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-3);
+  align-items: center;
+  margin-block-end: var(--ui-4);
+}
+
+.navigation-language-label {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+}
+
+/* One language's words, in the card itself: no card inside a card. Its name shows only
+   when every language stands in turn, without a script. */
+.words-for {
+  display: grid;
+  gap: var(--ui-4);
+}
+
+.words-for[hidden] {
+  display: none;
+}
+
+.words-language {
+  margin: 0;
+  padding-block-start: var(--ui-3);
+  border-block-start: var(--ui-border) solid var(--ui-line);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  font-weight: 600;
+}
+
+.one-language .words-language {
+  display: none;
+}
+
+/* A footer column is one group under its own heading (D-183): its menu, its title and its
+   words; the small print last, the same way. */
+.footer-column {
+  padding-block-start: var(--ui-4);
+  border-block-start: var(--ui-border) solid var(--ui-line);
+}
+
+.footer-column > h3 {
+  margin: 0;
+  font-size: var(--ui-text-base);
+}
+
+/* The footer's words are a line or two: three lines tall, growing with what is typed. */
+.navigation .richtext-editor .ProseMirror {
+  min-block-size: calc(3em * var(--ui-leading));
+}
+
+.navigation-lead {
+  margin: 0;
+}
+
+/* ---- a hint in one sentence, the rest behind (?) (D-182) ------------------------------ */
+
+/* The (?) is held to the last word before it (D-183), never alone on a line. */
+.hint-tail {
+  white-space: nowrap;
+}
+
+.help-tip {
+  position: relative;
+  display: inline-block;
+  white-space: normal;
+}
+
+.help-tip-button {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding: 0;
+  border: var(--ui-border) solid var(--ui-control-line);
+  border-radius: 999px;
+  background: var(--ui-panel);
+  color: var(--ui-ink-muted);
+  font: inherit;
+  font-size: var(--ui-text-xs);
+  font-weight: 700;
+  line-height: 1;
+  cursor: help;
+}
+
+.help-tip-button:hover,
+.help-tip-button:focus-visible {
+  border-color: var(--ui-accent);
+  color: var(--ui-ink);
+}
+
+.help-tip-text {
+  position: absolute;
+  inset-block-start: calc(100% + var(--ui-1));
+  inset-inline-start: 50%;
+  z-index: 20;
+  display: none;
+  inline-size: min(20rem, 70vw);
+  padding: var(--ui-2) var(--ui-3);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  background: var(--ui-panel);
+  box-shadow: var(--ui-shadow-m);
+  color: var(--ui-ink);
+  font-size: var(--ui-text-xs);
+  line-height: 1.45;
+  transform: translateX(-50%);
+}
+
+.help-tip:hover .help-tip-text,
+.help-tip:focus-within .help-tip-text {
+  display: block;
+}

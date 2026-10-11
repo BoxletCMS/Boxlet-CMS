@@ -1,0 +1,3 @@
+# Design sets (PLAN.md D-152) are read by Boxlet from the disk, never fetched from the web.
+# This folder is outside public/ already; this is the second lock, as in storage/.
+Require all denied

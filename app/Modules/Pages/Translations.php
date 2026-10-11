@@ -124,8 +124,8 @@ final class Translations
                 $from = $block['section_id'] === null ? null : (int) $block['section_id'];
                 $db->query(
                     "INSERT INTO page_blocks (page_id, section_id, column_index, block_group_id, block_type, sort, content_json,
-                                              style_json, layout, translation_status, source_hash, created_at, updated_at)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, '{}', ?, 'reviewed', ?, ?, ?)",
+                                              options_json, style_json, layout, translation_status, source_hash, created_at, updated_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, '{}', ?, 'reviewed', ?, ?, ?)",
                     [
                         $id,
                         $from === null ? null : ($sections[$from] ?? null),
@@ -137,6 +137,8 @@ final class Translations
                         $type,
                         (int) $block['sort'],
                         (string) $block['content_json'],
+                        // Its options with it: a translation is the same page in other words.
+                        (string) ($block['options_json'] ?? '{}'),
                         (string) ($block['layout'] ?? ''),
                         $hash,
                         $now,
@@ -147,6 +149,54 @@ final class Translations
 
             return $id;
         });
+    }
+
+    /**
+     * A TRANSLATION OF A PAGE NEVER PUBLISHED TAKES ITS DRAFT (PLAN.md D-163 point 6): the page
+     * as stored is only where it started, and the words the owner is writing are the draft's.
+     * A published page is translated as it is published; its unpublished changes are not.
+     *
+     * The draft becomes the translation's own draft, pointing at the translation's rows: each
+     * block at the copy made from it (the same block_group_id, so the two stay paired), each
+     * band at the copy in the same place. Anything the draft added has no copy and is new.
+     */
+    public static function carryDraft(Db $db, Blocks $registry, int $sourceId, int $translationId): void
+    {
+        $source = Page::find($db, $sourceId);
+        $copy = Page::find($db, $translationId);
+        $draft = $source === null || $source['published_at'] !== null ? null : PageDraft::find($db, $registry, $sourceId);
+        if ($draft === null || $copy === null) {
+            return;
+        }
+        // Bands by place: Sections::copy() made one for each, in the same order.
+        $theirs = array_column($db->all('SELECT id FROM page_sections WHERE page_id = ? ORDER BY sort, id', [$translationId]), 'id');
+        $bands = [];
+        foreach (array_column($db->all('SELECT id FROM page_sections WHERE page_id = ? ORDER BY sort, id', [$sourceId]), 'id') as $at => $id) {
+            if (isset($theirs[$at])) {
+                $bands[(int) $id] = (int) $theirs[$at];
+            }
+        }
+        $copies = [];
+        foreach ($db->all('SELECT b.id, c.id AS copy FROM page_blocks b JOIN page_blocks c ON c.block_group_id = b.block_group_id AND c.page_id = ? WHERE b.page_id = ?', [$translationId, $sourceId]) as $row) {
+            $copies[(int) $row['id']] = (int) $row['copy'];
+        }
+
+        $document = $draft['document'];
+        $keys = [];
+        foreach ($document['sections'] as $at => $section) {
+            $id = $section['id'] !== null ? ($bands[$section['id']] ?? null) : null;
+            $keys[$section['key']] = SectionForm::key($id, $at);
+            $document['sections'][$at] = ['key' => $keys[$section['key']], 'id' => $id] + $section;
+        }
+        foreach ($document['blocks'] as $at => $block) {
+            $id = $block['id'] !== null ? ($copies[$block['id']] ?? null) : null;
+            $document['blocks'][$at] = ['key' => BlockForm::key($id, $at), 'id' => $id, 'section' => $keys[$block['section']] ?? $block['section']] + $block;
+        }
+        // The copy's own address and place, which create() found free in its language.
+        $document['slug'] = (string) $copy['slug'];
+        $document['parent_id'] = $copy['parent_id'] === null ? null : (int) $copy['parent_id'];
+        $document['status'] = 'draft';
+        PageDraft::save($db, $translationId, $document, 0);
     }
 
     /**
@@ -170,7 +220,8 @@ final class Translations
      */
     public static function pageHash(array $page): string
     {
-        $seo = Page::seo($page);
+        // Its words only: whether search engines may list it is not something to translate.
+        $seo = array_intersect_key(PageSeo::of($page), ['title' => true, 'description' => true]);
 
         return hash('sha256', json_encode([(string) $page['title'], $seo], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
     }

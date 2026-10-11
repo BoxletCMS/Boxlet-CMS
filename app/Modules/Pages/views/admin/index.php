@@ -87,10 +87,18 @@ foreach ($pages as $row) {
             <input type="hidden" name="parent" value="">
             <input type="hidden" name="position" value="">
         </form>
+<?php
+    $bulkId = 'pages-bulk';
+    $bulkAction = Url::admin('pages', 'delete');
+    $bulkWords = 'pages.bulk';
+    $bulkKeep = ['lang' => $lang, 'q' => $query];
+    require dirname(__DIR__, 3) . '/Admin/views/bulk.php';
+?>
         <div class="table-wrap">
             <table class="table page-tree">
                 <thead>
                     <tr>
+                        <th scope="col" class="col-pick"><input type="checkbox" class="js-only" data-bulk-all form="pages-bulk" aria-label="<?= e(t('pages.bulk.all')) ?>" title="<?= e(t('pages.bulk.all')) ?>"></th>
                         <th scope="col" class="col-order"><span class="visually-hidden"><?= e(t('pages.col.order')) ?></span></th>
                         <th scope="col"><?= e(t('pages.col.title')) ?></th>
                         <th scope="col" class="col-address"><?= e(t('pages.col.address')) ?></th>
@@ -116,6 +124,7 @@ foreach ($pages as $row) {
                              parent, the title it names as a parent, whether it is a home page,
                              which takes no subpages, and where to send the page. */ ?>
                     <tr data-page-id="<?= $id ?>" data-page-group="<?= e($group) ?>" data-depth="<?= e((string) $page['depth']) ?>" data-locale="<?= e($page['locale']) ?>" data-parent="<?= $page['parent'] > 0 ? e((string) $page['parent']) : '' ?>" data-title="<?= e($page['title']) ?>"<?= $page['slug'] === '' ? ' data-home' : '' ?> data-place="<?= e(Url::admin('pages', $id, 'place')) ?>">
+                        <td class="col-pick"><input type="checkbox" name="ids[]" value="<?= $id ?>" form="pages-bulk" data-bulk-pick aria-label="<?= e(t('pages.bulk.pick', ['title' => $page['title']])) ?>"></td>
                         <td class="page-order">
 <?php if ($query === ''): ?>
                             <span class="drag-handle" data-page-handle aria-hidden="true"><?= icon('grip-vertical') ?></span>

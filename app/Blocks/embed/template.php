@@ -82,7 +82,7 @@ $allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-pictur
 <?php else: ?>
     <p class="embed-unknown"><?= e(site_t('site.embed.unknown', $locale)) ?></p>
 <?php endif; ?>
-<?php if ($content['caption'] !== ''): ?>
-    <figcaption class="embed-caption"><?= e($content['caption']) ?></figcaption>
+<?php if (edit_show($content['caption'] !== '')): ?>
+    <figcaption class="embed-caption"<?= edit_attr('caption') ?>><?= e($content['caption']) ?></figcaption>
 <?php endif; ?>
 </figure>

@@ -51,7 +51,7 @@ final class PageCache
         }
         $file = self::file($server);
         $modified = is_file($file) ? (int) filemtime($file) : 0;
-        if ($modified === 0 || $modified < time() - self::MAX_AGE) {
+        if ($modified === 0 || $modified < time() - self::MAX_AGE || self::newYearSince($modified, time())) {
             return false;
         }
         // As Response::send(): headers only while they can still be sent.
@@ -63,6 +63,17 @@ final class PageCache
         readfile($file);
 
         return true;
+    }
+
+    /**
+     * Whether a new year may have begun on the site since $kept: a page's {{year}} (D-201) is
+     * the year it was drawn in. Asked before the site's time zone is known, which is not read
+     * here, so of every zone there is, UTC-12 to UTC+14: a page drawn in the last hours of a
+     * year is drawn again a few hours sooner than it had to be, and never shown a year late.
+     */
+    public static function newYearSince(int $kept, int $now): bool
+    {
+        return gmdate('Y', $kept - 12 * 3600) !== gmdate('Y', $now + 14 * 3600);
     }
 
     /**
@@ -79,7 +90,7 @@ final class PageCache
             return;
         }
         $method = strtoupper((string) ($server['REQUEST_METHOD'] ?? 'GET'));
-        if ($method === 'POST' && self::segment($server) === 'admin' && !in_array(self::segment($server, 1), self::NOT_CHANGES, true)) {
+        if ($method === 'POST' && self::segment($server) === 'admin' && !in_array(self::segment($server, 1), self::NOT_CHANGES, true) && !self::drafting($server)) {
             self::clear();
 
             return;
@@ -99,6 +110,10 @@ final class PageCache
     /** Every kept page removed. */
     public static function clear(): void
     {
+        // Never told where the pages are, there are none: '' would make this the disk's root.
+        if (self::$directory === '') {
+            return;
+        }
         foreach (glob(self::$directory . '/*.html') ?: [] as $file) {
             @unlink($file);
         }
@@ -123,6 +138,20 @@ final class PageCache
             && preg_match('~(?:^|;)\s*boxlet_session=~', (string) ($server['HTTP_COOKIE'] ?? '')) !== 1
             && !in_array(self::segment($server), self::SKIPPED, true)
             && !is_file($storage . '/maintenance.flag');
+    }
+
+    /**
+     * A POST that touches only what the editors show (D-163, D-173, D-175): the draft's
+     * autosave and a revision put into it, a band or an inspector drawn for the builder, a
+     * block's fields cleaned, a pattern kept. Emptying every kept page on each of them would
+     * make the cache useless while anyone edits.
+     *
+     * @param array<string, mixed> $server
+     */
+    private static function drafting(array $server): bool
+    {
+        return (self::segment($server, 1) === 'pages' && in_array(self::segment($server, 3), ['draft', 'render', 'inspect', 'fields', 'restore'], true))
+            || self::segment($server, 1) === 'patterns';
     }
 
     /**

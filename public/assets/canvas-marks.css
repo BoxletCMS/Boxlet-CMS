@@ -1,0 +1,201 @@
+/* The editor's marks ON the page inside the canvas iframe (PLAN.md D-175): places that are
+ * empty on the page and must be seen here, a frame that must not take the press, and a
+ * translation's stale block. canvas.css is what is drawn over the page; this is what the
+ * page itself wears while edited. The same rule as canvas.css: literals and --bx- values,
+ * never a site token. The --bx- values are canvas.css's, set on .bx-canvas. */
+
+/* A COLUMN WITH NOTHING STANDING IN IT (PLAN.md D-101): on the page it is nothing; here it is
+   the place a block goes, and a place with no size is not one. :not(:has(*)) rather than
+   :empty, because the renderer leaves whitespace inside an empty column. */
+.bx-canvas .section-column:not(:has(*)) {
+  min-block-size: 6rem;
+  outline: 2px dashed var(--bx-hover);
+  outline-offset: -2px;
+  border-radius: 0.5rem;
+}
+
+/* A BLOCK THAT DRAWS NOTHING YET (PLAN.md D-117): a new Text, Call to action, Quote or Form
+   measures 0px tall. builder-overlay.js marks it, and here it has a size and says what it is. */
+.bx-canvas [data-bx-empty] {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  min-block-size: 5rem;
+  background: var(--bx-select-soft);
+  outline: 2px dashed var(--bx-hover);
+  outline-offset: -2px;
+  border-radius: 0.5rem;
+}
+
+.bx-canvas [data-bx-empty]::before,
+.bx-canvas [data-bx-empty] > * {
+  grid-area: 1 / 1;
+}
+
+.bx-canvas [data-bx-empty]::before {
+  content: attr(data-bx-empty);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--bx-paper);
+  color: var(--bx-ink);
+  font: 500 calc(0.8125rem * var(--bx-z, 1))/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.bx-canvas [data-bx-selected="section"][data-bx-empty] {
+  outline: 2px solid var(--bx-select);
+}
+
+/* A column of the Columns block, a gallery or cards with nothing in it yet (is-empty). */
+.bx-canvas [data-bx-key] .is-empty {
+  min-block-size: 8rem;
+  background: var(--bx-select-soft);
+  outline: 2px dashed var(--bx-hover);
+  outline-offset: -2px;
+  border-radius: 0.5rem;
+}
+
+/* An Embed whose address nothing recognises: blocks.css hides it on the page, and here it
+   says what is wrong, as legible text on the surface it sits on. */
+.bx-canvas [data-bx-key] .embed.is-empty {
+  display: block;
+  min-block-size: 0;
+  background: none;
+  outline: 0;
+}
+
+.bx-canvas [data-bx-key] .embed-unknown {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  background: var(--bx-select-soft);
+  border: 1px dashed var(--bx-hover);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* A Downloads item with no file chosen (PLAN.md D-127), hidden on the page. */
+.bx-canvas .downloads-item.is-empty {
+  display: grid;
+  outline: 2px dashed var(--bx-hover);
+  outline-offset: -2px;
+}
+
+.bx-canvas .downloads-item.is-empty .downloads-type {
+  min-block-size: 2rem;
+}
+
+/* A FRAME NEVER TAKES THE PRESS HERE (D-148): a click inside another site's frame is that
+   site's and never reaches this document. The press goes through to the block instead. */
+.bx-canvas main iframe {
+  pointer-events: none;
+}
+
+/* A translation's block whose source changed after it was translated (D-043): an amber edge
+   down its left side, at rest, in two tones so it reads on a pale band and a dark one. */
+.bx-canvas [data-bx-stale] {
+  box-shadow: inset 6px 0 0 #f0a020, inset 8px 0 0 #101a33;
+}
+
+/* ---- typing on the page (PLAN.md D-178) ---------------------------------------------------- */
+
+/* A FIELD THAT IS EMPTY, said where it would be: "+ Add subheading", in the page's own type.
+   Drawn in the canvas only (edit_show()); a visitor's page has no such element. Seen in the
+   selected block, not across the whole page, where a "+ Add link" on every card read as
+   clutter on the demo's home page (D-178). Elsewhere it keeps its place unseen (D-187, the
+   owner): taken out of the page, it came back as the block was selected and moved the page
+   under the first press. */
+.bx-canvas [data-bx-key]:not([data-bx-selected], :has([contenteditable], .ProseMirror)) [data-bx-placeholder]:empty {
+  visibility: hidden;
+}
+
+.bx-canvas [data-bx-placeholder]:empty::before {
+  content: attr(data-bx-placeholder);
+  font-style: normal;
+}
+
+.bx-canvas [data-bx-placeholder]:empty {
+  display: block;
+  min-inline-size: 6em;
+  outline: 1px dashed var(--bx-hover);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+  cursor: text;
+}
+
+/* A link's words stay a button or a link while empty, the placeholder as their words. */
+.bx-canvas a[data-bx-placeholder]:empty {
+  display: inline-block;
+}
+
+/* What is being typed in: a quiet edge of the selection's colour, the caret its own. An outline,
+   never a border or a padding: pressing a field to write in it moves nothing (D-186). Rich
+   text is mounted on the field itself, so this one rule is the edge for every kind. */
+.bx-canvas [data-bx-field][contenteditable] {
+  outline: 2px solid var(--bx-hover);
+  outline-offset: 3px;
+  border-radius: 0.125rem;
+}
+
+.bx-canvas [data-bx-field]:not([contenteditable]) {
+  cursor: text;
+}
+
+/* A picture is pressed to choose one, so it says it is a control. */
+.bx-canvas .hero-media[data-bx-field],
+.bx-canvas .image-text-media[data-bx-field],
+.bx-canvas .picture-frame[data-bx-field],
+.bx-canvas .cards-media[data-bx-field],
+.bx-canvas .gallery-frame[data-bx-field],
+.bx-canvas .hero-cover-picture[data-bx-field] {
+  cursor: pointer;
+}
+
+/* An error on the element it is about, at rest: the danger colour's edge in two tones. */
+.bx-canvas [data-bx-error] {
+  outline: 2px solid #c62828;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px #ffffff;
+}
+
+/* THE REPEATER'S "+", standing where the next item would. */
+.bx-canvas .bx-add-item-cell {
+  display: grid;
+  place-items: center;
+  min-block-size: 4rem;
+  border: 2px dashed var(--bx-hover);
+  border-radius: 0.5rem;
+  background: none;
+  list-style: none;
+}
+
+.bx-add-item {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--bx-paper);
+  border-radius: 999px;
+  background: var(--bx-ink);
+  color: var(--bx-paper);
+  font: 500 calc(0.8125rem * var(--bx-z, 1))/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+}
+
+.bx-add-item:hover,
+.bx-add-item:focus-visible {
+  background: var(--bx-select);
+  box-shadow: 0 0 0 2px var(--bx-ink);
+}
+
+/* A SPLIT HERO'S PICTURE NOT YET CHOSEN (D-182): in the canvas only, the place for it, said in
+   words and pressed to open the picker; dashed as every empty place is (.is-empty above). A
+   visitor's page draws no column for it. */
+.bx-canvas .hero-media.is-empty {
+  display: grid;
+  place-items: center;
+}
+
+.bx-canvas .hero-add-picture {
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--bx-paper);
+  border-radius: 999px;
+  background: var(--bx-ink);
+  color: var(--bx-paper);
+  font: 500 calc(0.8125rem * var(--bx-z, 1))/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}

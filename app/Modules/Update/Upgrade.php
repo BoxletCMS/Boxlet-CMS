@@ -114,7 +114,7 @@ final class Upgrade
             $state['phase'] = 'finish';
             $this->save($state);
         } elseif ($state['phase'] === 'finish') {
-            Design::publish($this->db, Design::load($this->db), $this->cache);
+            Design::publish($this->db, $this->cache);
             Sitemap::publish($this->db, $this->public);
             self::remove($this->dir() . '/new');
             if (is_file($this->dir() . '/package.zip')) {
@@ -204,9 +204,12 @@ final class Upgrade
         $new = $this->dir() . '/new';
         $items = [];
         foreach (self::children($new) as $name) {
-            if ($name === 'public') {
-                foreach (self::children($new . '/public') as $child) {
-                    $items[] = 'public/' . $child;
+            // public/ and designs/ child by child: each holds a folder that is the site's own
+            // and no release has — public/m and public/cache, designs/custom (D-155) — and a
+            // whole-folder swap would carry it off to old/ with the code.
+            if ($name === 'public' || $name === 'designs') {
+                foreach (self::children($new . '/' . $name) as $child) {
+                    $items[] = $name . '/' . $child;
                 }
             } else {
                 $items[] = $name;

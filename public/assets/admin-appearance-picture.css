@@ -87,6 +87,22 @@
   color: var(--ui-ink);
 }
 
+/* Undo and redo (D-181), side by side before the state. A disabled one is still drawn, in the
+   faint ink rather than faded: there is nothing to take back, and the place to do it shows. */
+.appearance-history {
+  display: flex;
+  gap: var(--ui-1);
+}
+
+.appearance-history[hidden] {
+  display: none;
+}
+
+.appearance-history .button[disabled] {
+  color: var(--ui-ink-faint);
+  cursor: default;
+}
+
 /* The state, in words. Never a colour alone: a dot says nothing to a reader who cannot see
    it and nothing at all to one reading the page aloud. */
 .preview-state {

@@ -30,15 +30,8 @@ final class MenusController
      */
     public function index(Request $request, string $locale, array $params): Response
     {
-        return AdminView::render($this->container, __DIR__ . '/views', 'index', [
-            'title' => t('menus.title'),
-            'nav' => 'menus',
-            'wide' => true,
-            'styles' => ['admin-pages.css'],
-            'menus' => Menu::all($this->db()),
-            'locales' => $this->container->get('locales'),
-            'errors' => [],
-        ]);
+        // The menus are listed on Navigation, under what the header and footer say (D-180).
+        return Response::redirect(Url::admin('navigation'));
     }
 
     /**
@@ -64,15 +57,9 @@ final class MenusController
         }
 
         if ($errors !== []) {
-            return AdminView::render($this->container, __DIR__ . '/views', 'index', [
-                'title' => t('menus.title'),
-                'nav' => 'menus',
-                'wide' => true,
-                'styles' => ['admin-pages.css'],
-                'menus' => Menu::all($db),
-                'locales' => $this->container->get('locales'),
-                'errors' => $errors,
-            ], 422);
+            $navigation = new NavigationController($this->container);
+
+            return $navigation->render($navigation->stored(), [], $errors, 422);
         }
 
         $id = Menu::create($db, $wanted, $name);
@@ -147,7 +134,7 @@ final class MenusController
         Activity::record($db, 'menu', 'deleted', $id, (string) $menu['name']);
         $this->flash(t('menus.deleted'));
 
-        return Response::redirect(Url::admin('menus'));
+        return Response::redirect(Url::admin('navigation'));
     }
 
     /**
@@ -297,7 +284,7 @@ final class MenusController
             'title' => (string) $menu['name'],
             'nav' => 'menus',
             'wide' => true,
-            'styles' => ['admin-pages.css'],
+            'styles' => ['admin-pages.css', 'admin-menus.css'],
             'scripts' => ['vendor/sortable.min.js', 'menus.js'],
             'menu' => $menu,
             'items' => MenuTree::admin($db, $id),

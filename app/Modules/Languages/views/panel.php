@@ -53,9 +53,11 @@ $firstOther = $others === [] ? '' : $others[0]['code'];
                                 <span class="badge"><?= e(t('languages.primary')) ?></span>
 <?php endif; ?>
                             </td>
-                            <td><code><?= e($code) ?></code></td>
-                            <td><?= e((string) $language['pages']) ?></td>
-                            <td>
+                            <?php /* Named here too: on a phone the column heads are not shown, and these
+                                     two stand under the language, each with its name (O-43). */ ?>
+                            <td class="language-code" data-label="<?= e(t('languages.col.code')) ?>"><code><?= e($code) ?></code></td>
+                            <td class="language-pages" data-label="<?= e(t('languages.col.pages')) ?>"><?= e((string) $language['pages']) ?></td>
+                            <td class="language-status">
 <?php if ($language['primary']): ?>
                                 <span class="hint"><?= e(t('languages.always_on')) ?></span>
 <?php else: ?>

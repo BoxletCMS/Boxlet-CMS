@@ -1,7 +1,7 @@
-/* The blocks of words and figures PLAN.md D-105 added: quote, space, questions, call to
-   action, numbers. Split from blocks.css when it passed the hard size limit (D-117), under
-   exactly its rule: only custom properties from
-   tokens.css and the --section-* properties each section sets in sections.css. No literal
+/* The blocks of words PLAN.md D-105 added: quote, space, call to action (numbers are
+   blocks-stats.css's, D-188; questions blocks-accordion.css's, D-190). Split from blocks.css
+   when it passed the hard size limit (D-117), under exactly its rule: only custom properties
+   from tokens.css and the --section-* properties each section sets in sections.css. No literal
    colours, pixel values, fonts or shadows. Linked straight after blocks.css. */
 
 /* Quote (D-105)
@@ -21,10 +21,23 @@
   text-align: center;
 }
 
+/* A rule down the left of centred words reads as detached from them. */
+.align-center .quote-words {
+  padding: 0;
+  border: 0;
+}
+
+/* Drawn as a Cards block's card (D-191, the owner): its surface, edge, corners, padding and
+   shadow. The card's own room gives way before the words do (D-185): with Editorial's spacing
+   on a phone, the page's gutter and the card's left the quote under 16rem. Never more than a
+   Cards card's padding, and only as little as keeps the words 16rem; a percentage here is of
+   the column. */
 .layout-card .quote {
-  padding: var(--space-l);
+  padding: clamp(var(--space-s), calc((100% - 16rem) / 2 - var(--border-width)), calc(var(--space-m) * 1.125));
   background: var(--section-card);
-  border-radius: var(--radius-m);
+  border: var(--border-width) solid var(--section-border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-s);
 }
 
 .quote-portrait img {
@@ -39,10 +52,41 @@
    came out a fifth larger and read as a slightly emphatic paragraph rather than a quotation. */
 .quote-words {
   margin: 0;
+  padding: 0 0 0 calc(var(--space-m) * 1.125);
+  /* The accent's rule down its left (README 1.6), three hairlines wide: the plain layout's,
+     whose drawing is that rule; Large and Card take it away below. */
+  border: 0;
+  border-inline-start: calc(var(--border-width) * 3) solid var(--section-link);
+  color: var(--section-text);
+  --quote-size: calc(var(--text-base) * 1.375);
+  font-size: var(--quote-size);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Large: the words alone, bigger, and no rule. */
+.layout-big .quote-words {
   padding: 0;
   border: 0;
-  font-size: var(--text-xl);
-  line-height: var(--leading-heading);
+  --quote-size: calc(var(--text-base) * 1.875);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+/* On a card the card is the frame, so the rule goes. */
+.layout-card .quote-words {
+  padding: 0;
+  border: 0;
+}
+
+/* LARGE AND ON A CARD, A QUOTATION IS SET AS A HEADING IS (D-193, the owner): the heading
+   family, its weight and its letter spacing. In Terra the pull quote stood in Inter, the
+   body's sans, under Source Serif headings. Plain keeps the body's face beside its rule;
+   a question of Questions keeps it too. */
+:is(.layout-big, .layout-card) .quote-words {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
 }
 
 .quote-said {
@@ -50,12 +94,15 @@
   flex-wrap: wrap;
   gap: var(--space-s);
   align-items: baseline;
-  font-size: var(--text-sm);
+  color: var(--section-muted);
+  /* Small (README 1.6): fourteen pixels under the default set, whatever the scale. */
+  font-size: var(--text-small);
 }
 
 .quote-who {
+  color: var(--section-text);
   font-style: normal;
-  font-weight: var(--heading-weight);
+  font-weight: 600;
 }
 
 .quote-role {
@@ -93,64 +140,6 @@
   margin-block: var(--space-3xl);
 }
 
-/* Questions (D-105)
-
-   <details> and <summary>, styled without taking away what they do. The marker is the
-   browser's own, rotated by the browser when the panel opens: replacing it with a drawn
-   arrow means drawing the open state too, and getting it wrong in one of them. */
-
-.accordion-heading {
-  margin: 0 0 var(--space-l);
-}
-
-/* RANGED TO THE EDGE EVEN IN A CENTRED BAND, which is not the block overruling the design
-   layer but the rule the form block already follows (.align-center .site-form). A summary
-   row is a CONTROL: its marker sits on the leading edge and its hit area is the whole row,
-   so centring makes every question start at a different place and puts the marker in the
-   middle of nothing. The block's own heading still follows the band. */
-.accordion-items {
-  display: grid;
-  gap: var(--space-s);
-}
-
-.align-center .accordion-items {
-  max-inline-size: var(--container-narrow);
-  margin-inline: auto;
-  text-align: start;
-}
-
-.accordion-item {
-  border-block-end: var(--border-width) solid var(--section-border);
-}
-
-.accordion-question {
-  padding-block: var(--space-s);
-  font-weight: var(--heading-weight);
-  cursor: pointer;
-}
-
-/* The words move, not the block: a summary that shifts its own padding on open makes the
-   whole list jump under the pointer. */
-.accordion-question:hover,
-.accordion-question:focus-visible {
-  color: var(--section-link);
-}
-
-.accordion-answer {
-  padding-block-end: var(--space-m);
-}
-
-.layout-cards .accordion-items {
-  gap: var(--space-m);
-}
-
-.layout-cards .accordion-item {
-  padding-inline: var(--space-l);
-  background: var(--section-card);
-  border: var(--border-card) solid var(--section-border);
-  border-radius: var(--radius-m);
-}
-
 /* Call to action (D-105)
 
    A closing block, not an opening one: the heading is a heading and not a hero line, and the
@@ -162,15 +151,28 @@
   gap: var(--space-l);
 }
 
+/* A banner is a centred stack whatever the section's alignment (README 1.6). */
+.layout-banner .cta {
+  justify-items: center;
+  text-align: center;
+}
+
+.layout-banner .cta-body {
+  margin-inline: auto;
+}
+
+.layout-banner .cta-links {
+  justify-content: center;
+}
+
 .layout-beside .cta {
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-xl);
+  gap: calc(var(--space-m) * 1.5);
   align-items: center;
 }
 
 .cta-heading {
   margin: 0;
-  font-size: var(--text-xl);
 }
 
 .cta-body {
@@ -197,70 +199,6 @@
 .cta-quiet {
   color: var(--section-link);
   font-weight: var(--heading-weight);
-}
-
-/* Numbers (D-105)
-
-   The number is the content, so it is set at display size and the word under it is not.
-   That relationship is the block: three Text blocks in a row cannot have it, because a
-   heading is sized as a heading. */
-
-.stats-heading {
-  margin: 0 0 var(--space-l);
-}
-
-/* THE BLOCK MEASURES ITS OWN ROOM, not the window's (D-125). Three or four numbers side by
-   side need a width a narrow column does not have: measured, three in a column of 211 pixels,
-   "120+" 110 wide in a track of 70, running into its neighbour. The rule for a narrow window
-   below could not see that — the window was wide. */
-.stats {
-  container-type: inline-size;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-l);
-  margin: 0;
-}
-
-.layout-four .stats-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.stats-item {
-  display: grid;
-  gap: var(--space-xs);
-}
-
-.stats-value {
-  font-family: var(--font-heading);
-  font-size: var(--text-3xl);
-  font-weight: var(--heading-weight);
-  line-height: var(--leading-heading);
-  letter-spacing: var(--heading-tracking);
-}
-
-.stats-label {
-  margin: 0;
-  color: var(--section-muted);
-  font-size: var(--text-sm);
-}
-
-/* Numbers in fewer columns as their own room narrows, whether a phone or a column made it
-   narrow (D-125): two, then one. */
-@container (max-width: 36rem) {
-  .stats-grid,
-  .layout-four .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container (max-width: 18rem) {
-  .stats-grid,
-  .layout-four .stats-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 /* On a narrow screen everything else that was a row becomes one column. */
