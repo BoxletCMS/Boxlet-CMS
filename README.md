@@ -9,7 +9,7 @@ shell, no Composer, no Node, no build step. An FTP client and a browser are enou
 > **This is a release candidate for v0.1.** It is what v0.1 will be unless testing finds a
 > fault. From v0.1 on, updates keep your site as it is: no fresh install between versions.
 
-![The Boxlet admin: the overview screen](https://raw.githubusercontent.com/BoxletCMS/boxlet-cms-dev/main/tools/release/readme/overview.png)
+![The Boxlet page builder: the demo's home page, its hero selected](https://raw.githubusercontent.com/BoxletCMS/boxlet-cms-dev/main/tools/release/readme/builder.jpg)
 
 ## Why another CMS?
 
@@ -38,10 +38,12 @@ visitor's cookie jar stayed empty.
   the address itself.
 - **Fonts are served from your own server.** No Google Fonts, no CDN, so a visit doesn't
   report anything to anyone.
-- **YouTube videos** are embedded through `youtube-nocookie.com`, and a map can be
-  OpenStreetMap instead of Google.
-- **Almost no JavaScript** on the public site. The only script is a small one that folds the
-  menu on a phone, and it loads only when the header has a menu to fold.
+- **Videos and maps load only when pressed.** Until a visitor presses Play, nothing of
+  YouTube's, Vimeo's or Google's is loaded, and YouTube then comes from
+  `youtube-nocookie.com`. A map can be OpenStreetMap instead, which stores nothing.
+- **Almost no JavaScript** on the public site: three small scripts, each loaded only on a page
+  that needs it. One folds the menu on a phone, one starts a video or a map when it is
+  pressed, and one brings a section in as it is scrolled to, where you asked for that.
 - **A suggested privacy-policy paragraph** for the statistics, written from your own
   settings, in every language the site speaks.
 
@@ -76,12 +78,14 @@ Already using another analytics tool? Switch Boxlet's statistics off in Settings
 
 This is the part Boxlet is really about.
 
-- **Five characters.** Editorial, Minimal, Bold, Soft and Brutalist. Each one changes how a
-  page is *composed*, not just its colours: reading width, vertical rhythm, section edges,
-  and how a hero is arranged.
-- **Eight decisions.** Main colour and an optional second one, typeface pairing, type scale,
-  spacing, corners, shadows, content width and surface contrast. The whole palette is worked
-  out from those.
+- **Thirteen design sets.** Editorial, Minimal, Bold, Soft, Brutalist, Terra, Clinic,
+  Gallery, Launch, Commons, Zine, Couture and Riso. Each one changes how a page is
+  *composed*, not just its colours: reading width, vertical rhythm, section edges, how a hero
+  is arranged and which layout each block takes.
+- **Then make it yours.** A main colour and an optional second one, 27 self-hosted typefaces
+  to pair, the type scale, spacing, corners, shadows, content width and surface contrast. The
+  whole palette is worked out from your colours, for a light site or a dark one.
+- **Designs travel.** Export a design as a file and import it on another site.
 - **Contrast is enforced.** A colour combination that would make any text hard to read is
   refused, and Boxlet tells you which pair failed.
 - **Bounded on purpose.** Sections choose from a few surfaces built from your palette, so
@@ -92,17 +96,32 @@ This is the part Boxlet is really about.
 
 ## Writing pages
 
-- **A visual editor.** You edit the page on a canvas that shows it as visitors will see it,
-  add blocks from a library that shows each block as it looks, and drag them to reorder.
-- **Fifteen blocks:** hero, text, image and text, picture, gallery, columns, quote, numbers,
-  call to action, accordion, logo strip, downloads, form, video or map embed, and divider.
+- **You write on the page itself.** Click a heading and type. Select words for bold, a link,
+  a list or the alignment. What you see is what visitors get, on a computer, a tablet or a
+  phone, a press away.
+- **Sections and columns.** A page is made of sections, and a section holds one to four
+  columns: halves, thirds, quarters, two thirds and one, or a sidebar. Each section has a
+  surface (plain, tinted, contrast, a picture or a gradient), an edge (a line, a slant or a
+  curve), its spacing and height, an optional entrance animation, and can be hidden on a
+  phone, a tablet or a computer.
+- **Fifteen blocks:** hero, text, image and text, picture, gallery, cards, quote, numbers,
+  call to action, questions, logos, downloads, form, video or map, and space. Most have
+  several layouts, and each follows the design set until you choose otherwise.
+- **The structure beside the page.** Every section and block in a tree: drag a block into
+  another section or column, or a section up or down. Save a section as a pattern to use it
+  again, or start a page from one of three templates.
+- **Drafts that save themselves.** Every change is kept as a draft while you work, with undo
+  and redo, and a preview of the draft in its own tab. Publish puts it on the site. The last
+  five published versions are kept, and any of them can be restored.
+- **Snippets and tags.** Write the opening hours or a phone number once, as a snippet, and
+  place it in any text: change it once, and every page has it. `{{year}}` is always this
+  year, and the language switcher can stand inside a sentence.
 - **Rich text that stays clean.** Pasting from Word leaves no inline styles, font tags or
   leftover classes, and what's saved is checked and cleaned on the server.
 - **The page tree.** Drag a page right to put it under another, left to take it out, up or
-  down to reorder, and Undo if you change your mind. Its translations follow.
+  down to reorder, and Undo if you change your mind. Its translations follow. Tick several
+  pages to delete them at once; the menu items that led to them go too.
 - **No JavaScript? Still works.** Every page can also be edited in a plain form.
-- **Nothing is saved until you save.** If you try to leave with unsaved changes, Boxlet asks
-  first.
 
 ## Pictures and files
 
@@ -119,6 +138,8 @@ This is the part Boxlet is really about.
 - **Files as well.** PDFs, documents, spreadsheets and ZIPs sit in the same library,
   each with its own icon. The Downloads block offers them to visitors and counts the
   downloads.
+- **Tidy up in one go.** Tick pictures and files to delete them together. Anything a page
+  still shows is kept, and Boxlet tells you where it is used.
 
 ## Fast without trying
 
@@ -127,8 +148,13 @@ a computer and 98 on a phone**. SEO and best practices scored 100 on both. That 
 Boxlet had a page cache. Now it also keeps each page as a file and hands it to the next
 visitor without touching the database, and empties it the moment you change anything.
 
-It gets there by leaving things out:
+It gets there by leaving things out, and by keeping what it can:
 - **Next to no JavaScript,** so nothing blocks the page (0 ms of blocking time).
+- **One stylesheet for the whole site,** next to the one your design compiles to, instead of
+  a file per part. On Apache, Boxlet's `.htaccess` also compresses pages, styles and scripts.
+- **Kept by the browser.** Styles, scripts, fonts and pictures carry a version in their
+  address, so a browser keeps them for a year and a second visit fetches almost nothing.
+  When a file changes, its address changes with it.
 - **Pictures in AVIF and WebP** at the size the screen needs.
 - **Width and height on every picture,** so nothing jumps while the page loads.
 - **Fonts from your own server,** with no third-party requests.
@@ -144,6 +170,8 @@ It gets there by leaving things out:
   description and sharing image of its own.
 - **Structured data:** a BreadcrumbList that tells search engines where the page sits.
 - **Written for you:** `sitemap.xml` and `robots.txt` stay up to date as pages change.
+- **`llms.txt` for AI tools.** A plain list of your published pages and their descriptions,
+  in every language, kept up to date with the sitemap. One switch in Settings turns it off.
 
 ## Multilingual from day one
 
@@ -227,9 +255,16 @@ host's file manager.
 **The primary language can't be changed later**, so choose it with care.
 
 If you like, the installer adds a demo site, so you can try the design on real pages
-straight away. Its pictures are fetched from GitHub while it installs, every size already made.
-They aren't covered by the Boxlet licence; each one's source and licence is in
+straight away: **The Printworks**, an arts centre in an old printing works, in the Couture
+design set. Fourteen pages, among them one that shows every block in every layout, with the
+home page and Visit in Croatian too, its forms, menus and footer. Its pictures are fetched
+from GitHub while it installs, every size already made. They aren't covered by the Boxlet
+licence; each one's source and licence is in
 [CREDITS.md](https://github.com/BoxletCMS/boxlet-cms-dev/blob/main/demo_images/CREDITS.md).
+
+When you're ready for your own content, clear the demo in two steps: in **Pages** tick every
+page and delete them, then in **Media** choose **Unused**, tick everything and delete it. The
+demo's forms, footer words and site name are yours to change or remove.
 
 When it's done, the installer deletes itself. If it can't, it tells you, and you delete
 `public/install.php` by hand. Then log in at `/admin`.
