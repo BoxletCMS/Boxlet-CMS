@@ -1,0 +1,187 @@
+/* A picture that opens larger on a press (PLAN.md D-236, the owner): Picture and Gallery, when
+   their option is on. The picture is a link to its largest uncropped size; site-lightbox.js
+   opens it over the page in a <dialog>, on the dark the owner chose (--color-scrim, a
+   near-black of the site's hue, and --color-on-scrim for its words and buttons). */
+
+.enlarge {
+  --enlarge-mark: color-mix(in srgb, var(--color-scrim) 45%, transparent);
+  --enlarge-ink: color-mix(in srgb, var(--color-on-scrim) 88%, transparent);
+  position: relative;
+  display: block;
+  color: inherit;
+  cursor: zoom-in;
+}
+
+/* VISIBLE AT REST (CLAUDE.md): a picture that opens says so before it is hovered, by a small
+   mark in its corner, gently (the owner: lighter than the first, at 70%); hover and focus
+   make it whole. */
+.enlarge-mark {
+  position: absolute;
+  inset-block-start: var(--space-xs);
+  inset-inline-end: var(--space-xs);
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--radius-s);
+  background: var(--enlarge-mark);
+  color: var(--enlarge-ink);
+  pointer-events: none;
+}
+
+.enlarge:hover .enlarge-mark,
+.enlarge:focus-visible .enlarge-mark {
+  --enlarge-mark: var(--color-scrim);
+  --enlarge-ink: var(--color-on-scrim);
+}
+
+.enlarge:focus-visible {
+  outline: 0.1875rem solid var(--color-accent);
+  outline-offset: 0.1875rem;
+}
+
+/* A round picture's corner is outside it: the mark sits on the circle instead. */
+.shape-round .enlarge-mark {
+  inset-block-start: 12%;
+  inset-inline-end: 12%;
+}
+
+/* ---- the opened picture ------------------------------------------------------------------ */
+
+.lightbox {
+  --lightbox-ground: color-mix(in srgb, var(--color-scrim) 96%, transparent);
+  --lightbox-button: color-mix(in srgb, var(--color-on-scrim) 14%, transparent);
+  --lightbox-button-hover: color-mix(in srgb, var(--color-on-scrim) 26%, transparent);
+  --lightbox-edge: color-mix(in srgb, var(--color-on-scrim) 45%, transparent);
+  --lightbox-round: 50%;
+  inline-size: 100vw;
+  block-size: 100dvh;
+  max-inline-size: none;
+  max-block-size: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--lightbox-ground);
+  color: var(--color-on-scrim);
+  font-family: var(--font-body);
+}
+
+/* THE DIALOG PAINTS THE DARK ITSELF, edge to edge: ::backdrop inherits no custom property in
+   every browser, and drawn there the page showed through (the first picture of D-236). */
+.lightbox::backdrop {
+  background: transparent;
+}
+
+html.lightbox-open {
+  overflow: hidden;
+}
+
+.lightbox-stage {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-s);
+  block-size: 100%;
+  padding: var(--space-s) var(--space-m) var(--space-m);
+}
+
+.lightbox-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+  min-block-size: 2.75rem;
+}
+
+.lightbox-count {
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.lightbox-figure {
+  display: grid;
+  place-items: center;
+  min-block-size: 0;
+  margin: 0;
+}
+
+.lightbox-figure picture,
+.lightbox-figure img {
+  display: block;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  min-block-size: 0;
+}
+
+.lightbox-figure img {
+  inline-size: auto;
+  block-size: auto;
+  max-block-size: calc(100dvh - 9rem);
+  object-fit: contain;
+}
+
+.lightbox-caption {
+  max-inline-size: 60ch;
+  margin-inline: auto;
+  text-align: center;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.lightbox-caption:empty {
+  display: none;
+}
+
+/* The buttons: a round edge and a faint fill at rest, more fill on hover (CLAUDE.md). */
+.lightbox-button {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border: 0.0625rem solid var(--lightbox-edge);
+  border-radius: var(--lightbox-round);
+  background: var(--lightbox-button);
+  color: var(--color-on-scrim);
+  cursor: pointer;
+}
+
+.lightbox-button:hover {
+  background: var(--lightbox-button-hover);
+}
+
+.lightbox-button:focus-visible {
+  outline: 0.1875rem solid var(--color-on-scrim);
+  outline-offset: 0.125rem;
+}
+
+.lightbox-previous,
+.lightbox-next {
+  position: absolute;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-previous {
+  inset-inline-start: var(--space-m);
+}
+
+.lightbox-next {
+  inset-inline-end: var(--space-m);
+}
+
+.lightbox-previous[hidden],
+.lightbox-next[hidden] {
+  display: none;
+}
+
+/* On a phone the arrows stand under the picture, beside its caption, not over it. */
+@media (max-width: 40rem) {
+  .lightbox-previous,
+  .lightbox-next {
+    inset-block-start: auto;
+    inset-block-end: var(--space-m);
+    transform: none;
+  }
+}

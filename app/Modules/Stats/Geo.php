@@ -2,7 +2,6 @@
 
 namespace App\Modules\Stats;
 
-use DateTimeImmutable;
 use RuntimeException;
 use Throwable;
 
@@ -97,34 +96,6 @@ final class Geo
     }
 
     /**
-     * Fetches DB-IP's file for this month, or last month's when this month's is not out
-     * yet (it appears on the first, in DB-IP's time), and puts it in use.
-     *
-     * @throws RuntimeException with a message for the owner
-     */
-    public static function download(string $storagePath, DateTimeImmutable $now, string $source = self::SOURCE): void
-    {
-        $directory = self::directory($storagePath);
-        $part = $directory . '/download.mmdb.gz.part';
-        $failure = '';
-        foreach ([$now, $now->modify('first day of last month')] as $month) {
-            $failure = self::fetch(sprintf($source, $month->format('Y-m')), $part);
-            if ($failure === '') {
-                try {
-                    self::install($storagePath, $part);
-                } finally {
-                    self::remove($part);
-                }
-
-                return;
-            }
-        }
-        self::remove($part);
-
-        throw new RuntimeException(t('stats.geo_download_failed', ['reason' => $failure]));
-    }
-
-    /**
      * Puts a database in use: $source is a .mmdb file, or one gzipped as DB-IP sends it.
      * $source is left where it is; the caller removes it.
      *
@@ -179,52 +150,6 @@ final class Geo
         if ($written > self::MAX_BYTES) {
             throw new RuntimeException(t('stats.geo_too_big'));
         }
-    }
-
-    /**
-     * Downloads $url to $target. Returns '' on success, else what went wrong in a few
-     * words. curl where PHP has it, since a shared host that turns off allow_url_fopen
-     * usually still has curl; PHP's own streams otherwise.
-     */
-    private static function fetch(string $url, string $target): string
-    {
-        if (function_exists('curl_init') && str_starts_with($url, 'https://')) {
-            $out = @fopen($target, 'wb');
-            if ($out === false) {
-                return t('stats.geo_not_saved');
-            }
-            $curl = curl_init($url);
-            curl_setopt_array($curl, [
-                CURLOPT_FILE => $out,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_MAXREDIRS => 3,
-                CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
-                CURLOPT_CONNECTTIMEOUT => 15,
-                CURLOPT_TIMEOUT => 120,
-                CURLOPT_FAILONERROR => true,
-                CURLOPT_USERAGENT => 'Boxlet',
-            ]);
-            $done = curl_exec($curl);
-            $error = $done === true ? '' : (curl_error($curl) !== '' ? curl_error($curl) : 'HTTP ' . curl_getinfo($curl, CURLINFO_RESPONSE_CODE));
-            curl_close($curl);
-            fclose($out);
-
-            return $error;
-        }
-
-        try {
-            $in = @fopen($url, 'rb', false, stream_context_create(['http' => ['timeout' => 120, 'user_agent' => 'Boxlet']]));
-        } catch (Throwable $e) {
-            // An error handler that ignores @ turns the warning into this.
-            return $e->getMessage();
-        }
-        if ($in === false) {
-            return error_get_last()['message'] ?? 'no connection';
-        }
-        $copied = @file_put_contents($target, $in);
-        fclose($in);
-
-        return $copied === false ? t('stats.geo_not_saved') : '';
     }
 
     private static function remove(string $path): void

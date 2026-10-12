@@ -29,5 +29,8 @@ return [
     'options' => [
         // The picture as it was taken, or cropped to a shape (D-166: an option).
         'shape' => ['values' => ['natural', 'wide', 'square', 'round'], 'default' => 'natural'],
+        // Opened larger on a press, over the page (D-236, the owner): off unless chosen, so a
+        // picture that is only decoration is not a link.
+        'enlarge' => ['values' => ['off', 'on'], 'default' => 'off'],
     ],
 ];

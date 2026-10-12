@@ -10,11 +10,11 @@ use Throwable;
 /**
  * Fetching a location database a few megabytes at a time (PLAN.md D-055).
  *
- * The country file is 3.9 MB and comes down in one request (Geo::download). The city file
- * is 57.5 MB, which on a shared host will not: `max_execution_time` is often thirty
+ * The city file is 57.5 MB, which on a shared host will not come down in one request: `max_execution_time` is often thirty
  * seconds, and a slow line makes that a certainty rather than a risk. So it arrives in
  * pieces, the way the media remake makes pictures (D-048) — Start, then a Continue that a
- * script presses by itself and the owner can press by hand.
+ * script presses by itself and the owner can press by hand. The country file (3.9 MB) comes
+ * the same way since D-237, one piece: one path, one progress in the panel, for both.
  *
  * NOTHING IS KEPT IN THE DATABASE. Where to carry on from is the size of the part file
  * itself, so there is no counter to drift out of step with what is on disk. Beside it sits
@@ -132,6 +132,17 @@ final class GeoDownload
         $part = self::path($storagePath, self::PART);
 
         return ['done' => is_file($part) ? (int) filesize($part) : 0, 'total' => $state['total']];
+    }
+
+    /**
+     * Which database is coming down, for the panel's words (D-237): 'city' or 'country', null
+     * when none is. Read from the address being fetched, so nothing more is stored.
+     */
+    public static function kind(string $storagePath): ?string
+    {
+        $state = self::read($storagePath);
+
+        return $state === null ? null : (str_contains($state['url'], 'city') ? 'city' : 'country');
     }
 
     /** Forgets a download, finished or abandoned, and takes its files with it. */

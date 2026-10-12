@@ -73,15 +73,15 @@ final class StatsSettingsController
      *
      * @param array<string, string> $params
      */
+    /**
+     * The country database (D-051), fetched as the city one is since D-237: one piece, the same
+     * progress in the panel.
+     *
+     * @param array<string, string> $params
+     */
     public function geoDownload(Request $request, string $locale, array $params): Response
     {
-        try {
-            Geo::download($this->storage(), new DateTimeImmutable());
-        } catch (RuntimeException $e) {
-            return $this->back($e->getMessage(), true);
-        }
-
-        return $this->back(t('stats.geo_installed'));
+        return $this->begin($request, Geo::SOURCE);
     }
 
     /**
@@ -96,22 +96,22 @@ final class StatsSettingsController
         $error = is_array($file) ? (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) : UPLOAD_ERR_NO_FILE;
         $temporary = is_array($file) ? (string) ($file['tmp_name'] ?? '') : '';
         if ($error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE) {
-            return $this->back(t('stats.geo_upload_too_big', ['limit' => Bytes::limits()['fileLabel']]), true);
+            return $this->answer($request, [], t('stats.geo_upload_too_big', ['limit' => Bytes::limits()['fileLabel']]), true);
         }
         if ($error !== UPLOAD_ERR_OK || $temporary === '' || !is_uploaded_file($temporary)) {
-            return $this->back(t('stats.geo_upload_none'), true);
+            return $this->answer($request, [], t('stats.geo_upload_none'), true);
         }
         try {
             Geo::install($this->storage(), $temporary);
         } catch (RuntimeException $e) {
-            return $this->back($e->getMessage(), true);
+            return $this->answer($request, [], $e->getMessage(), true);
         } finally {
             if (is_file($temporary)) {
                 unlink($temporary);
             }
         }
 
-        return $this->back(t('stats.geo_installed'));
+        return $this->answer($request, [], $this->installed());
     }
 
     /**
@@ -120,45 +120,107 @@ final class StatsSettingsController
      *
      * @param array<string, string> $params
      */
+    /** @param array<string, string> $params */
     public function cityStart(Request $request, string $locale, array $params): Response
     {
-        try {
-            GeoDownload::start($this->storage(), new DateTimeImmutable());
-        } catch (RuntimeException $e) {
-            return $this->back($e->getMessage(), true);
-        }
-
-        return $this->back(t('stats.geo_started'));
+        return $this->begin($request, Geo::CITY_SOURCE);
     }
 
     /**
-     * One more piece. geo-download.js presses this by itself while any are left; without a
-     * script the owner presses Continue, which is why it is a form and not a fetch.
+     * The next piece, or the database put in use once the last is in. The panel's script asks
+     * this over and over, and shows how far it is; without the script it is a button.
      *
      * @param array<string, string> $params
      */
     public function cityStep(Request $request, string $locale, array $params): Response
     {
+        $kind = GeoDownload::kind($this->storage()) ?? 'city';
         try {
-            $progress = GeoDownload::step($this->storage());
+            $progress = GeoDownload::step($this->storage(), $this->container->get('geo_fetch'));
         } catch (RuntimeException $e) {
-            return $this->back($e->getMessage(), true);
+            return $this->answer($request, ['phase' => 'error', 'message' => $e->getMessage()], $e->getMessage(), true);
+        }
+        if ($progress['finished']) {
+            $said = $this->installed();
+
+            return $this->answer($request, ['phase' => 'installed', 'kind' => $kind, 'message' => $said, 'inUse' => $this->inUse()], $said);
         }
 
-        return $this->back($progress['finished'] ? t('stats.geo_installed') : t('stats.geo_downloading', [
-            'done' => Bytes::human($progress['done']),
-            'total' => Bytes::human($progress['total']),
-        ]));
+        return $this->answer($request, $this->downloading($progress['done'], $progress['total'], $kind), '');
     }
 
-    /**
-     * @param array<string, string> $params
-     */
+    /** @param array<string, string> $params */
     public function cityCancel(Request $request, string $locale, array $params): Response
     {
         GeoDownload::cancel($this->storage());
 
-        return $this->back(t('stats.geo_cancelled'));
+        return $this->answer($request, ['phase' => 'idle', 'message' => t('stats.geo_cancelled')], t('stats.geo_cancelled'));
+    }
+
+    /** A download begun: the month found, nothing fetched yet beyond a byte. */
+    private function begin(Request $request, string $source): Response
+    {
+        try {
+            GeoDownload::start($this->storage(), new DateTimeImmutable(), $source, $this->container->get('geo_fetch'));
+        } catch (RuntimeException $e) {
+            return $this->answer($request, ['phase' => 'error', 'message' => $e->getMessage()], $e->getMessage(), true);
+        }
+        $progress = GeoDownload::progress($this->storage()) ?? ['done' => 0, 'total' => 0];
+
+        return $this->answer($request, $this->downloading($progress['done'], $progress['total'], GeoDownload::kind($this->storage()) ?? 'city'), '');
+    }
+
+    /**
+     * How far a download is, in the words the panel shows.
+     *
+     * @return array<string, mixed>
+     */
+    private function downloading(int $done, int $total, string $kind): array
+    {
+        return [
+            'phase' => 'downloading',
+            'kind' => $kind,
+            'done' => $done,
+            'total' => $total,
+            // The last piece is also when the file is unpacked and checked: said, so the
+            // longest wait is not a bar standing still at the end.
+            'last' => $total - $done <= GeoDownload::CHUNK,
+            'message' => t($kind === 'city' ? 'stats.geo_downloading' : 'stats.geo_downloading_country', ['done' => Bytes::human($done), 'total' => Bytes::human($total)]),
+        ];
+    }
+
+    /** What a database put in use means, for the one it is: a city one knows more (D-237). */
+    private function installed(): string
+    {
+        return t((Geo::status($this->storage())['cities'] ?? false) ? 'stats.geo_installed_city' : 'stats.geo_installed');
+    }
+
+    /** The panel's sentence for the database in use, as it is drawn. */
+    private function inUse(): string
+    {
+        $geo = Geo::status($this->storage());
+
+        return $geo === null ? t('stats.geo_none') : t('stats.geo_in_use', ['date' => $geo['built']]) . ' ' . t($geo['cities'] ? 'stats.geo_kind_city' : 'stats.geo_kind_country');
+    }
+
+    /**
+     * THE ANSWER WHERE THE OWNER IS LOOKING (D-237): JSON for the panel's script, which shows
+     * it beside the buttons; without the script, the settings again, at the maps' part, with
+     * the words there rather than in the bar at the top of a page scrolled away from it.
+     *
+     * @param array<string, mixed> $json
+     */
+    private function answer(Request $request, array $json, string $notice, bool $error = false): Response
+    {
+        if (str_contains((string) $request->header('accept'), 'application/json')) {
+            return Response::json($json, $error ? 422 : 200);
+        }
+        $session = $this->container->get('session');
+        if ($notice !== '') {
+            $session->set('geo_notice', ['text' => $notice, 'error' => $error]);
+        }
+
+        return Response::redirect(Url::admin('settings') . '#geo');
     }
 
     private function storage(): string

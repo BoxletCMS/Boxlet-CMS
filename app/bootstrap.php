@@ -202,6 +202,9 @@ $container->set('media_variants', fn (Container $c) => new MediaVariants(
 ));
 // The library needs the block registry as well as the database: which fields can hold a
 // picture is declared by the blocks, so a block added later is covered without editing it.
+// How a piece of a location database is asked for (D-055, D-237): a service, so the tests of
+// the settings' download steps answer it themselves and never reach DB-IP.
+$container->set('geo_fetch', fn () => \App\Support\RangeDownload::piece(...));
 $container->set('media_library', fn (Container $c) => new MediaLibrary(
     $c->get('db'),
     $c->get('blocks'),

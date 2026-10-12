@@ -43,7 +43,7 @@ final class Derived
         $unit = (float) $resolved['spacing'];
 
         return [
-            'color' => $colors + self::success($colors),
+            'color' => $colors + self::success($colors) + self::scrim($colors),
             'font' => ['heading' => Fonts::stack($heading), 'body' => Fonts::stack($body)],
             // The heading family's own treatment, unless the owner has taken one over (D-066,
             // D-185); a weight its files do not have is the nearest one they do.
@@ -117,6 +117,25 @@ final class Derived
         return [
             'success' => self::green([$colors['background'], $colors['surface']], $colors['text']),
             'success-on-contrast' => self::green([$colors['contrast']], $colors['on-contrast']),
+        ];
+    }
+
+    /**
+     * THE DARK BEHIND AN OPENED PICTURE (D-236, the owner: "dark"): a picture opened larger
+     * stands on a near-black of the site's own hue, and its words and buttons on a near-white
+     * of it. Neither the contrast surface (the owner's second colour, light as often as not)
+     * nor the text (light on a dark site) is dark on every site; these are.
+     *
+     * @param array<string, string> $colors
+     * @return array<string, string>
+     */
+    private static function scrim(array $colors): array
+    {
+        [, , $hue] = Color::toOklch($colors['accent']);
+
+        return [
+            'scrim' => Color::fromOklch(0.17, 0.02, $hue),
+            'on-scrim' => Color::fromOklch(0.97, 0.01, $hue),
         ];
     }
 

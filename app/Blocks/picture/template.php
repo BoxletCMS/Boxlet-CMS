@@ -14,6 +14,7 @@
  * @var array<string, string> $options the block's options, every one answered (D-166)
  * @var array<int, array{id: int, filename: string, width: int, height: int, focalX: int, focalY: int, variants: array<string, array{width: int, height: int, formats: list<string>}>, alt: string, version: string}> $media
  * @var bool $eager
+ * @var string $locale the page's language, for the words an opened picture's buttons say
  */
 $picture = is_int($content['image'] ?? null) ? ($media[$content['image']] ?? null) : null;
 /* A NATURAL SHAPE IS THE PICTURE'S OWN (D-119). `card` and `wide` are cropped to 3:2 and
@@ -21,6 +22,10 @@ $picture = is_int($content['image'] ?? null) ? ($media[$content['image']] ?? nul
    other shapes are drawn by the stylesheet over a crop, and keep asking for one. */
 $presets = $options['shape'] === 'natural' ? ['natural', 'full'] : ['card', 'wide'];
 $tag = \App\Modules\Media\MediaPicture::tag($picture, $presets, '(max-width: 40rem) 100vw, 50vw', $eager);
+// Opened larger on a press, when the owner chose so (D-236).
+if ($options['enlarge'] === 'on') {
+    $tag = \App\Modules\Media\MediaPicture::enlarge($tag, $picture, $content['caption'], $locale);
+}
 ?>
 <figure class="picture shape-<?= e($options['shape']) ?>">
     <div class="picture-frame"<?= edit_attr('image') ?>>

@@ -194,6 +194,56 @@ final class MediaPicture
     }
 
     /**
+     * A PICTURE THAT OPENS LARGER ON A PRESS (D-236, the owner): $tag, drawn by tag(), inside a
+     * link to the picture's largest uncropped size, which site-lightbox.js opens over the page
+     * and which, without the script, is the picture itself in the browser. The sizes it can
+     * be had in ride along for the script (AVIF, WebP), and the words its buttons say, in the
+     * page's language. A small mark in a corner says it opens, at rest, not only on hover.
+     *
+     * In the editor it is no link: a press there selects the block. The mark still shows that
+     * the option is on.
+     *
+     * @param Picture|null $picture
+     */
+    public static function enlarge(string $tag, ?array $picture, string $caption, string $locale): string
+    {
+        $mark = '<span class="enlarge-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>';
+        $large = null;
+        foreach (['full', 'natural'] as $preset) {
+            $variant = $picture['variants'][$preset] ?? null;
+            if ($large === null && $variant !== null && $variant['formats'] !== [] && $variant['width'] > 0) {
+                $large = [$preset, $variant];
+            }
+        }
+        if ($tag === '' || $picture === null || $large === null) {
+            return $tag;
+        }
+        if (\App\Support\Editing::on()) {
+            return '<span class="enlarge">' . $tag . $mark . '</span>';
+        }
+        [$preset, $variant] = $large;
+        $formats = $variant['formats'];
+        $original = (string) end($formats);
+        $sources = '';
+        foreach (array_slice($formats, 0, -1) as $format) {
+            $sources .= ' data-enlarge-' . e($format) . '="' . e(self::url($picture, $preset, $format)) . '"';
+        }
+        $words = [
+            'close' => site_t('site.enlarge.close', $locale),
+            'previous' => site_t('site.enlarge.previous', $locale),
+            'next' => site_t('site.enlarge.next', $locale),
+            'count' => site_t('site.enlarge.count', $locale),
+        ];
+        $open = site_t('site.enlarge.open', $locale);
+
+        return '<a class="enlarge" href="' . e(self::url($picture, $preset, $original)) . '" data-enlarge' . $sources
+            . ' data-width="' . (int) $variant['width'] . '" data-height="' . (int) $variant['height'] . '"'
+            . ' data-caption="' . e($caption) . '" data-words="' . e((string) json_encode($words, JSON_UNESCAPED_UNICODE)) . '"'
+            . ' aria-label="' . e($picture['alt'] !== '' ? $open . ': ' . $picture['alt'] : $open) . '">'
+            . $tag . $mark . '</a>';
+    }
+
+    /**
      * @param Picture $picture
      * @param array<string, Variant> $available
      */

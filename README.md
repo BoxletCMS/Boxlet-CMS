@@ -41,9 +41,10 @@ visitor's cookie jar stayed empty.
 - **Videos and maps load only when pressed.** Until a visitor presses Play, nothing of
   YouTube's, Vimeo's or Google's is loaded, and YouTube then comes from
   `youtube-nocookie.com`. A map can be OpenStreetMap instead, which stores nothing.
-- **Almost no JavaScript** on the public site: three small scripts, each loaded only on a page
+- **Almost no JavaScript** on the public site: four small scripts, each loaded only on a page
   that needs it. One folds the menu on a phone, one starts a video or a map when it is
-  pressed, and one brings a section in as it is scrolled to, where you asked for that.
+  pressed, one brings a section in as it is scrolled to, and one opens a picture larger,
+  where you asked for those.
 - **A suggested privacy-policy paragraph** for the statistics, written from your own
   settings, in every language the site speaks.
 

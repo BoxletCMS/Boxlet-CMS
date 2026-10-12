@@ -44,5 +44,7 @@ return [
         // proportions make a ragged grid, and cropping them to agree is the whole point. An
         // option since D-166, so a character may have its own.
         'shape' => ['values' => ['square', 'wide', 'natural', 'round'], 'default' => 'square'],
+        // Opened larger on a press, with the gallery's others a press away (D-236, the owner).
+        'enlarge' => ['values' => ['off', 'on'], 'default' => 'off'],
     ],
 ];

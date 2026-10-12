@@ -164,7 +164,7 @@ final class SettingsController
             'nav' => 'settings',
             // The picker's own stylesheets and script, the same set the page editor loads.
             'styles' => ['admin-media.css', 'admin-picker.css', 'admin-browser.css', 'vendor/cropper.min.css', 'admin-crop.css', 'admin-two-step.css', 'admin-settings.css'],
-            'scripts' => ['vendor/cropper.min.js', 'media-browser-upload.js', 'media-browser.js', 'media-picker.js', 'mail-settings.js', 'settings-nav.js', 'auto-continue.js', 'file-sends.js'],
+            'scripts' => ['vendor/cropper.min.js', 'media-browser-upload.js', 'media-browser.js', 'media-picker.js', 'mail-settings.js', 'settings-nav.js', 'auto-continue.js', 'file-sends.js', 'geo-download.js'],
             'values' => $values,
             'errors' => $errors,
             'notice' => $notice,
@@ -190,9 +190,13 @@ final class SettingsController
             'trustedProxies' => Settings::text($this->db(), 'trusted_proxies'),
             'stats' => $stats = Tracker::settings($this->db()),
             'geo' => $geo = Geo::status($storage = (string) $this->container->get('config')->get('app.storage_path')),
-            // A city database that is part-way down (D-055): the panel draws how far it got
-            // and a Continue, which a script presses by itself.
+            // A database that is part-way down (D-055, D-237): the panel draws how far it got
+            // and a Continue, which geo-download.js presses by itself.
             'geoDownload' => GeoDownload::progress($storage),
+            'geoKind' => GeoDownload::kind($storage),
+            // What the last download, upload or cancel said, shown beside the maps' buttons
+            // rather than at the top of the page (D-237).
+            'geoNotice' => $this->geoNotice(),
             'privacy' => PrivacyText::all($stats, $geo !== null),
             'uploadLimit' => Bytes::limits()['fileLabel'],
         ] + $this->mail(), $status);
@@ -262,5 +266,19 @@ final class SettingsController
     private function db(): Db
     {
         return $this->container->get('db');
+    }
+
+    /**
+     * The words a geo action left for the panel, once (D-237).
+     *
+     * @return array{text: string, error: bool}|null
+     */
+    private function geoNotice(): ?array
+    {
+        $session = $this->container->get('session');
+        $notice = $session->get('geo_notice');
+        $session->remove('geo_notice');
+
+        return is_array($notice) && is_string($notice['text'] ?? null) ? ['text' => $notice['text'], 'error' => ($notice['error'] ?? false) === true] : null;
     }
 }

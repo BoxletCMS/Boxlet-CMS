@@ -1203,6 +1203,19 @@
                                             "type": "string"
                                         }
                                     ]
+                                },
+                                "enlarge": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "off",
+                                                "on"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
                                 }
                             }
                         },
@@ -1250,6 +1263,19 @@
                                                 "wide",
                                                 "square",
                                                 "round"
+                                            ]
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "enlarge": {
+                                    "anyOf": [
+                                        {
+                                            "enum": [
+                                                "off",
+                                                "on"
                                             ]
                                         },
                                         {

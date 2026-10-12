@@ -264,3 +264,16 @@
   }
 }
 
+
+/* The maps' download, said where its buttons are (PLAN.md D-237): a bar and the words under
+   it, while a database comes down. The parts not in play are hidden: .form-actions is a flex
+   box, which would show them anyway. */
+#geo [hidden] {
+  display: none;
+}
+
+.geo-progress progress {
+  inline-size: 100%;
+  block-size: 0.5rem;
+  accent-color: var(--ui-accent);
+}

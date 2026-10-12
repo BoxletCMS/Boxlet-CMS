@@ -10,7 +10,9 @@ use App\Support\Url;
  *
  * @var array{enabled: bool, dnt: bool, retention: int, missing: bool, group: bool, location: string, cityMonths: int, cityMin: int} $stats
  * @var array{built: string, type: string, cities: bool}|null $geo the location database in use
- * @var array{done: int, total: int}|null $geoDownload a city database part-way down (D-055)
+ * @var array{done: int, total: int}|null $geoDownload a database part-way down (D-055)
+ * @var string|null $geoKind which one: 'city' or 'country' (D-237)
+ * @var array{text: string, error: bool}|null $geoNotice what the last geo action said (D-237)
  * @var string $uploadLimit the largest file this server accepts, as php.ini says it
  * @var string $trustedProxies the addresses that may speak for a visitor, one per line
  * @var array<string, array{language: string, text: string}> $privacy the suggested policy text, by language
@@ -99,42 +101,53 @@ use App\Support\Url;
                 <span class="hint" id="trusted_proxies-hint"><?= e(t('stats.proxies_hint')) ?></span>
             </div>
 
-            <?php /* The country database (D-051): optional, fetched only when asked. */ ?>
-            <fieldset class="fieldset stack">
+            <?php /* The location databases (D-051, D-055): optional, fetched only when asked.
+                     HOW FAR IT IS, SAID HERE (D-237, the owner): geo-download.js fetches the
+                     pieces without leaving the page and draws the bar and the words below;
+                     without it the buttons post, and what they did is said here too, not in
+                     the bar at the top of a page scrolled to this part. */ ?>
+<?php $running = $geoDownload !== null; ?>
+            <fieldset class="fieldset stack" id="geo" data-geo
+                      data-geo-step="<?= e(Url::admin('settings', 'statistics', 'cities', 'step')) ?>"
+                      data-geo-csrf="<?= e($csrf) ?>"
+                      data-geo-words="<?= e((string) json_encode(['finding' => t('stats.geo_finding'), 'unpacking' => t('stats.geo_unpacking'), 'retrying' => t('stats.geo_retrying'), 'lost' => t('stats.geo_lost')], JSON_UNESCAPED_UNICODE)) ?>"<?= $running ? ' data-geo-running' : '' ?>>
                 <legend><?= e(t('stats.geo_title')) ?></legend>
                 <p class="hint"><?= e(t('stats.geo_intro')) ?></p>
-                <p><?= e($geo === null ? t('stats.geo_none') : t('stats.geo_in_use', ['date' => $geo['built']]) . ' ' . t($geo['cities'] ? 'stats.geo_kind_city' : 'stats.geo_kind_country')) ?></p>
-<?php if ($geoDownload !== null): ?>
-                <?php /* A city database part-way down (D-055): how far it got, and the button
-                         that fetches the next piece. auto-continue.js presses it by itself,
-                         so with a script the whole file arrives on its own. */ ?>
-                <p><?= e(t('stats.geo_downloading', [
-                    'done' => App\Support\Bytes::human($geoDownload['done']),
-                    'total' => App\Support\Bytes::human($geoDownload['total']),
-                ])) ?></p>
-                <div class="form-actions">
-                    <form method="post" action="<?= e(Url::admin('settings', 'statistics', 'cities', 'step')) ?>" data-auto-continue>
+                <p data-geo-in-use><?= e($geo === null ? t('stats.geo_none') : t('stats.geo_in_use', ['date' => $geo['built']]) . ' ' . t($geo['cities'] ? 'stats.geo_kind_city' : 'stats.geo_kind_country')) ?></p>
+<?php if ($geoNotice !== null): ?>
+                <p class="notice <?= $geoNotice['error'] ? 'notice-error' : 'notice-success' ?>" role="<?= $geoNotice['error'] ? 'alert' : 'status' ?>" data-geo-notice><?= e($geoNotice['text']) ?></p>
+<?php endif; ?>
+                <div class="geo-progress stack"<?= $running ? '' : ' hidden' ?> data-geo-progress>
+                    <progress max="<?= (int) ($geoDownload['total'] ?? 1) ?>" value="<?= (int) ($geoDownload['done'] ?? 0) ?>" data-geo-bar></progress>
+                    <p class="hint" role="status" aria-live="polite" data-geo-text><?= $running ? e(t($geoKind === 'country' ? 'stats.geo_downloading_country' : 'stats.geo_downloading', [
+                        'done' => App\Support\Bytes::human($geoDownload['done']),
+                        'total' => App\Support\Bytes::human($geoDownload['total']),
+                    ])) : '' ?></p>
+                </div>
+                <?php /* Part-way down: Continue fetches the next piece, Cancel forgets it. */ ?>
+                <div class="form-actions"<?= $running ? '' : ' hidden' ?> data-geo-busy>
+                    <form method="post" action="<?= e(Url::admin('settings', 'statistics', 'cities', 'step')) ?>" data-geo-continue>
                         <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                         <button type="submit" class="button button-secondary"><?= e(t('stats.geo_continue')) ?></button>
                     </form>
-                    <form method="post" action="<?= e(Url::admin('settings', 'statistics', 'cities', 'cancel')) ?>">
+                    <form method="post" action="<?= e(Url::admin('settings', 'statistics', 'cities', 'cancel')) ?>" data-geo-cancel>
                         <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                         <button type="submit" class="button button-ghost"><?= e(t('stats.geo_cancel')) ?></button>
                     </form>
                 </div>
-<?php else: ?>
-                <div class="form-actions">
-                    <form method="post" action="<?= e(Url::admin('settings', 'statistics', 'countries')) ?>">
-                        <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
-                        <button type="submit" class="button button-secondary"><?= e(t($geo === null ? 'stats.geo_download' : 'stats.geo_update')) ?></button>
-                    </form>
-                    <form method="post" action="<?= e(Url::admin('settings', 'statistics', 'cities')) ?>">
-                        <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
-                        <button type="submit" class="button button-secondary"><?= e(t('stats.geo_city_download')) ?></button>
-                    </form>
+                <div class="stack"<?= $running ? ' hidden' : '' ?> data-geo-idle>
+                    <div class="form-actions">
+                        <form method="post" action="<?= e(Url::admin('settings', 'statistics', 'countries')) ?>" data-geo-start>
+                            <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                            <button type="submit" class="button button-secondary"><?= e(t($geo === null ? 'stats.geo_download' : 'stats.geo_update')) ?></button>
+                        </form>
+                        <form method="post" action="<?= e(Url::admin('settings', 'statistics', 'cities')) ?>" data-geo-start>
+                            <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                            <button type="submit" class="button button-secondary"><?= e(t('stats.geo_city_download')) ?></button>
+                        </form>
+                    </div>
+                    <p class="hint"><?= e(t('stats.geo_city_hint')) ?></p>
                 </div>
-                <p class="hint"><?= e(t('stats.geo_city_hint')) ?></p>
-<?php endif; ?>
                 <form method="post" action="<?= e(Url::admin('settings', 'statistics', 'countries', 'upload')) ?>" enctype="multipart/form-data" class="stack">
                     <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                     <div class="field">

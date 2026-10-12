@@ -95,6 +95,11 @@ use App\Support\Url;
 <?php if (str_contains($content, 'data-anim=')): ?>
     <script src="<?= e(Url::versioned('assets/anim.js')) ?>" defer></script>
 <?php endif; ?>
+<?php /* And a fourth, only where a picture opens larger on a press (D-236). Without it the
+         press opens the picture itself. */ ?>
+<?php if (str_contains($content, 'data-enlarge')): ?>
+    <script src="<?= e(Url::versioned('assets/site-lightbox.js')) ?>" defer></script>
+<?php endif; ?>
 <?php if ($designPreview): ?>
     <?php /* PRESSING A PART OF THE PICTURE OPENS ITS SETTINGS (D-181, README 5.7): the parts
              the preview marks (AppearancePreview::region()) and their outlines. */ ?>

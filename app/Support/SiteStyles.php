@@ -21,7 +21,7 @@ final class SiteStyles
     /** In the order the cascade needs, which is the order they were linked in. */
     public const FILES = [
         'site.css', 'blocks-hero.css', 'blocks-hero-split.css', 'blocks.css', 'blocks-cards.css',
-        'blocks-words.css', 'blocks-accordion.css', 'blocks-stats.css', 'blocks-media.css',
+        'blocks-words.css', 'blocks-accordion.css', 'blocks-stats.css', 'blocks-media.css', 'blocks-enlarge.css',
         'blocks-logos.css', 'blocks-embed.css', 'blocks-downloads.css', 'chrome.css',
         'chrome-footer.css', 'chrome-header.css', 'sections.css', 'sections-edges.css',
         'sections-steps.css', 'sections-columns.css',
