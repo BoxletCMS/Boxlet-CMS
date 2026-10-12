@@ -61,8 +61,10 @@ final class AccountController
 
         $db = $this->db();
         $db->query('UPDATE admin SET password_hash = ? WHERE id = ?', [password_hash($request->input('new_password'), PASSWORD_DEFAULT), $this->adminId()]);
-        // A new session id, as at every change of who holds the account (SPEC §6).
+        // A new session id, as at every change of who holds the account (SPEC §6), and every
+        // other login ended: one stolen does not outlive the change meant to end it (O-67).
         $this->container->get('session')->regenerate();
+        AdminLogin::endOthers($db, $this->adminId(), $this->container->get('session'));
         Activity::record($db, 'account', 'password', null, '');
 
         return $this->back(t('account.password_changed'), false);

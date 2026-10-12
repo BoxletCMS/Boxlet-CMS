@@ -111,7 +111,7 @@ $container->set('blocks', fn () => $blocks);
 $container->set('chrome', fn () => $chrome);
 $container->set('installed', fn () => is_file($storage . '/install.lock'));
 $container->set('db', fn () => Db::fromConfig($config->get('database', [])));
-$container->set('session', fn () => Session::start($storage . '/sessions', $request->https));
+$container->set('session', fn () => Session::start($storage . '/sessions', $request->https, \App\Modules\Auth\AdminLogin::IDLE));
 $container->set('locales', fn (Container $c) => $c->get('db')->all(
     'SELECT code, label, is_primary FROM locales WHERE enabled = 1 ORDER BY sort, code'
 ));

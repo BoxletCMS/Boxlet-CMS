@@ -129,6 +129,7 @@ try {
         (string) ($response->headers['Content-Type'] ?? ''),
         $response->body,
         static fn (): bool => Settings::get($container->get('db'), 'page_cache', '1') !== '0',
+        (string) ($response->headers['Cache-Control'] ?? ''),
     );
 } catch (Throwable $e) {
     error_log('Page cache: ' . get_class($e) . ': ' . $e->getMessage());

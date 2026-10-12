@@ -94,7 +94,9 @@ final class Response
         if (!headers_sent()) {
             http_response_code($this->status);
             foreach ($this->headers as $name => $value) {
-                header($name . ': ' . $value);
+                // A cookie is added beside those already set: header() replaces by default,
+                // and the login's own cookie took the session's with it (O-65).
+                header($name . ': ' . $value, strtolower($name) !== 'set-cookie');
             }
         }
         if ($this->file !== null) {

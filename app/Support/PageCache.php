@@ -83,8 +83,10 @@ final class PageCache
      * @param array<string, mixed> $server
      * @param \Closure(): bool $enabled whether the owner has the cache on, asked only when a
      *        page could be kept, since asking reads the database
+     * @param string $cacheControl the answer's Cache-Control: a page that says no-store is
+     *        not kept, as a page with a form says (O-64)
      */
-    public static function after(array $server, string $storage, int $status, string $contentType, string $body, \Closure $enabled): void
+    public static function after(array $server, string $storage, int $status, string $contentType, string $body, \Closure $enabled, string $cacheControl = ''): void
     {
         if (self::$directory === '') {
             return;
@@ -95,7 +97,7 @@ final class PageCache
 
             return;
         }
-        if ($status !== 200 || !str_contains(strtolower($contentType), 'text/html') || !self::eligible($server, $storage) || !$enabled()) {
+        if ($status !== 200 || !str_contains(strtolower($contentType), 'text/html') || str_contains(strtolower($cacheControl), 'no-store') || !self::eligible($server, $storage) || !$enabled()) {
             return;
         }
         if (!is_dir(self::$directory) && !@mkdir(self::$directory, 0775, true) && !is_dir(self::$directory)) {

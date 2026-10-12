@@ -62,6 +62,8 @@ final class PasswordReset
             password_hash($password, PASSWORD_DEFAULT),
             $adminId,
         ]);
+        // No login survives a reset: whoever held one may be why it was needed (O-67).
+        AdminLogin::endOthers($db, $adminId, null);
         Activity::record($db, 'account', 'password_reset', null, '');
     }
 
@@ -91,6 +93,7 @@ final class PasswordReset
             return t('account.file_refused', ['file' => $shown, 'problem' => $problem]);
         }
         $db->query('UPDATE admin SET password_hash = ?, reset_hash = NULL, reset_expires_at = NULL', [password_hash($password, PASSWORD_DEFAULT)]);
+        AdminLogin::endAll($db);
         Activity::record($db, 'account', 'password_file', null, '');
 
         return t('account.file_done', ['file' => $shown]);

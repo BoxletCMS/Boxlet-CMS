@@ -73,7 +73,7 @@ final class PageController
         // better than one repeating the title, so it stays empty and the tag is dropped.
         $seo = PageSeo::of($page);
 
-        return $this->render('page', $locale, [
+        $response = $this->render('page', $locale, [
             'title' => $seo['title'] !== '' ? $seo['title'] : (string) $page['title'],
             'description' => $seo['description'],
             'noindex' => $seo['noindex'],
@@ -87,6 +87,14 @@ final class PageController
             // Where the page sits under its parents, for search engines (D-129).
             'breadcrumbs' => PagePaths::jsonLd(PagePaths::trail($db, $page)),
         ], ['blocksHtml' => $html], 200, Url::page($locale, $slug), $page);
+        // A FORM'S TOKEN IS THE TIME ITS PAGE WAS DRAWN (O-64): kept, by the page cache or a
+        // browser, every visitor had the same one, and a script sending at once was older
+        // than the three seconds a person takes. Drawn afresh for each visit instead.
+        if (str_contains($html, 'name="started"')) {
+            $response->headers['Cache-Control'] = 'no-store';
+        }
+
+        return $response;
     }
 
     /**

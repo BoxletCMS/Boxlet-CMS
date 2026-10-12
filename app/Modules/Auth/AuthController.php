@@ -70,7 +70,7 @@ final class AuthController
         $fromFile = PasswordReset::fromFile($db, $this->storage());
         $throttle = new LoginThrottle($db);
         $now = time();
-        if ($throttle->isLocked($ipHash, $emailHash, $now)) {
+        if ($throttle->isLocked($ipHash, $emailHash, $now, KnownDevice::known($request, $key, $emailHash))) {
             $minutes = intdiv(LoginThrottle::WINDOW_SECONDS, 60);
 
             return $this->form($email, t('auth.throttled', ['minutes' => $minutes]), 429);
@@ -103,12 +103,20 @@ final class AuthController
 
             return Response::redirect(Url::admin('login', 'code'));
         }
-        $session->set('admin_id', (int) $admin['id']);
+        AdminLogin::begin($session, $db, (int) $admin['id'], $now);
         if ($reset['done'] || $fromFile !== null) {
             $session->set('flash', trim(($this->resetNotice($reset) ?? '') . ' ' . ($fromFile ?? '')));
         }
 
-        return Response::redirect(Url::admin());
+        return $this->known(Response::redirect(Url::admin()), $request, $key, $emailHash);
+    }
+
+    /** The login's answer, and the browser marked as one that logged in here (O-65). */
+    private function known(Response $response, Request $request, string $key, string $emailHash): Response
+    {
+        $response->headers['Set-Cookie'] = KnownDevice::cookie($key, $emailHash, $request->https);
+
+        return $response;
     }
 
     /**
@@ -138,7 +146,7 @@ final class AuthController
         $emailHash = hash_hmac('sha256', $pending['email'], $key);
         $throttle = new LoginThrottle($db);
         $now = time();
-        if ($throttle->isLocked($ipHash, $emailHash, $now)) {
+        if ($throttle->isLocked($ipHash, $emailHash, $now, KnownDevice::known($request, $key, $emailHash))) {
             return $this->codeForm(t('auth.throttled', ['minutes' => intdiv(LoginThrottle::WINDOW_SECONDS, 60)]), 429);
         }
 
@@ -158,12 +166,12 @@ final class AuthController
         $session = $this->session();
         $session->remove('pending_admin');
         $session->regenerate();
-        $session->set('admin_id', $pending['id']);
+        AdminLogin::begin($session, $db, $pending['id'], $now);
         if ($recovery) {
             $session->set('flash', t('twofactor.recovery_used', ['left' => (string) $twoFactor->codesLeft($pending['id'])]));
         }
 
-        return Response::redirect(Url::admin());
+        return $this->known(Response::redirect(Url::admin()), $request, $key, $emailHash);
     }
 
     /**

@@ -11,7 +11,12 @@ final class Session
     /**
      * @param string $savePath directory for session files, '' for PHP's default
      */
-    public static function start(string $savePath, bool $secure): self
+    /**
+     * @param int $lifetime seconds a session file is kept unused: the admin's idle limit
+     *        (AdminLogin::IDLE), so the host's own default (24 minutes) does not end a login
+     *        sooner than Boxlet says it ends
+     */
+    public static function start(string $savePath, bool $secure, int $lifetime = 1440): self
     {
         if (session_status() === PHP_SESSION_NONE) {
             if ($savePath !== '') {
@@ -23,6 +28,7 @@ final class Session
                 ini_set('session.gc_probability', '1');
                 ini_set('session.gc_divisor', '100');
             }
+            ini_set('session.gc_maxlifetime', (string) $lifetime);
             ini_set('session.use_strict_mode', '1');
             ini_set('session.use_only_cookies', '1');
             session_name('boxlet_session');

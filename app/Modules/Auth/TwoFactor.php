@@ -91,8 +91,9 @@ final class TwoFactor
     public function enable(int $adminId, string $secret): array
     {
         $codes = self::newCodes();
+        // A new secret starts with no code used: the last step belonged to the old one.
         $this->db->query(
-            'UPDATE admin SET totp_secret = ?, recovery_codes_json = ? WHERE id = ?',
+            'UPDATE admin SET totp_secret = ?, recovery_codes_json = ?, totp_last_step = NULL WHERE id = ?',
             [Secret::seal($secret, $this->appKey), self::hashed($codes), $adminId],
         );
 
@@ -120,10 +121,44 @@ final class TwoFactor
     /** Whether a code from the app is right for this admin now. */
     public function check(int $adminId, string $code): bool
     {
-        $row = $this->db->one('SELECT totp_secret FROM admin WHERE id = ?', [$adminId]);
+        // Every column: between an update's swap and its migration (0043) totp_last_step is
+        // not there, and a login then must still work, as it did before.
+        $row = $this->db->one('SELECT * FROM admin WHERE id = ?', [$adminId]);
         $secret = Secret::open((string) ($row['totp_secret'] ?? ''), $this->appKey);
+        $step = $secret === '' ? null : $this->step($secret, $code);
+        // EACH CODE ONCE (O-66): a code seen over a shoulder worked again for the rest of its
+        // minute. The step it belongs to must be later than the last one accepted, so the
+        // same code is refused, and so is an older one still inside the leeway.
+        $last = $row['totp_last_step'] ?? null;
+        if ($step === null || ($last !== null && $step <= (int) $last)) {
+            return false;
+        }
+        if ($row !== null && array_key_exists('totp_last_step', $row)) {
+            $this->db->query('UPDATE admin SET totp_last_step = ? WHERE id = ?', [$step, $adminId]);
+        }
 
-        return $secret !== '' && $this->valid($secret, $code);
+        return true;
+    }
+
+    /**
+     * The time step $code belongs to, one period either side of now as valid() allows, or
+     * null when it is no code of this secret's then.
+     */
+    private function step(string $secret, string $code): ?int
+    {
+        $code = preg_replace('~\s+~', '', $code) ?? '';
+        if ($secret === '' || preg_match('~^\d{6}$~', $code) !== 1) {
+            return null;
+        }
+        $totp = TOTP::createFromSecret($secret, $this->clock());
+        $now = $this->clock()->now()->getTimestamp();
+        foreach ([$now - self::LEEWAY, $now, $now + self::LEEWAY] as $time) {
+            if (hash_equals($totp->at(max(0, $time)), $code)) {
+                return intdiv($time, $totp->getPeriod());
+            }
+        }
+
+        return null;
     }
 
     /** Uses up a recovery code if it is one of this admin's; true when it was. */

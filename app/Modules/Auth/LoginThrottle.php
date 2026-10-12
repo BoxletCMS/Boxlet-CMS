@@ -18,7 +18,11 @@ final class LoginThrottle
     {
     }
 
-    public function isLocked(string $ipHash, string $emailHash, int $now): bool
+    /**
+     * $knownDevice: the browser has logged in as this email before (KnownDevice, O-65), and
+     * failures for the email do not lock it out; those for its address still do.
+     */
+    public function isLocked(string $ipHash, string $emailHash, int $now, bool $knownDevice = false): bool
     {
         $row = $this->db->one(
             'SELECT
@@ -30,7 +34,7 @@ final class LoginThrottle
         );
 
         return (int) ($row['ip_failures'] ?? 0) >= self::MAX_FAILURES
-            || (int) ($row['email_failures'] ?? 0) >= self::MAX_FAILURES;
+            || (!$knownDevice && (int) ($row['email_failures'] ?? 0) >= self::MAX_FAILURES);
     }
 
     /**
