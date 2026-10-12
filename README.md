@@ -1,4 +1,4 @@
-# Boxlet
+# Boxlet CMS
 
 **A small, self-hosted CMS for people who build lots of small websites.**
 
@@ -9,7 +9,7 @@ shell, no Composer, no Node, no build step. An FTP client and a browser are enou
 > **This is a release candidate for v0.1.** It is what v0.1 will be unless testing finds a
 > fault. From v0.1 on, updates keep your site as it is: no fresh install between versions.
 
-![The Boxlet page builder: the demo's home page, its hero selected](https://raw.githubusercontent.com/BoxletCMS/boxlet-cms-dev/main/tools/release/readme/builder.jpg)
+![The Boxlet CMS page builder: the demo's home page, its hero selected](https://raw.githubusercontent.com/BoxletCMS/boxlet-cms-dev/main/tools/release/readme/builder.jpg)
 
 ## Why another CMS?
 

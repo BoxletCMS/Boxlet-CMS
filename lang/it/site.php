@@ -7,7 +7,7 @@ return [
     'site.not_found.intro' => 'Non c’è nessuna pagina a questo indirizzo.',
     'site.languages' => 'Lingue',
     'site.menu' => 'Menu',
-    'site.credit' => 'Realizzato con Boxlet',
+    'site.credit' => 'Realizzato con Boxlet CMS',
     'site.form.send' => 'Invia',
     'site.form.thanks' => 'Grazie, il tuo messaggio è stato inviato.',
     'site.form.required' => 'Compila questo campo.',

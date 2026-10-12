@@ -7,7 +7,7 @@ return [
     'site.not_found.intro' => 'There is no page at this address.',
     'site.languages' => 'Languages',
     'site.menu' => 'Menu',
-    'site.credit' => 'Made with Boxlet',
+    'site.credit' => 'Made with Boxlet CMS',
     'site.form.send' => 'Send',
     'site.form.thanks' => 'Thank you, your message has been sent.',
     'site.form.required' => 'Please fill in this field.',

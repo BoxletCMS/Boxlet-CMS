@@ -7,8 +7,8 @@
 // test failure rather than whichever file happened to load first.
 
 return [
-    'install.title' => 'Install Boxlet',
-    'install.brand' => 'Boxlet installer',
+    'install.title' => 'Install Boxlet CMS',
+    'install.brand' => 'Boxlet CMS installer',
     'install.continue' => 'Continue',
     'install.restart' => 'Start over',
     'install.state_lost' => 'The installer lost track of earlier steps. Start over.',

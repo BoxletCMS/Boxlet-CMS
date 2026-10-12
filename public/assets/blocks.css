@@ -89,10 +89,13 @@
   margin: var(--space-s) 0 0;
 }
 
+/* The wide gap is between the columns only (D-230). In a column too narrow for two
+   (sections-columns.css) the words stand above the fields, and their own margin is the space
+   between, as in the other layout; a row gap added the wide gap to it as well. */
 .layout-beside .form-block {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-  gap: var(--space-xl);
+  gap: 0 var(--space-xl);
   align-items: start;
 }
 

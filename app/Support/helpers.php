@@ -24,13 +24,13 @@ const ADMIN_LANG = 'en';
 
 /**
  * Boxlet's own page, for the one line a site may carry in its footer about what made it
- * (PLAN.md O-20).
+ * (PLAN.md O-20): boxletcms.org, the project's site, since D-231 (the owner); boxlet.org before.
  *
  * In code rather than in config/: every install credits the same project, a credit a site
  * could point anywhere is not a credit, and config/ is the part of a Boxlet an owner may
  * have edited — so it is the part an update cannot safely replace.
  */
-const BOXLET_SITE = 'https://boxlet.org';
+const BOXLET_SITE = 'https://boxletcms.org';
 
 /**
  * Admin UI string from lang/{locale}/ with :name placeholders replaced. A missing key

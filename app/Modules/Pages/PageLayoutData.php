@@ -341,7 +341,7 @@ final class PageLayoutData
         // An SVG logo (D-142), which the template draws in place of the picture in its slot.
         $svg = LogoSvg::all($db);
         $hasHeader = $header['logo'] !== null || $svg['logo'] !== null || $header['button']['url'] !== '' || $menu !== [] || trim($siteName) !== '';
-        // "Made with Boxlet", when the owner leaves it on (O-20). It is part of what makes a
+        // "Made with Boxlet CMS", when the owner leaves it on (O-20). It is part of what makes a
         // footer worth drawing: a site whose footer is otherwise empty still has this line,
         // and without it here the credit would be switched on and never appear.
         $credit = Settings::get($db, 'site_credit') === true ? BOXLET_SITE : '';
