@@ -7,7 +7,10 @@
  * the same grey box it showed before media existed rather than a broken URL.
  *
  * card and wide: this block is half the column at most, so the widest it is ever asked to
- * fill is the wide preset (SPEC §5.5).
+ * fill is the wide preset (SPEC §5.5). Those two are cut to 3:2 and 1.9:1, so "Show the whole
+ * image" takes natural and full, the sizes that keep the picture's own shape, as the picture
+ * and gallery blocks do: from card and wide it showed the whole of a crop, and a screenshot
+ * lost its left edge (D-228).
  *
  * @var array<string, mixed> $content
  * @var array<string, mixed> $style
@@ -19,7 +22,8 @@
  * @var bool $eager
  */
 $picture = is_int($content['image'] ?? null) ? ($media[$content['image']] ?? null) : null;
-$tag = \App\Modules\Media\MediaPicture::tag($picture, ['card', 'wide'], '(max-width: 40rem) 100vw, 50vw', $eager);
+$presets = $content['image_fit'] === 'contain' ? ['natural', 'full'] : ['card', 'wide'];
+$tag = \App\Modules\Media\MediaPicture::tag($picture, $presets, '(max-width: 40rem) 100vw, 50vw', $eager);
 ?>
 <div class="image-text fit-<?= e($content['image_fit']) ?>">
     <div class="image-text-media"<?= edit_attr('image') ?>>

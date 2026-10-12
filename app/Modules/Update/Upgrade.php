@@ -33,6 +33,9 @@ final class Upgrade
         '640034f1ec232c793a9e561eee9bc8f5d727340a4d57120d2f2f68cdb99952bc', // public/, v0.1.0-preview
         'efbe6399da99be8ff780c5dc669eb34b2cee5828609117370e9102409aa5fd98', // public/, v0.1.0-preview.2
         '315cac908468223c7da8c0db292e66b23e9485fa7bfb2cc907e88143d43ebfb4', // root, v0.1.0-preview.2
+        // designs/, v0.1.0-preview.3 to rc.4: merged since D-155 swapped designs/ child by
+        // child, and every update from one candidate to the next kept it and told the owner so.
+        'c53920f895b2d4002dcb95d975e91de1e3604c98f6adb2ca8c41aa026a043702',
     ];
 
     private const BEGIN = '# BEGIN Boxlet';
@@ -193,8 +196,9 @@ final class Upgrade
 
     /**
      * Every folder and file at the top of the new code in place of the running one's, and
-     * public/'s one by one, since public/ also holds the site's pictures and cache. The two
-     * .htaccess files are merged rather than moved: see htaccess().
+     * public/'s one by one, since public/ also holds the site's pictures and cache. The three
+     * .htaccess files at those levels (the root's, public/'s, designs/') are merged rather than
+     * moved: see htaccess().
      *
      * @param array<string, mixed> $state
      * @return array<string, mixed>

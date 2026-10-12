@@ -1,3 +1,6 @@
+# BEGIN Boxlet
+# Everything down to END Boxlet is replaced when Boxlet is updated (PLAN.md D-140).
 # Design sets (PLAN.md D-152) are read by Boxlet from the disk, never fetched from the web.
 # This folder is outside public/ already; this is the second lock, as in storage/.
 Require all denied
+# END Boxlet

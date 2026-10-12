@@ -145,10 +145,10 @@ This is the part Boxlet is really about.
 
 ## Fast without trying
 
-On 28 September 2026, Google PageSpeed Insights gave the demo site **100 for performance on
-a computer and 98 on a phone**. SEO and best practices scored 100 on both. That was before
-Boxlet had a page cache. Now it also keeps each page as a file and hands it to the next
-visitor without touching the database, and empties it the moment you change anything.
+On 12 October 2026, Google PageSpeed Insights gave the demo site **100 for performance on
+a computer and 99 on a phone**. Accessibility, best practices and SEO scored 100 on both.
+Boxlet keeps each page as a file and hands it to the next visitor without touching the
+database, and empties that page cache the moment you change anything.
 
 It gets there by leaving things out, and by keeping what it can:
 - **Next to no JavaScript,** so nothing blocks the page (0 ms of blocking time).
