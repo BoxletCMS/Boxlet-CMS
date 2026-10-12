@@ -78,10 +78,12 @@ Already using another analytics tool? Switch Boxlet's statistics off in Settings
 
 This is the part Boxlet is really about.
 
-- **Thirteen design sets.** Editorial, Minimal, Bold, Soft, Brutalist, Terra, Clinic,
-  Gallery, Launch, Commons, Zine, Couture and Riso. Each one changes how a page is
-  *composed*, not just its colours: reading width, vertical rhythm, section edges, how a hero
-  is arranged and which layout each block takes.
+- **Twenty-one design sets.** Thirteen ready from the start (Editorial, Minimal, Bold, Soft,
+  Brutalist, Terra, Clinic, Gallery, Launch, Commons, Zine, Couture and Riso) and eight more
+  in the library, a click away (Coast, Event, Mono, Playground, Portfolio, Retreat, Terminal
+  and Workshop). Each one changes how a page is *composed*, not just its colours: reading
+  width, vertical rhythm, section edges, how a hero is arranged and which layout each block
+  takes.
 - **Then make it yours.** A main colour and an optional second one, 27 self-hosted typefaces
   to pair, the type scale, spacing, corners, shadows, content width and surface contrast. The
   whole palette is worked out from your colours, for a light site or a dark one.
