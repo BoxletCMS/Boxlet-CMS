@@ -43,7 +43,7 @@ final class Derived
         $unit = (float) $resolved['spacing'];
 
         return [
-            'color' => $colors,
+            'color' => $colors + self::success($colors),
             'font' => ['heading' => Fonts::stack($heading), 'body' => Fonts::stack($body)],
             // The heading family's own treatment, unless the owner has taken one over (D-066,
             // D-185); a weight its files do not have is the nearest one they do.
@@ -98,6 +98,52 @@ final class Derived
             'page' => DerivedPage::page($resolved, $colors, $sectionWidth),
             'chrome' => DerivedPage::chrome($resolved, $colors),
         ];
+    }
+
+    /**
+     * THE GREEN OF "SENT" (D-223, the owner): a form's thank-you in a thin green frame, which
+     * the palette, made from the owner's colours, has no colour for. One hue for every site,
+     * its lightness found for this one: the green nearest a middle lightness whose words read
+     * at 4.5:1 on the frame, a tenth of the green over the ground (the CSS's color-mix), on
+     * the page and the tinted surface (`success`), and on the contrast surface
+     * (`success-on-contrast`). Measured against the bare ground at 5:1 first, the frame's tint
+     * took it to 4.27:1. A site where no green reads takes its text's ink.
+     *
+     * @param array<string, string> $colors
+     * @return array<string, string>
+     */
+    private static function success(array $colors): array
+    {
+        return [
+            'success' => self::green([$colors['background'], $colors['surface']], $colors['text']),
+            'success-on-contrast' => self::green([$colors['contrast']], $colors['on-contrast']),
+        ];
+    }
+
+    /** @param list<string> $grounds */
+    private static function green(array $grounds, string $otherwise): string
+    {
+        $best = null;
+        $distance = INF;
+        for ($step = 15; $step <= 95; $step++) {
+            $hex = Color::fromOklch($step / 100, 0.14, 150.0);
+            $reads = array_reduce($grounds, static fn (bool $all, string $ground): bool => $all && Color::contrast($hex, self::tint($hex, $ground)) >= 4.5, true);
+            if ($reads && abs($step / 100 - 0.6) < $distance) {
+                $best = $hex;
+                $distance = abs($step / 100 - 0.6);
+            }
+        }
+
+        return $best ?? $otherwise;
+    }
+
+    /** A tenth of $ink over $ground, channel by channel, as `color-mix(in srgb, ink 10%, ground)`. */
+    private static function tint(string $ink, string $ground): string
+    {
+        $a = array_map('hexdec', str_split(substr(ltrim($ink, '#'), 0, 6), 2));
+        $b = array_map('hexdec', str_split(substr(ltrim($ground, '#'), 0, 6), 2));
+
+        return '#' . implode('', array_map(static fn (int|float $x, int|float $y): string => sprintf('%02x', (int) round($x * 0.1 + $y * 0.9)), $a, $b));
     }
 
     /**

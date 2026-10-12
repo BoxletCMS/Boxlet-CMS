@@ -177,8 +177,17 @@
   margin: 0;
 }
 
+/* A form sent (D-223, the owner): said in green, in a thin green frame on a tint of it, so it
+   stands apart from the words around it. The green is worked out to read at 4.5:1 on that tint
+   (Derived::success); the tint is laid on the section's own ground, so the frame is solid over a
+   picture or a gradient too. The frame keeps a hairline where the design draws no rules. */
 .form-block-sent {
   margin: 0;
+  padding: var(--space-s) var(--space-m);
+  border: max(var(--border-width), 0.0625rem) solid var(--section-success);
+  border-radius: var(--radius-s);
+  background: var(--section-success-tint);
+  color: var(--section-success);
   font-size: var(--text-lg);
   font-weight: var(--heading-weight);
 }

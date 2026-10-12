@@ -16,6 +16,10 @@
      were the same tone and a card inside one had nothing to be distinct from. */
   --section-card: var(--color-card);
   --section-border: var(--color-border);
+  /* A form's "sent" (D-223): the green that reads on this surface, and its frame's tint, a
+     tenth of it over the section's ground (what Derived::success measures against). */
+  --section-success: var(--color-success);
+  --section-success-tint: color-mix(in srgb, var(--section-success) 10%, var(--section-bg));
 
   /* Derived from the section's own text colour, which every surface guarantees is
      readable against it, so a placeholder is visible on any surface — including one
@@ -114,6 +118,7 @@
   --section-button-text: var(--color-contrast);
   --section-card: var(--color-contrast-raised);
   --section-border: var(--color-muted-on-contrast);
+  --section-success: var(--color-success-on-contrast);
 }
 
 /* Over a photograph, nothing is muted. A lowered-contrast secondary colour is right on a
