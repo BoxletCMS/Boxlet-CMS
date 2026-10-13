@@ -44,7 +44,19 @@ final class InstallController
     ) {
     }
 
+    /**
+     * THE LAST STEPS IN THE SITE'S LANGUAGE (PLAN.md D-240): once the site's main language is
+     * chosen, the installer says the rest in it, where Boxlet has the admin in that language,
+     * as the admin will from the first login on. Before that, English.
+     */
     public function handle(Request $request): Response
+    {
+        $chosen = (string) ($this->state()['site']['locale'] ?? '');
+
+        return \App\Support\AdminLang::speaking($chosen, fn (): Response => $this->answer($request));
+    }
+
+    private function answer(Request $request): Response
     {
         if (is_file($this->storage . '/install.lock')) {
             return $this->page('locked', ['deleted' => Installer::deleteScript($this->script)], 403);
@@ -177,7 +189,8 @@ final class InstallController
         }
         $this->installer()->finish($db, $state['db'], $site, false);
 
-        return $this->installed();
+        // The done page is the first said in the site's language: nothing was saved for it yet.
+        return \App\Support\AdminLang::speaking((string) $site['locale'], fn (): Response => $this->installed());
     }
 
     /**
@@ -264,7 +277,7 @@ final class InstallController
             'error' => null,
             'old' => [],
         ];
-        $html = (new View(__DIR__ . '/views'))->render($template, 'en', $data);
+        $html = (new View(__DIR__ . '/views'))->render($template, \App\Support\AdminLang::code(), $data);
 
         return Response::admin($html, $status);
     }

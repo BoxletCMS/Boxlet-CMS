@@ -32,4 +32,8 @@ return [
     'site.embed.play' => 'Video abspielen',
     'site.embed.show_map' => 'Karte anzeigen',
     'site.embed.unknown' => 'Boxlet kann ein Video von YouTube oder Vimeo und eine Karte von OpenStreetMap oder Google Maps zeigen. Diese Adresse ist keine davon.',
+    'site.closed.maintenance.title' => 'Gleich wieder da',
+    'site.closed.maintenance.body' => 'Diese Website ist kurz nicht erreichbar. Bitte versuchen Sie es gleich noch einmal.',
+    'site.closed.update.title' => 'Wird aktualisiert',
+    'site.closed.update.body' => 'Diese Website wird gerade aktualisiert und ist gleich wieder da.',
 ];

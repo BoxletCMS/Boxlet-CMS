@@ -64,7 +64,7 @@ if ($across > 0) {
     $repeater = (string) array_key_first(array_filter($definition['fields'], static fn (array $f): bool => $f['type'] === 'repeater'));
     $count = is_array($block['content'][$repeater] ?? null) ? count($block['content'][$repeater]) : 0;
     if ($count > $across && $count % $across === 1) {
-        $layoutGroup .= '<p class="hint-line" data-layout-alone>' . e(t('block.' . $type . '.alone', ['count' => (string) $count, 'across' => (string) $across])) . '</p>';
+        $layoutGroup .= '<p class="hint-line" data-layout-alone>' . e(tn('block.' . $type . '.alone', $count, ['across' => (string) $across])) . '</p>';
     }
 }
 

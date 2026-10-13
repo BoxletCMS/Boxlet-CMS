@@ -148,7 +148,7 @@ $changed = $count(SectionStyle::composed());
     <span class="inspector-icon" aria-hidden="true"><?= icon('rows-3') ?></span>
     <div class="inspector-titles">
         <h2 class="inspector-name"><?= e($name !== '' ? $name : t('builder.section_n', ['n' => $number])) ?></h2>
-        <p class="inspector-context"><?= e(t(count($blocks) === 1 ? 'builder.section_context_one' : 'builder.section_context', ['count' => count($blocks)])) ?></p>
+        <p class="inspector-context"><?= e(tn('builder.section_context', count($blocks))) ?></p>
     </div>
 <?php if ($changed > 0): ?>
     <button type="button" class="link-button inspector-reset" data-reset-all="section"><?= icon('history') ?> <?= e(t('builder.reset_to_character')) ?></button>

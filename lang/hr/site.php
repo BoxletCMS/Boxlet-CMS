@@ -32,4 +32,8 @@ return [
     'site.embed.play' => 'Pokreni video',
     'site.embed.show_map' => 'Prikaži kartu',
     'site.embed.unknown' => 'Boxlet može prikazati videozapis s YouTubea ili Vimea i kartu s OpenStreetMapa ili Google Mapsa. Ta adresa nije nijedna od njih.',
+    'site.closed.maintenance.title' => 'Vraćamo se uskoro',
+    'site.closed.maintenance.body' => 'Ova web-stranica nakratko nije dostupna. Pokušajte ponovno malo kasnije.',
+    'site.closed.update.title' => 'Ažuriranje u tijeku',
+    'site.closed.update.body' => 'Ova se web-stranica ažurira i uskoro će ponovno biti dostupna.',
 ];

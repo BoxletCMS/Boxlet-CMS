@@ -39,14 +39,14 @@ final class Overview
         $metrics = [
             [
                 'label' => t('overview.pages'),
-                'value' => number_format((int) ($pages['n'] ?? 0)),
-                'note' => $drafts === 0 ? t('overview.pages_all_published') : t('overview.pages_drafts', ['count' => (string) $drafts]),
+                'value' => \App\Support\AdminLang::number((int) ($pages['n'] ?? 0)),
+                'note' => $drafts === 0 ? t('overview.pages_all_published') : tn('overview.pages_drafts', (int) $drafts),
                 'href' => Url::admin('pages'),
                 'word' => false,
             ],
             [
                 'label' => t('overview.pictures'),
-                'value' => number_format((int) ($media['n'] ?? 0)),
+                'value' => \App\Support\AdminLang::number((int) ($media['n'] ?? 0)),
                 'note' => Bytes::human((int) ($media['bytes'] ?? 0)),
                 'href' => Url::admin('media'),
                 'word' => false,
@@ -62,7 +62,7 @@ final class Overview
             $change = StatsQuery::change($now, $query->totals($week, $before['from'], $before['to'])['visitors']);
             $metrics[] = [
                 'label' => t('overview.visitors'),
-                'value' => number_format($now),
+                'value' => \App\Support\AdminLang::number($now),
                 'note' => $change === null ? t('overview.visitors_new') : t('overview.visitors_change', ['change' => sprintf('%+d%%', (int) round($change * 100))]),
                 'href' => Url::admin('statistics') . '?period=7d',
                 'word' => false,
@@ -72,8 +72,8 @@ final class Overview
         $unread = (int) ($messages['unread'] ?? 0);
         $metrics[] = [
             'label' => t('overview.messages'),
-            'value' => number_format((int) ($messages['n'] ?? 0)),
-            'note' => $unread === 0 ? t('overview.messages_all_read') : t('overview.messages_unread', ['count' => (string) $unread]),
+            'value' => \App\Support\AdminLang::number((int) ($messages['n'] ?? 0)),
+            'note' => $unread === 0 ? t('overview.messages_all_read') : tn('overview.messages_unread', (int) $unread),
             'href' => Url::admin('forms'),
             'word' => false,
         ];
@@ -205,7 +205,7 @@ final class Overview
             return t('overview.design_today');
         }
 
-        return t($days === 1 ? 'overview.design_unchanged_one' : 'overview.design_unchanged', ['days' => (string) $days]);
+        return $days === 1 ? t('overview.design_unchanged_yesterday') : tn('overview.design_unchanged', $days, ['days' => (string) $days]);
     }
 
     /**

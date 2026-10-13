@@ -85,7 +85,7 @@ use App\Support\Url;
                         <li>
                             <span class="most-read-row">
                                 <span class="most-read-path"><?= e($page['path']) ?></span>
-                                <span class="most-read-views"><?= e(number_format($page['views'])) ?></span>
+                                <span class="most-read-views"><?= e(\App\Support\AdminLang::number($page['views'])) ?></span>
                             </span>
                             <?php /* The track: an SVG rect as long as the share, since a width in a
                                      style attribute is refused by the admin's CSP. */ ?>

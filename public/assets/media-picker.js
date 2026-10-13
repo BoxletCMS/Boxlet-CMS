@@ -148,6 +148,9 @@
     });
 
     paint();
+    // A value set by a script, not by choosing: the builder's page tab after a restore puts
+    // back the page's sharing picture (D-242), and the button must show it.
+    select.addEventListener('boxlet:repaint', paint);
 
     if (select.hasAttribute('data-poster-url')) {
       poster(select, root, choose);

@@ -40,7 +40,7 @@ $menuError = static fn (string $key): string => isset($menuErrors[$key])
                     <tr>
                         <td class="row-title"><a href="<?= e(Url::admin('menus', $menu['id'])) ?>"><?= e($menu['name']) ?></a></td>
                         <td><?= e($menu['locale']) ?></td>
-                        <td><?= e(t('menus.items_count', ['count' => (string) $menu['items']])) ?></td>
+                        <td><?= e(tn('menus.items_count', (int) $menu['items'])) ?></td>
                         <td>
                             <form method="post" action="<?= e(Url::admin('menus', $menu['id'], 'delete')) ?>">
                                 <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">

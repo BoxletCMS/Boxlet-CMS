@@ -24,8 +24,6 @@ return [
     'update.failed' => 'The update stopped at :file. Nothing after it has run, and everything before it is recorded, so fixing the problem and pressing the button again continues from there.',
     'update.locked' => 'An update is already running. Wait for it to finish, then reload this page.',
     'update.backup_failed' => 'The backup could not be written to storage/backups/. Nothing has been changed. Make that directory writable and try again.',
-    'update.public.title' => 'Being updated',
-    'update.public.body' => 'This site is being updated and will be back in a moment.',
 
     // Maintenance mode (PLAN.md D-021). The same page and the same gate as an update;
     // the difference is that the owner chose it, and can still see the real site.
@@ -39,6 +37,4 @@ return [
     'maintenance.bar' => 'Maintenance mode is on — visitors cannot see this site.',
     'maintenance.bar_off' => 'Turn it off',
     'maintenance.failed' => 'Maintenance mode could not be switched: the storage directory is not writable. Your site is unchanged.',
-    'maintenance.public.title' => 'Back in a moment',
-    'maintenance.public.body' => 'This site is briefly unavailable. Please try again shortly.',
 ];

@@ -221,7 +221,7 @@
       if (name === 'unpublished' && counter) {
         var n = counter.count();
         name = n === 0 ? 'published' : name;
-        words = n === 0 ? state.getAttribute('data-published') : state.getAttribute(n === 1 ? 'data-one' : 'data-many').replace(':count', String(n));
+        words = n === 0 ? state.getAttribute('data-published') : state.getAttribute('data-' + window.boxletPlural(n)).replace(':count', String(n));
       }
       if (words) {
         state.textContent = words;

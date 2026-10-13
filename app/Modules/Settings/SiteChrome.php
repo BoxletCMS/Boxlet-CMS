@@ -46,15 +46,17 @@ final class SiteChrome
     }
 
     /**
-     * The default sharing picture as an absolute URL, or null when none is chosen.
+     * The sharing picture as an absolute URL: the page's own where it has one that is still a
+     * picture (D-242), else the site's default, else null.
      *
      * `wide` is 1200×630, which is the shape every crawler crops to anyway; `hero` is the
      * fallback for a library where wide has not been generated yet. Absolute because the
      * fetcher has no page to resolve a relative path against.
      */
-    public static function shareImage(Db $db): ?string
+    public static function shareImage(Db $db, ?int $own = null): ?string
     {
-        $variant = self::variant($db, 'site_share_image', ['wide', 'hero'], true);
+        $variant = $own === null ? null : self::variantOf($db, $own, ['wide', 'hero'], true);
+        $variant ??= self::variant($db, 'site_share_image', ['wide', 'hero'], true);
 
         return $variant === null ? null : Url::absolute($variant['file']);
     }
@@ -264,10 +266,18 @@ final class SiteChrome
     private static function variant(Db $db, string $key, array $presets, bool $originalFirst): ?array
     {
         $id = Settings::mediaId($db, $key);
-        if ($id === null) {
-            return null;
-        }
 
+        return $id === null ? null : self::variantOf($db, $id, $presets, $originalFirst);
+    }
+
+    /**
+     * The same, for a picture named by its id rather than by a setting.
+     *
+     * @param list<string> $presets in order of preference
+     * @return array{file: string, type: string}|null
+     */
+    private static function variantOf(Db $db, int $id, array $presets, bool $originalFirst): ?array
+    {
         // A picture chosen here can be deleted from the library afterwards; the setting is
         // not a foreign key and nothing stops that. Missing reads as "none chosen".
         $media = $db->one('SELECT * FROM media WHERE id = ?', [$id]);

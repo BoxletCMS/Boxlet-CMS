@@ -170,8 +170,11 @@ It gets there by leaving things out, and by keeping what it can:
 - **Your own redirects**, for addresses from an old site, each with a count of how often it
   was used.
 - **In every page's head:** a canonical link, `hreflang` for each translation, and a title,
-  description and sharing image of its own.
-- **Structured data:** a BreadcrumbList that tells search engines where the page sits.
+  description and sharing picture of its own (the site's, where it has none).
+- **Link previews:** Open Graph and Twitter tags made from the page's title, description,
+  address and picture, so a link shared in a chat or on social media shows what it is.
+- **Structured data:** a BreadcrumbList that tells search engines where the page sits, and
+  on each language's home page the site's name (WebSite).
 - **Written for you:** `sitemap.xml` and `robots.txt` stay up to date as pages change.
 - **`llms.txt` for AI tools.** A plain list of your published pages and their descriptions,
   in every language, kept up to date with the sitemap. One switch in Settings turns it off.
@@ -183,7 +186,7 @@ It gets there by leaving things out, and by keeping what it can:
 - **Translations are linked.** Each page knows its translations, so the language switcher and
   `hreflang` come for free.
 - **Built-in words** such as form labels, buttons and "page not found" are already translated
-  into English, German, Spanish, French, Croatian, Italian and Slovenian.
+  into English, German, Spanish, French, Croatian, Italian and Portuguese.
 
 ## Forms and email
 
@@ -205,7 +208,10 @@ It gets there by leaving things out, and by keeping what it can:
   never forced.
 - **Protected login.** Repeated wrong passwords get locked out. A forgotten password can be
   reset by email, or with a file uploaded over FTP when the site can't send mail.
-- **Maintenance mode** for working in peace while visitors see a short message.
+- **In your language.** The admin speaks the site's main language, the one chosen when it is
+  installed: Croatian today, English otherwise, more to come.
+- **Maintenance mode** for working in peace while visitors see a short message of your own,
+  in the site's language.
 - **Backups and updates** from the admin, in steps that suit a slow shared host, with a
   backup made before every update and a way back from each.
 

@@ -19,9 +19,6 @@ function env(string $key, ?string $default = null): ?string
     return is_string($value) && $value !== '' ? $value : $default;
 }
 
-/** The admin's own language. Slice 6 adds locales for the SITE; the admin has one. */
-const ADMIN_LANG = 'en';
-
 /**
  * Boxlet's own page, for the one line a site may carry in its footer about what made it
  * (PLAN.md O-20): boxletcms.org, the project's site, since D-231 (the owner); boxlet.org before.
@@ -33,39 +30,53 @@ const ADMIN_LANG = 'en';
 const BOXLET_SITE = 'https://boxletcms.org';
 
 /**
- * Admin UI string from lang/{locale}/ with :name placeholders replaced. A missing key
- * returns the key itself, so it shows up rather than rendering blank.
+ * Admin UI string in the admin's language (PLAN.md D-240, \App\Support\AdminLang): the
+ * site's main language where Boxlet has the admin in it, else English; a word that language
+ * lacks is English. :name placeholders are replaced. A key nobody defines returns the key
+ * itself, so it shows up rather than rendering blank.
  *
  * @param array<string, string|int> $replace
  */
 function t(string $key, array $replace = []): string
 {
-    static $strings = null;
-    if ($strings === null) {
-        // Every file in the admin locale's directory, not a list of names: the strings
-        // were split by concern when one file passed the 300-line rule, and a loader that
-        // names its files means editing this function every time another concern earns
-        // one. A key defined in two files is a test failure (tests/lang_test.php), not a
-        // silent win for whichever loads first.
-        //
-        // Nested by locale, so that Slice 6 adding lang/hr/ cannot merge Croatian into
-        // English by sitting beside it. ADMIN_LANG is the one locale there is today; it
-        // is a constant rather than a setting, because switching it is a feature nobody
-        // has asked for yet.
-        $strings = [];
-        foreach (glob(dirname(__DIR__, 2) . '/lang/' . ADMIN_LANG . '/*.php') ?: [] as $file) {
-            $part = require $file;
-            if (is_array($part)) {
-                $strings += $part;
-            }
-        }
-    }
-    $text = is_array($strings) && is_string($strings[$key] ?? null) ? $strings[$key] : $key;
+    $strings = \App\Support\AdminLang::strings(\App\Support\AdminLang::code());
+    $text = $strings[$key] ?? $key;
     foreach ($replace as $name => $value) {
         $text = str_replace(':' . $name, (string) $value, $text);
     }
 
     return $text;
+}
+
+/**
+ * A counted admin string (D-240): the form $count takes in the admin's language, with :count
+ * filled. $key is the general form; `…_one` and, in a language that has it, `…_few` stand
+ * beside it (AdminLang::countedKey). English "1 page" and "5 pages"; Croatian "1 stranica",
+ * "3 stranice", "5 stranica", "21 stranica".
+ *
+ * @param array<string, string|int> $replace
+ */
+function tn(string $key, int $count, array $replace = []): string
+{
+    return t(\App\Support\AdminLang::countedKey($key, $count), $replace + ['count' => (string) $count]);
+}
+
+/**
+ * The forms of a counted string as data attributes, for a script that writes the count
+ * itself: data-one, data-few, data-other, each with :count left in (D-240). admin.js's
+ * boxletPlural() says which to read.
+ *
+ * @param array<string, string|int> $replace
+ */
+function tn_attrs(string $key, array $replace = []): string
+{
+    $html = '';
+    foreach (['one' => 1, 'few' => 2, 'other' => 5] as $form => $sample) {
+        $chosen = \App\Support\AdminLang::countedKey($key, $sample);
+        $html .= ' data-' . $form . '="' . e(t($form === 'other' ? $key : $chosen, $replace)) . '"';
+    }
+
+    return $html;
 }
 
 /**

@@ -155,13 +155,21 @@
   }
 
   .media-table .col-thumb { inline-size: 4.25rem; }
+  /* The tick box and the description narrower, so the name has the room it had before the tick
+     box came: at 7.5rem the description left the name 26px, one letter (D-240). Wide enough for
+     "Missing" and "Nedostaje" as a badge. */
+  .media-table .col-pick { inline-size: 2rem; }
+  .media-table .col-described { inline-size: 4.75rem; }
 
+  /* Counted from the tick box in front (D-218's bulk delete added it): the dimensions, the size
+     and the use are the 4th, 5th and 6th. Counted as 3rd to 5th, as before it, the phone hid the
+     name and showed the use under the description's heading (found 2026-10-13, D-240). */
   .media-table .col-dimensions,
   .media-table .col-size,
   .media-table .col-used,
-  .media-table td:nth-child(3),
   .media-table td:nth-child(4),
-  .media-table td:nth-child(5) {
+  .media-table td:nth-child(5),
+  .media-table td:nth-child(6) {
     display: none;
   }
 }

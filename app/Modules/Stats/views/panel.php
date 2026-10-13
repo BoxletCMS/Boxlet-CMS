@@ -28,7 +28,7 @@ use App\Support\Url;
                 <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                 <label class="checkbox"><input type="checkbox" name="stats_enabled" value="1"<?= $stats['enabled'] ? ' checked' : '' ?>> <span><?= e(t('stats.enabled')) ?></span></label>
                 <label class="checkbox"><input type="checkbox" name="stats_dnt" value="1"<?= $stats['dnt'] ? ' checked' : '' ?>> <span><?= e(t('stats.dnt')) ?></span></label>
-                <label class="checkbox"><input type="checkbox" name="stats_group" value="1"<?= $stats['group'] ? ' checked' : '' ?>> <span><?= e(t('stats.group_small', ['count' => (string) \App\Modules\Stats\StatsQuery::SMALL])) ?></span></label>
+                <label class="checkbox"><input type="checkbox" name="stats_group" value="1"<?= $stats['group'] ? ' checked' : '' ?>> <span><?= e(tn('stats.group_small', \App\Modules\Stats\StatsQuery::SMALL)) ?></span></label>
                 <label class="checkbox"><input type="checkbox" name="stats_missing" value="1"<?= $stats['missing'] ? ' checked' : '' ?>> <span><?= e(t('stats.missing_count')) ?></span></label>
                 <?php /* How much of where a visitor is (D-055). A radio group, because the
                          three are one choice and each has to say what it means. */ ?>
@@ -70,8 +70,7 @@ use App\Support\Url;
 <?php foreach (Tracker::CITY_MONTHS as $months): ?>
                             <option value="<?= e($months) ?>"<?= $months === $stats['cityMonths'] ? ' selected' : '' ?>><?= e(match ($months) {
                                 0 => t('stats.city_months_all'),
-                                1 => t('stats.months_one'),
-                                default => t('stats.months', ['months' => (string) $months]),
+                                default => tn('stats.months', $months, ['months' => (string) $months]),
                             }) ?></option>
 <?php endforeach; ?>
                         </select>
@@ -82,7 +81,7 @@ use App\Support\Url;
                     <label for="stats_retention"><?= e(t('stats.retention')) ?></label>
                     <select id="stats_retention" name="stats_retention" aria-describedby="stats_retention-hint">
 <?php foreach (Tracker::RETENTION as $months): ?>
-                        <option value="<?= e($months) ?>"<?= $months === $stats['retention'] ? ' selected' : '' ?>><?= e(t('stats.months', ['months' => (string) $months])) ?></option>
+                        <option value="<?= e($months) ?>"<?= $months === $stats['retention'] ? ' selected' : '' ?>><?= e(tn('stats.months', $months, ['months' => (string) $months])) ?></option>
 <?php endforeach; ?>
                     </select>
                     <span class="hint" id="stats_retention-hint"><?= e(t('stats.retention_hint')) ?></span>

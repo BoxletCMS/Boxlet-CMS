@@ -19,7 +19,7 @@ $error = static fn (string $key): string => isset($errors[$key])
     : '';
 $used = static fn (int $hits, ?string $last): string => $hits === 0
     ? t('redirects.never_used')
-    : t($hits === 1 ? 'redirects.used_one' : 'redirects.used_many', ['count' => (string) $hits, 'date' => substr((string) $last, 0, 10)]);
+    : tn('redirects.used_many', $hits, ['date' => substr((string) $last, 0, 10)]);
 $remove = static function (int $id, string $from) use ($csrf): string {
     return '<form method="post" action="' . e(Url::admin('redirects', $id, 'delete')) . '">'
         . '<input type="hidden" name="_csrf" value="' . e($csrf) . '">'

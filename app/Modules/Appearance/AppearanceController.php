@@ -117,8 +117,7 @@ final class AppearanceController
         if ($character !== '') {
             if ($composing) {
                 $count = Composition::apply($db, $this->container->get('blocks'), $character);
-                $message = t('design.saved_with_composition', [
-                    'count' => $count,
+                $message = tn('design.saved_with_composition', $count, [
                     'character' => Characters::label($character),
                 ]);
             }

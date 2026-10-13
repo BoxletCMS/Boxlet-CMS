@@ -37,7 +37,7 @@ use App\Support\Url;
                 <dt><?= e(t('media.added')) ?></dt>
                 <dd><?= e($added) ?></dd>
                 <dt><?= e(t('media.file_downloads')) ?></dt>
-                <dd><?= e(t($file['downloads'] === 1 ? 'media.downloads_one' : 'media.downloads_many', ['count' => (string) $file['downloads']])) ?></dd>
+                <dd><?= e(tn('media.downloads_many', (int) $file['downloads'])) ?></dd>
                 <dt><?= e(t('media.file_address')) ?></dt>
                 <dd><a href="<?= e($file['download']) ?>"><?= e($file['download']) ?></a></dd>
             </dl>

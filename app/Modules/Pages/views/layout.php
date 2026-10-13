@@ -19,7 +19,10 @@ use App\Support\Url;
  * @var bool $designPreview drawn inside the Appearance preview, where the editor-only marks
  *                         show (D-170)
  * @var array{url: string, type: string}|null $icon the site's tab icon (D-028)
- * @var string|null $shareImage absolute URL of the default sharing picture (D-028)
+ * @var list<array{attribute: string, name: string, content: string}> $sharing Open Graph and
+ *                              Twitter tags, og:image the page's own sharing picture else the
+ *                              site's; none on an error page or a preview (D-028, D-242)
+ * @var string $website WebSite JSON-LD on a language's home page, '' elsewhere (D-242)
  * @var string $headerHtml the site header, already rendered, or '' when there is none (5c)
  * @var string $footerHtml the site footer, already rendered, or '' when there is none.
  *                         It carries the language switcher: the site has exactly one footer
@@ -63,8 +66,12 @@ use App\Support\Url;
     <link rel="icon" href="<?= e($icon['url']) ?>" type="<?= e($icon['type']) ?>" sizes="any">
     <link rel="apple-touch-icon" href="<?= e($icon['url']) ?>">
 <?php endif; ?>
-<?php if ($shareImage !== null): ?>
-    <meta property="og:image" content="<?= e($shareImage) ?>">
+<?php /* What a link to this page shows where it is shared (D-242): og:image among them. */ ?>
+<?php foreach ($sharing as $tag): ?>
+    <meta <?= $tag['attribute'] === 'name' ? 'name' : 'property' ?>="<?= e($tag['name']) ?>" content="<?= e($tag['content']) ?>">
+<?php endforeach; ?>
+<?php if ($website !== ''): ?>
+    <script type="application/ld+json"><?= $website ?></script>
 <?php endif; ?>
 <?php /* The two families' first files at once (D-185): drawn in their own face the first time. */ ?>
 <?php foreach ($fontPreloads as $font): ?>

@@ -87,7 +87,7 @@ final class UpdateGate
             return $response;
         }
 
-        $html = (new View(__DIR__ . '/views'))->render('public/bar', 'en', [
+        $html = (new View(__DIR__ . '/views'))->render('public/bar', \App\Support\AdminLang::code(), [
             'off' => Url::admin('maintenance'),
         ], null);
 
@@ -125,9 +125,15 @@ final class UpdateGate
      */
     private static function closed(Container $container, string $because): Response
     {
-        $body = (new View(__DIR__ . '/views'))->render('public/updating', 'en', [
-            'title' => $because === 'update' ? t('update.public.title') : t('maintenance.public.title'),
-            'message' => $because === 'update' ? t('update.public.body') : t('maintenance.public.body'),
+        // In the site's main language and with the owner's message (D-241), as the admin last
+        // wrote them for this page (Maintenance::remember()); English and the standard words
+        // where it never did. A visitor's words, so every language Boxlet speaks to visitors.
+        $words = $container->get('maintenance')->words();
+        $locale = $words['locale'] !== '' ? $words['locale'] : 'en';
+        $own = $because === 'maintenance' ? $words['message'] : '';
+        $body = (new View(__DIR__ . '/views'))->render('public/updating', $locale, [
+            'title' => site_t('site.closed.' . $because . '.title', $locale),
+            'message' => $own !== '' ? $own : site_t('site.closed.' . $because . '.body', $locale),
         ], null);
 
         return new Response($body, 503, [

@@ -39,7 +39,8 @@ use App\Modules\Settings\SiteChrome;
  *     description: string,
  *     canonical: string|null,
  *     icon: array{url: string, type: string}|null,
- *     shareImage: string|null,
+ *     sharing: list<array{attribute: string, name: string, content: string}>,
+ *     website: string,
  *     hreflang: list<array{hreflang: string, href: string}>,
  *     breadcrumbs: string,
  *     noindex: bool,
@@ -57,7 +58,7 @@ final class PageLayoutData
      * What the layout is handed, beside View's own $locale and $content. The test above
      * asserts this list against the template, so it is a fact rather than a comment.
      */
-    public const KEYS = ['title', 'description', 'canonical', 'icon', 'shareImage', 'hreflang', 'breadcrumbs', 'noindex', 'designPreview', 'fontPreloads', 'siteStyles', 'headerBleed', 'footerBleed', 'headerHtml', 'footerHtml'];
+    public const KEYS = ['title', 'description', 'canonical', 'icon', 'sharing', 'website', 'hreflang', 'breadcrumbs', 'noindex', 'designPreview', 'fontPreloads', 'siteStyles', 'headerBleed', 'footerBleed', 'headerHtml', 'footerHtml'];
 
     /**
      * A visitor's page, or an error page.
@@ -68,7 +69,7 @@ final class PageLayoutData
      * a "not found" without the site's own header around it reads as a broken site rather
      * than a wrong address.
      *
-     * @param array{title: string, description?: string, canonical?: string|null, shareImage?: string|null, first_surface?: string, breadcrumbs?: string, noindex?: bool} $head
+     * @param array{title: string, description?: string, canonical?: string|null, shareImage?: string|null, website?: string, first_surface?: string, breadcrumbs?: string, noindex?: bool} $head
      * @param array<string, mixed>|null $page the page being drawn; null on an error page
      * @param string $current its address, for marking the menu; '' on an error page
      * @return LayoutData
@@ -90,8 +91,11 @@ final class PageLayoutData
             'canonical' => $head['canonical'] ?? null,
             // One indexed lookup per render, and null when no favicon is chosen.
             'icon' => SiteChrome::icon($db),
-            // A link preview of an error page is not worth a row, so this is the caller's.
-            'shareImage' => $head['shareImage'] ?? null,
+            // Open Graph and Twitter tags for a real page, none for an error page (D-242). The
+            // picture is the caller's: a link preview of an error page is not worth a row.
+            'sharing' => PageSharing::tags($head['title'], $head['description'] ?? '', $head['canonical'] ?? null, $head['shareImage'] ?? null, Settings::text($db, 'site_name')),
+            // WebSite JSON-LD on a language's home page, '' elsewhere (D-242).
+            'website' => $head['website'] ?? '',
             'hreflang' => Alternates::hreflang($alternates, self::primary($container->get('locales'))),
             // BreadcrumbList JSON-LD for a page under a parent, '' otherwise (D-129).
             'breadcrumbs' => $head['breadcrumbs'] ?? '',
@@ -134,7 +138,8 @@ final class PageLayoutData
             'description' => '',
             'canonical' => null,
             'icon' => SiteChrome::icon($db),
-            'shareImage' => null,
+            'sharing' => [],
+            'website' => '',
             // An admin address must never announce itself as a translation of anything.
             'hreflang' => [],
             'breadcrumbs' => '',

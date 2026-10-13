@@ -245,7 +245,7 @@
     if (fails) fails.hidden = failing.length === 0;
     if (tally) tally.textContent = (pairs.length - failing.length) + '/' + pairs.length;
     if (count) {
-      count.textContent = (count.getAttribute(failing.length === 1 ? 'data-one' : 'data-many') || '').replace(':count', String(failing.length));
+      count.textContent = (count.getAttribute('data-' + window.boxletPlural(failing.length)) || '').replace(':count', String(failing.length));
     }
     if (fix) fix.hidden = byHand.length === 0;
     if (seed) seed.hidden = failing.length === byHand.length;

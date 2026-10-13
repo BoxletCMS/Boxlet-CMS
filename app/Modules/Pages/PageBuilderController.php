@@ -71,6 +71,8 @@ final class PageBuilderController
             // Each possible parent's address, so the Page tab shows the whole address live.
             'parentUrls' => $this->parentUrls((string) $page['locale']),
             'siteName' => \App\Core\Settings::text($this->db(), 'site_name'),
+            // The pictures the page's own sharing picture is chosen from (D-242).
+            'sharePictures' => \App\Modules\Media\MediaReference::choices($this->db()),
             'languages' => $this->languages($id, (string) $page['locale']),
             'library' => $library,
             'patterns' => [
@@ -166,7 +168,7 @@ final class PageBuilderController
     {
         $keys = [
             'save.saving', 'save.saved', 'save.failed', 'save.conflict', 'save.reload', 'save.idle', 'publishing', 'published', 'publish_refused',
-            'discard_confirm', 'structure.sections', 'structure.sections_one', 'structure.blocks', 'structure.blocks_one', 'structure.column_name', 'structure.empty', 'add.where_end', 'add.where_after', 'add.none_found',
+            'discard_confirm', 'structure.sections', 'structure.blocks', 'structure.column_name', 'structure.empty', 'add.where_end', 'add.where_after', 'add.none_found',
             'canvas.add_here', 'canvas.add_end', 'canvas.add_block', 'canvas.add_block_title', 'canvas.insert_title', 'canvas.close', 'canvas.hidden_here', 'canvas.move_up', 'canvas.move_down',
             'canvas.copy', 'canvas.delete', 'canvas.layout', 'layout_default', 'canvas.page', 'canvas.empty', 'section_n', 'pattern_name', 'pattern_saved', 'delete_confirm',
             'page.restored', 'device.desktop', 'device.tablet', 'device.phone', 'add.mine', 'add.none_mine', 'add.from_set', 'inline.remove_item', 'inline.item_before', 'inline.item_after', 'inline.link_title', 'inline.link_text', 'inline.link_page', 'inline.link_other', 'inline.link_url', 'inline.link_done', 'inline.link_remove',
@@ -174,6 +176,13 @@ final class PageBuilderController
         $strings = [];
         foreach ($keys as $key) {
             $strings[$key] = t('builder.' . $key);
+        }
+        // The forms a count takes (D-240), each the one its sample number takes in the admin's
+        // language: builder-tree.js asks for structure.sections_few where boxletPlural() says
+        // few, and a language with no few form hands it the general one.
+        foreach (['structure.sections', 'structure.blocks'] as $key) {
+            $strings[$key . '_one'] = t(\App\Support\AdminLang::countedKey('builder.' . $key, 1));
+            $strings[$key . '_few'] = t(\App\Support\AdminLang::countedKey('builder.' . $key, 2));
         }
         // The rich text editor's own words, for its toolbar on the page (D-178): the same
         // words the inspector's toolbar says.

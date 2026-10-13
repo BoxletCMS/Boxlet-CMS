@@ -36,4 +36,10 @@ return [
     'site.embed.play' => 'Play video',
     'site.embed.show_map' => 'Show map',
     'site.embed.unknown' => 'Boxlet can show a video from YouTube or Vimeo, and a map from OpenStreetMap or Google Maps. That address is not one of them.',
+    // The page a visitor gets while the site is closed (D-019, D-021), in the site's main
+    // language (D-241): the owner's own message, when there is one, instead of maintenance.body.
+    'site.closed.maintenance.title' => 'Back in a moment',
+    'site.closed.maintenance.body' => 'This site is briefly unavailable. Please try again shortly.',
+    'site.closed.update.title' => 'Being updated',
+    'site.closed.update.body' => 'This site is being updated and will be back in a moment.',
 ];

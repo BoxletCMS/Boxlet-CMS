@@ -109,7 +109,8 @@ final class MediaLibrary
             }
         }
 
-        return $used;
+        // And a page's own sharing picture (D-242), which is in no block.
+        return $used + \App\Modules\Pages\PageSeo::pagesUsing($this->db, $mediaId);
     }
 
     /**
@@ -139,6 +140,10 @@ final class MediaLibrary
             foreach ($ids as $id) {
                 $pages[$id][(int) $row['page_id']] = true;
             }
+        }
+
+        foreach (\App\Modules\Pages\PageSeo::images($this->db) as $pageId => $id) {
+            $pages[$id][$pageId] = true;
         }
 
         $usage = [];

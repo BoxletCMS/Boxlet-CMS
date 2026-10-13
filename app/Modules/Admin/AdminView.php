@@ -55,7 +55,12 @@ final class AdminView
             // Statistics has a place in the rail only while it counts (D-051).
             'statsOn' => \App\Modules\Stats\Tracker::settings($container->get('db'))['enabled'],
         ] + self::frame($container);
-        $html = (new View($directory, __DIR__ . '/views'))->render($template, 'en', $data);
+        // A site from before D-241 has no words for its closed page yet: written on the owner's
+        // first admin screen after the update, once.
+        if (!$container->get('maintenance')->remembers()) {
+            $container->get('maintenance')->remember($container->get('db'));
+        }
+        $html = (new View($directory, __DIR__ . '/views'))->render($template, \App\Support\AdminLang::code(), $data);
 
         return Response::admin($html, $status);
     }

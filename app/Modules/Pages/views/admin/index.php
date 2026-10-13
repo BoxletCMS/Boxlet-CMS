@@ -170,7 +170,7 @@ foreach ($pages as $row) {
                                  the page a draft, pressing "Draft" publishes it. A pill with an
                                  edge, so it reads as something to press at rest; the title and
                                  the hidden words say what pressing it does. */ ?>
-                        <td>
+                        <td class="status-cell">
                             <form method="post" action="<?= e(Url::admin('pages', $id, 'status')) ?>">
                                 <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                                 <input type="hidden" name="status" value="<?= $published ? 'draft' : 'published' ?>">

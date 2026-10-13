@@ -144,7 +144,7 @@ ob_start();
                     <?php /* The roles nobody sets by hand are worked out from the ones above:
                              there, for whoever wants to read them, and out of the way. */ ?>
                     <details class="roles-more">
-                        <summary><?= e(t('inspector.palette_all', ['count' => count($colors) - count(Palette::BY_HAND)])) ?></summary>
+                        <summary><?= e(tn('inspector.palette_all', count($colors) - count(Palette::BY_HAND))) ?></summary>
                         <ul class="roles" role="list">
 <?php foreach ($colors as $name => $hex): ?>
 <?php if (!in_array($name, Palette::BY_HAND, true)): ?>
@@ -163,7 +163,7 @@ ob_start();
                             <span><?= e(t('inspector.contrast.ok')) ?></span>
                             <span class="contrast-tally" data-contrast-tally><?= e(count($pairs) . '/' . count($pairs)) ?></span></p>
                         <div class="contrast-fails" data-contrast-fails<?= $failing === [] ? ' hidden' : '' ?> role="status">
-                            <p><?= icon('circle-alert') ?> <span data-contrast-count data-one="<?= e(t('inspector.contrast.fail_one')) ?>" data-many="<?= e(t('inspector.contrast.fail_many')) ?>"><?= e(t(count($failing) === 1 ? 'inspector.contrast.fail_one' : 'inspector.contrast.fail_many', ['count' => count($failing)])) ?></span></p>
+                            <p><?= icon('circle-alert') ?> <span data-contrast-count <?= tn_attrs('inspector.contrast.fail_many') ?>><?= e(tn('inspector.contrast.fail_many', count($failing))) ?></span></p>
                             <button type="submit" form="design-form" name="action" value="colour:free:failing" class="button button-secondary" data-contrast-fix<?= $freeable === [] ? ' hidden' : '' ?>><?= e(t('inspector.contrast.fix')) ?></button>
                             <p class="hint hint-always" data-contrast-seed<?= $seedBound > 0 ? '' : ' hidden' ?>><?= e(t('inspector.contrast.change_seed')) ?></p>
                         </div>

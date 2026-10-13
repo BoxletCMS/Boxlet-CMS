@@ -2,6 +2,8 @@
 
 namespace App\Modules\Update;
 
+use App\Core\Db;
+use App\Core\Settings;
 use RuntimeException;
 
 /**
@@ -22,6 +24,9 @@ use RuntimeException;
 final class Maintenance
 {
     private const FILE = 'maintenance.flag';
+
+    /** What the closed page says, kept beside the flag (D-241): see remember(). */
+    private const WORDS = 'maintenance-words.json';
 
     /** Set by the owner from the dashboard; only the owner clears it. */
     public const MANUAL = 'manual';
@@ -91,6 +96,54 @@ final class Maintenance
         if (!@unlink($this->path())) {
             throw new RuntimeException(t('maintenance.failed'));
         }
+    }
+
+    /**
+     * THE CLOSED PAGE IN THE SITE'S LANGUAGE (PLAN.md D-241, the owner): the site's main language
+     * and the owner's own message, written where the page that cannot read the database can.
+     *
+     * The page a visitor gets while the site is closed is drawn before the router, without the
+     * database (D-019, D-021): a pending migration may be changing the very tables it would read.
+     * So what it needs is copied into a file whenever it can change — the message saved, the
+     * switch turned on — and once on any admin screen where the file is not there yet, so a site
+     * installed before this has it from the owner's next visit. The main language never changes.
+     * A file that cannot be written leaves the page in English with the standard words, which is
+     * what it said before; nothing else depends on it.
+     */
+    public function remember(Db $db): void
+    {
+        $locale = $db->one('SELECT code FROM locales WHERE is_primary = 1');
+        $words = [
+            'locale' => is_string($locale['code'] ?? null) ? $locale['code'] : '',
+            'message' => Settings::text($db, 'maintenance_message', ''),
+        ];
+        if ($words !== $this->words()) {
+            @file_put_contents($this->storagePath . '/' . self::WORDS, json_encode($words, JSON_UNESCAPED_UNICODE));
+        }
+    }
+
+    /** Whether remember() has written the words yet. */
+    public function remembers(): bool
+    {
+        return is_file($this->storagePath . '/' . self::WORDS);
+    }
+
+    /**
+     * What remember() kept: the main language ('' when unknown) and the owner's message ('' for
+     * the standard words).
+     *
+     * @return array{locale: string, message: string}
+     */
+    public function words(): array
+    {
+        $file = $this->storagePath . '/' . self::WORDS;
+        $read = is_file($file) ? json_decode((string) file_get_contents($file), true) : null;
+        $locale = is_array($read) && is_string($read['locale'] ?? null) ? $read['locale'] : '';
+
+        return [
+            'locale' => preg_match('~^[a-z]{2,3}$~', $locale) === 1 ? $locale : '',
+            'message' => is_array($read) && is_string($read['message'] ?? null) ? $read['message'] : '',
+        ];
     }
 
     private function path(): string

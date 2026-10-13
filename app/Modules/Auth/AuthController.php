@@ -73,7 +73,7 @@ final class AuthController
         if ($throttle->isLocked($ipHash, $emailHash, $now, KnownDevice::known($request, $key, $emailHash))) {
             $minutes = intdiv(LoginThrottle::WINDOW_SECONDS, 60);
 
-            return $this->form($email, t('auth.throttled', ['minutes' => $minutes]), 429);
+            return $this->form($email, tn('auth.throttled', $minutes, ['minutes' => $minutes]), 429);
         }
 
         $admin = $db->one('SELECT id, password_hash FROM admin WHERE email = ?', [$email]);
@@ -147,7 +147,7 @@ final class AuthController
         $throttle = new LoginThrottle($db);
         $now = time();
         if ($throttle->isLocked($ipHash, $emailHash, $now, KnownDevice::known($request, $key, $emailHash))) {
-            return $this->codeForm(t('auth.throttled', ['minutes' => intdiv(LoginThrottle::WINDOW_SECONDS, 60)]), 429);
+            return $this->codeForm(tn('auth.throttled', intdiv(LoginThrottle::WINDOW_SECONDS, 60), ['minutes' => intdiv(LoginThrottle::WINDOW_SECONDS, 60)]), 429);
         }
 
         $twoFactor = new TwoFactor($db, $key);
@@ -191,7 +191,7 @@ final class AuthController
 
     private function codeForm(?string $error, int $status): Response
     {
-        return Response::admin((new View(__DIR__ . '/views'))->render('login-code', 'en', [
+        return Response::admin((new View(__DIR__ . '/views'))->render('login-code', \App\Support\AdminLang::code(), [
             'title' => t('twofactor.login_title'),
             'theme' => Theme::of($this->container->get('request')),
             'error' => $error,
@@ -228,7 +228,7 @@ final class AuthController
 
     private function form(string $email, ?string $error, int $status, ?string $notice = null): Response
     {
-        $html = (new View(__DIR__ . '/views'))->render('login', 'en', [
+        $html = (new View(__DIR__ . '/views'))->render('login', \App\Support\AdminLang::code(), [
             'title' => t('auth.title'),
             // The palette this browser chose in the admin (D-054): logging out, or being
             // logged out, is no reason for the colours to change.

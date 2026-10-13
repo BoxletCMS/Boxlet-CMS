@@ -11,6 +11,25 @@
 
   document.documentElement.classList.add('js');
 
+  /*
+   * WHICH FORM A COUNT TAKES (PLAN.md D-240), in the admin's language, the page's lang: 'one',
+   * 'few' or 'other', the data-one, data-few and data-other a counted string carries
+   * (tn_attrs()). AdminLang::plural() is the same rule on the server: English, and every
+   * language not named, has a form for 1 and one for the rest; Croatian has three, by the
+   * last digits, and 21 is "one".
+   */
+  window.boxletPlural = function (count) {
+    var n = Math.abs(count);
+    var lang = document.documentElement.lang;
+    if (lang === 'hr' || lang === 'bs' || lang === 'sr') {
+      var last = n % 10;
+      var lastTwo = n % 100;
+      if (last === 1 && lastTwo !== 11) { return 'one'; }
+      return last >= 2 && last <= 4 && (lastTwo < 12 || lastTwo > 14) ? 'few' : 'other';
+    }
+    return n === 1 ? 'one' : 'other';
+  };
+
   // Buttons with data-confirm ask before they submit.
   document.addEventListener('click', function (event) {
     var button = event.target.closest && event.target.closest('[data-confirm]');

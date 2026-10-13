@@ -33,8 +33,10 @@
   text-decoration: none;
 }
 
-/* On a phone the list keeps what a page is and whether it is live; the language and when it
-   was edited go, rather than making the table scroll. */
+/* On a phone the list keeps what a page is; its address, language, status and when it was
+   edited go, rather than making the table scroll. The status cell by its class: by its place
+   (the 5th) it became the language when D-218 put a tick box in front, and the status stood over
+   the menu with no heading (found 2026-10-13, D-240). */
 @media (max-width: 47.5rem) {
   .page-tree .col-lang,
   .page-tree .lang,
@@ -43,7 +45,7 @@
   .page-tree .col-address,
   .page-tree .address,
   .page-tree .col-status,
-  .page-tree td:nth-child(5) {
+  .page-tree .status-cell {
     display: none;
   }
 

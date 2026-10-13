@@ -113,8 +113,8 @@ final class Activity
         return match (true) {
             $days >= 0 => $at->format('H:i'),
             $days === -1 => t('activity.yesterday'),
-            $days > -7 => t('activity.days_ago', ['days' => (string) -$days]),
-            default => $at->format('j M'),
+            $days > -7 => tn('activity.days_ago', -$days, ['days' => (string) -$days]),
+            default => \App\Support\AdminLang::date($at, false),
         };
     }
 }

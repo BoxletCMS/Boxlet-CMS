@@ -73,7 +73,11 @@
       html += '</li>';
     });
     tree.innerHTML = html || '<li class="pb-tree-empty">' + text(pb.t('structure.empty')) + '</li>';
-    var n = function (key, count) { return pb.t('structure.' + key + (count === 1 ? '_one' : ''), { count: count }); };
+    // The form the count takes in the admin's language (D-240): structure.sections, _one, _few.
+    var n = function (key, count) {
+      var form = window.boxletPlural(count);
+      return pb.t('structure.' + key + (form === 'other' ? '' : '_' + form), { count: count });
+    };
     count.textContent = n('sections', pb.doc.sections.length) + ' · ' + n('blocks', pb.doc.blocks.length);
     mark();
     sortable();

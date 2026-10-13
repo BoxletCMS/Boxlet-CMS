@@ -112,7 +112,7 @@ ob_start();
                              are kept live by appearance-overrides.js from the two templates. */ ?>
                     <div class="overrides" data-overrides<?= $changed === [] ? ' hidden' : '' ?>>
                         <span class="control-changed" aria-hidden="true"></span>
-                        <span data-overrides-text data-one="<?= e(t('inspector.overrides_one', ['character' => Characters::label($basis)])) ?>" data-many="<?= e(t('inspector.overrides_many', ['character' => Characters::label($basis)])) ?>"><?= e(t(count($changed) === 1 ? 'inspector.overrides_one' : 'inspector.overrides_many', ['count' => count($changed), 'character' => Characters::label($basis)])) ?></span>
+                        <span data-overrides-text <?= tn_attrs('inspector.overrides_many', ['character' => Characters::label($basis)]) ?>><?= e(tn('inspector.overrides_many', count($changed), ['character' => Characters::label($basis)])) ?></span>
                         <button type="submit" form="design-form" name="action" value="reset:all" class="button button-quiet"><?= e(t('inspector.reset.all')) ?></button>
                     </div>
 

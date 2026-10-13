@@ -151,6 +151,11 @@ h4 {
   letter-spacing: var(--heading-tracking);
   text-transform: var(--heading-transform);
   line-height: var(--leading-heading);
+  /* A word wider than its column breaks rather than running off the screen (D-241, the owner:
+     "prelomiti"): the not-found page's "PRONAĐENA" at a display size on a phone. Only a word
+     that does not fit: every other line wraps between words as before. The hero's own
+     heading says `anywhere`, for the same reason. */
+  overflow-wrap: break-word;
 }
 
 a {
@@ -170,7 +175,11 @@ code {
 }
 
 .not-found h1 {
-  font-size: var(--text-3xl);
+  /* The character's size is the ceiling and the window brings it down, as the hero's heading
+     (blocks-hero.css): at --text-3xl alone a Croatian "STRANICA NIJE PRONAĐENA" in Couture was
+     wider than a phone, and broken mid-word it read "STRANIC / A NIJE" (D-241). */
+  --not-found-size: min(var(--text-3xl), calc(1rem + 4.6vw));
+  font-size: var(--not-found-size);
 }
 
 .meta {

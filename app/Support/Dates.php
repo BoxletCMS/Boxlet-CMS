@@ -26,12 +26,13 @@ final class Dates
     }
 
     /**
-     * "18 Sep 2026, 09:40" in $zone, from a stored Y-m-d H:i:s UTC string. A value that is
+     * "18 Sep 2026, 09:40" in $zone, from a stored Y-m-d H:i:s UTC string; the date as the
+     * admin's language writes it (D-240), "18. 9. 2026., 09:40" in Croatian. A value that is
      * not one comes back as it is: a date shown raw is better than a date made up.
      */
     public static function local(string $utc, string $zone): string
     {
-        return self::format($utc, $zone, 'j M Y, H:i');
+        return self::format($utc, $zone, 'H:i');
     }
 
     /**
@@ -43,9 +44,10 @@ final class Dates
      */
     public static function localToSecond(string $utc, string $zone): string
     {
-        return self::format($utc, $zone, 'j M Y, H:i:s');
+        return self::format($utc, $zone, 'H:i:s');
     }
 
+    /** The date in the admin's words, then the time in $pattern. */
     private static function format(string $utc, string $zone, string $pattern): string
     {
         $time = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $utc, new DateTimeZone('UTC'));
@@ -58,6 +60,6 @@ final class Dates
             // An unknown zone reads as UTC rather than as an error on a list screen.
         }
 
-        return $time->format($pattern);
+        return AdminLang::date($time) . ', ' . $time->format($pattern);
     }
 }

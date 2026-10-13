@@ -205,7 +205,7 @@ $vector = static function (string $slot) use ($logoSvg): string {
                 <div class="field">
                     <label for="maintenance_message"><?= e(t('settings.maintenance_message')) ?></label>
                     <textarea id="maintenance_message" name="maintenance_message" rows="3"
-                              placeholder="<?= e(t('maintenance.public.body')) ?>"
+                              placeholder="<?= e(site_t('site.closed.maintenance.body', Url::primaryLocale())) ?>"
                               aria-describedby="maintenance_message-hint"><?= e($text('maintenance_message')) ?></textarea>
                     <span class="hint" id="maintenance_message-hint"><?= e(t('settings.maintenance_message_hint')) ?></span>
                 </div>

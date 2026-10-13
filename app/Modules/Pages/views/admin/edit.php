@@ -112,6 +112,17 @@ $error = static fn (string $key): string => isset($errors[$key]) ? '<p class="fi
                         <label class="checkbox"><input type="checkbox" id="page-seo-noindex" name="seo_noindex" value="1" aria-describedby="page-seo-noindex-hint"<?= $seo['noindex'] ? ' checked' : '' ?>> <?= e(t('pages.field.seo_noindex')) ?></label>
                         <span class="hint" id="page-seo-noindex-hint"><?= e(t('pages.field.seo_noindex_hint')) ?></span>
                     </div>
+                    <?php /* The page's own sharing picture (D-242), the same picker as a block's. */ ?>
+                    <div class="field">
+                        <label for="page-seo-image"><?= e(t('pages.field.seo_image')) ?></label>
+                        <select id="page-seo-image" name="seo_image" data-media-field<?= \App\Modules\Media\MediaReference::pickerAttributes() ?> aria-describedby="page-seo-image-hint">
+                            <option value=""><?= e(t('pages.field.media_none')) ?></option>
+<?php foreach ($pictures as $picture): ?>
+                            <option value="<?= e($picture['id']) ?>"<?= $picture['thumb'] === null ? '' : ' data-thumb="' . e($picture['thumb']) . '"' ?><?= $seo['image'] === $picture['id'] ? ' selected' : '' ?>><?= e($picture['name']) ?></option>
+<?php endforeach; ?>
+                        </select>
+                        <span class="hint" id="page-seo-image-hint"><?= e(t('pages.field.seo_image_hint')) ?></span>
+                    </div>
                 </div>
             </div>
 

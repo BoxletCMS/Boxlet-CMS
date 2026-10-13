@@ -104,10 +104,11 @@
       }, template);
     }
 
-    // Matches Bytes::human() on the server, so the two never disagree about a size.
+    // Matches Bytes::human() on the server, so the two never disagree about a size: its
+    // decimal mark too, the admin's language's (D-240), which the page carries.
     function human(bytes) {
       if (bytes >= 1048576) {
-        return (bytes / 1048576).toFixed(1) + ' MB';
+        return (bytes / 1048576).toFixed(1).replace('.', document.documentElement.getAttribute('data-decimal') || '.') + ' MB';
       }
       if (bytes >= 1024) {
         return Math.round(bytes / 1024) + ' KB';

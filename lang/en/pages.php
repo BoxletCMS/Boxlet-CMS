@@ -406,8 +406,8 @@ return [
     'pages.place.own_child' => 'A page cannot go under itself or one of its own subpages.',
     'pages.place.too_deep' => 'Pages go :levels levels deep at most, counting the subpages it takes with it.',
 
-    // What the page says about itself in a search result (PLAN.md D-004). Two fields,
-    // and no more: no sharing image, no robots directive, no sitemap.
+    // What the page says about itself in a search result (PLAN.md D-004), and, since D-242,
+    // the picture a link to it is shared with.
     'pages.field.seo_title' => 'Title in search results',
     'pages.field.seo_title_hint' => 'The title search engines and browser tabs show. Leave it empty to use the page title; fill it in when a longer, more descriptive title helps people find the page.',
     'pages.field.seo_description' => 'Description in search results',
@@ -417,6 +417,8 @@ return [
     'pages.field.seo_description_hint' => 'The short summary search engines may show under the title. One or two sentences, about 160 characters. Leave it empty and they choose words from the page.',
     'pages.field.seo_noindex' => 'Keep out of search engines',
     'pages.field.seo_noindex_hint' => 'The page stays published for anyone with its address, but search engines are asked not to list it, and it is left out of the sitemap and llms.txt.',
+    'pages.field.seo_image' => 'Sharing picture',
+    'pages.field.seo_image_hint' => 'Shown when a link to this page is shared in a chat or on social media. Leave it empty to use the site’s sharing picture from Settings. 1200×630 works best.',
 
     // THE SHELVES a block is found on (D-104). Named for what a person is looking for
     // rather than for what the block is made of: somebody wants "a picture" or "something

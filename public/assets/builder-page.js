@@ -61,6 +61,9 @@
     field('seo_title').placeholder = pb.doc.title || '';
     field('seo_description').value = s.description || '';
     field('noindex').checked = s.noindex === true;
+    // The page's own sharing picture (D-242); one the options do not hold reads as none.
+    field('seo_image').value = s.image ? String(s.image) : '';
+    field('seo_image').dispatchEvent(new Event('boxlet:repaint'));
     shown();
   }
 
@@ -78,8 +81,13 @@
         doc.parent_id = value === '' ? null : Number(value);
       } else {
         var s = seo();
-        s[{ seo_title: 'title', seo_description: 'description', noindex: 'noindex' }[name]] = value;
+        if (name === 'seo_image') {
+          s.image = value === '' ? null : Number(value);
+        } else {
+          s[{ seo_title: 'title', seo_description: 'description', noindex: 'noindex' }[name]] = value;
+        }
         if (s.noindex !== true) { delete s.noindex; }
+        if (!s.image) { delete s.image; }
         doc.seo_json = JSON.stringify(s);
       }
     }, { coalesce: 'page.' + name, quiet: true });

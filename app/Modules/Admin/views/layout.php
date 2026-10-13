@@ -74,7 +74,7 @@ foreach ($rail as $entries) {
 }
 ?>
 <!doctype html>
-<html lang="<?= e($locale) ?>">
+<html lang="<?= e($locale) ?>" data-decimal="<?= e(t('format.decimal')) ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -43,7 +43,7 @@ final class PagesBulkController
         $session = $this->container->get('session');
         $session->set('flash', $deleted === 0
             ? t('pages.bulk.none')
-            : t($deleted === 1 ? 'pages.bulk.deleted_one' : 'pages.bulk.deleted_many', ['count' => (string) $deleted]));
+            : tn('pages.bulk.deleted_many', $deleted));
         if ($deleted === 0) {
             $session->set('flash_kind', 'warning');
         }

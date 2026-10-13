@@ -45,9 +45,9 @@ final class MediaBulkController
         }
         $said = $deleted === 0 && $kept === []
             ? t('media.bulk.none')
-            : ($deleted > 0 ? t($deleted === 1 ? 'media.bulk.deleted_one' : 'media.bulk.deleted_many', ['count' => (string) $deleted]) : '');
+            : ($deleted > 0 ? tn('media.bulk.deleted_many', $deleted) : '');
         if ($kept !== []) {
-            $said = trim($said . ' ' . t(count($kept) === 1 ? 'media.bulk.kept_heading_one' : 'media.bulk.kept_heading_many', ['count' => (string) count($kept)]) . ' ' . implode('; ', $kept) . '.');
+            $said = trim($said . ' ' . tn('media.bulk.kept_heading_many', count($kept)) . ' ' . implode('; ', $kept) . '.');
         }
         $session = $this->container->get('session');
         $session->set('flash', $said);

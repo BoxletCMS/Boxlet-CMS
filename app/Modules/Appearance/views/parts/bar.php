@@ -45,8 +45,7 @@ use App\Support\Url;
                 <span class="preview-state" data-state role="status"
                       data-published="<?= e(t('appearance.state.published')) ?>"
                       data-unpublished="<?= e(t('appearance.state.unpublished')) ?>"
-                      data-one="<?= e(t('appearance.state.changes_one')) ?>"
-                      data-many="<?= e(t('appearance.state.changes_many')) ?>"
+                     <?= tn_attrs('appearance.state.changes_many') ?>
                       data-problem="<?= e(t('appearance.state.problem')) ?>"><?= e(t('appearance.state.published')) ?></span>
 
                 <?php /* ONE BUTTON. Applying a character to a site that has blocks can rewrite

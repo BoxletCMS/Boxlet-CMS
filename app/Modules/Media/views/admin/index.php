@@ -55,7 +55,7 @@ use App\Support\Url;
                 <a href="<?= e(Url::admin('media') . (($query = array_filter(['q' => $search, 'show' => $value, 'kind' => $kind])) !== [] ? '?' . http_build_query($query) : '')) ?>"<?= $show === $value ? ' aria-current="page"' : '' ?>><?= e(t($key)) ?></a>
 <?php endforeach; ?>
             </nav>
-            <span class="list-count"><?= e(t('media.count', ['count' => (string) count($pictures), 'size' => \App\Support\Bytes::human($bytes)])) ?></span>
+            <span class="list-count"><?= e(tn('media.count', count($pictures), ['size' => \App\Support\Bytes::human($bytes)])) ?></span>
         </div>
 
 <?php if ($pictures === []): ?>

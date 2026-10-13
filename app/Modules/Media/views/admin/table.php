@@ -50,14 +50,14 @@ use App\Support\Url;
 <?php if ($row['kind'] === 'file'): ?>
                         <?php /* A file has no dimensions (D-126): what it is, and how often it
                                  was taken, instead. */ ?>
-                        <td class="numeric media-facts"><?= e(strtoupper($row['ext'])) ?> · <?= e(t($row['downloads'] === 1 ? 'media.downloads_one' : 'media.downloads_many', ['count' => (string) $row['downloads']])) ?></td>
+                        <td class="numeric media-facts"><?= e(strtoupper($row['ext'])) ?> · <?= e(tn('media.downloads_many', (int) $row['downloads'])) ?></td>
 <?php else: ?>
                         <td class="numeric media-facts"><?= e(t('media.dimensions', ['width' => (string) $row['width'], 'height' => (string) $row['height']])) ?></td>
 <?php endif; ?>
                         <td class="numeric media-facts"><?= e($row['size']) ?></td>
                         <td class="media-used">
 <?php if ($row['pages'] > 0): ?>
-                            <?= e(t($row['pages'] === 1 ? 'media.used_one' : 'media.used_many', ['count' => (string) $row['pages']])) ?><?= $row['site'] ? ' · ' . e(t('media.used_site')) : '' ?>
+                            <?= e(tn('media.used_many', (int) $row['pages'])) ?><?= $row['site'] ? ' · ' . e(t('media.used_site')) : '' ?>
 <?php elseif ($row['site']): ?>
                             <?= e(t('media.used_site')) ?>
 <?php else: ?>

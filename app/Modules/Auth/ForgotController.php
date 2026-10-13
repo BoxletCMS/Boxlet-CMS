@@ -59,7 +59,7 @@ final class ForgotController
         $throttle = new LoginThrottle($db);
         $now = time();
         if ($throttle->isLocked($ipHash, $emailHash, $now)) {
-            return $this->screen('forgot', ['sent' => false, 'error' => t('auth.throttled', ['minutes' => intdiv(LoginThrottle::WINDOW_SECONDS, 60)])], 429);
+            return $this->screen('forgot', ['sent' => false, 'error' => tn('auth.throttled', intdiv(LoginThrottle::WINDOW_SECONDS, 60), ['minutes' => intdiv(LoginThrottle::WINDOW_SECONDS, 60)])], 429);
         }
         $throttle->record($ipHash, $emailHash, false, $now);
 
@@ -72,7 +72,7 @@ final class ForgotController
                     ->from(new Address($addresses['from'], $addresses['fromName']))
                     ->to($email)
                     ->subject(t('account.mail_subject', ['site' => $site]))
-                    ->text(t('account.mail_body', [
+                    ->text(tn('account.mail_body', intdiv(PasswordReset::LIFETIME_SECONDS, 60), [
                         'site' => $site,
                         'url' => Url::withOrigin(Url::admin('reset', $token)),
                         'minutes' => (string) intdiv(PasswordReset::LIFETIME_SECONDS, 60),
@@ -122,7 +122,7 @@ final class ForgotController
      */
     private function screen(string $template, array $data, int $status = 200): Response
     {
-        $html = (new View(__DIR__ . '/views'))->render($template, 'en', $data + [
+        $html = (new View(__DIR__ . '/views'))->render($template, \App\Support\AdminLang::code(), $data + [
             'title' => t('account.forgot_title'),
             'theme' => Theme::of($this->container->get('request')),
             'csrf' => $this->container->get('session')->csrfToken(),

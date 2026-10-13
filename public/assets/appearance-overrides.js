@@ -103,7 +103,7 @@
       var text = banner.querySelector('[data-overrides-text]');
       if (text) {
         // Both forms of the sentence come from the markup: they are translated and this is not.
-        text.textContent = (text.getAttribute(total === 1 ? 'data-one' : 'data-many') || '').replace(':count', String(total));
+        text.textContent = (text.getAttribute('data-' + window.boxletPlural(total)) || '').replace(':count', String(total));
       }
     }
   }

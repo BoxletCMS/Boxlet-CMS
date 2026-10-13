@@ -28,9 +28,9 @@ use App\Support\Url;
  */
 $all = null;
 $figures = [
-    ['visitors', number_format($totals['visitors']), StatsView::change(StatsQuery::change($totals['visitors'], $previous['visitors']))],
-    ['views', number_format($totals['views']), StatsView::change(StatsQuery::change($totals['views'], $previous['views']))],
-    ['per_visitor', number_format($totals['perVisitor'], 1), StatsView::change(StatsQuery::change($totals['perVisitor'], $previous['perVisitor']))],
+    ['visitors', \App\Support\AdminLang::number($totals['visitors']), StatsView::change(StatsQuery::change($totals['visitors'], $previous['visitors']))],
+    ['views', \App\Support\AdminLang::number($totals['views']), StatsView::change(StatsQuery::change($totals['views'], $previous['views']))],
+    ['per_visitor', \App\Support\AdminLang::number($totals['perVisitor'], 1), StatsView::change(StatsQuery::change($totals['perVisitor'], $previous['perVisitor']))],
     ['mobile', StatsView::percent($totals['mobile']), '<span class="stats-change">' . e(t('stats.before', ['value' => StatsView::percent($previous['mobile'])])) . '</span>'],
 ];
 ?>
@@ -68,7 +68,7 @@ $figures = [
                     </tr></thead>
                     <tbody>
 <?php foreach ($series as $point): ?>
-                        <tr><th scope="row"><?= e(StatsView::day($point['day'], true)) ?></th><td class="stats-num"><?= e(number_format($point['visitors'])) ?></td><td class="stats-num"><?= e(number_format($point['views'])) ?></td></tr>
+                        <tr><th scope="row"><?= e(StatsView::day($point['day'], true)) ?></th><td class="stats-num"><?= e(\App\Support\AdminLang::number($point['visitors'])) ?></td><td class="stats-num"><?= e(\App\Support\AdminLang::number($point['views'])) ?></td></tr>
 <?php endforeach; ?>
                     </tbody>
                 </table>

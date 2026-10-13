@@ -83,6 +83,11 @@ final class PageSubmission
         if (array_key_exists('seo_title', $request->body)) {
             $seo['noindex'] = $request->input('seo_noindex') === '1';
         }
+        // The page's own sharing picture (D-242): a picture's id, or nothing for the site's.
+        if (array_key_exists('seo_image', $request->body)) {
+            $image = $request->input('seo_image');
+            $seo['image'] = ctype_digit($image) && (int) $image > 0 ? (int) $image : null;
+        }
 
         return PageSeo::json($seo);
     }

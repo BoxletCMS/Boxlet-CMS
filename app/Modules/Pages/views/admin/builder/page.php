@@ -16,6 +16,7 @@ use App\Support\Url;
  * @var list<array{id: int, created_at: string}> $revisions
  * @var string $zone
  * @var string $siteName
+ * @var list<array{id: int, name: string, thumb: string|null, whole: string|null}> $sharePictures
  */
 $seo = PageSeo::of(['seo_json' => (string) ($document['seo_json'] ?? '{}')]);
 $home = Url::page((string) $page['locale'], '');
@@ -51,6 +52,18 @@ $home = Url::page((string) $page['locale'], '');
                     <textarea id="pb-seo-description" data-pb-page="seo_description" rows="3"><?= e($seo['description']) ?></textarea>
                 </div>
                 <label class="checkbox"><input type="checkbox" data-pb-page="noindex" value="1"<?= $seo['noindex'] ? ' checked' : '' ?>> <?= e(t('pages.field.seo_noindex')) ?></label>
+                <?php /* The page's own sharing picture (D-242): media-picker.js upgrades the select,
+                         and choosing fires the change builder-page.js writes into seo_json. */ ?>
+                <div class="field">
+                    <label for="pb-seo-image"><?= e(t('pages.field.seo_image')) ?></label>
+                    <select id="pb-seo-image" data-pb-page="seo_image" data-media-field<?= \App\Modules\Media\MediaReference::pickerAttributes() ?> aria-describedby="pb-seo-image-hint">
+                        <option value=""><?= e(t('pages.field.media_none')) ?></option>
+<?php foreach ($sharePictures as $picture): ?>
+                        <option value="<?= e($picture['id']) ?>"<?= $picture['thumb'] === null ? '' : ' data-thumb="' . e($picture['thumb']) . '"' ?><?= $seo['image'] === $picture['id'] ? ' selected' : '' ?>><?= e($picture['name']) ?></option>
+<?php endforeach; ?>
+                    </select>
+                    <p class="hint-line" id="pb-seo-image-hint"><?= e(t('pages.field.seo_image_hint')) ?></p>
+                </div>
                 <div class="pb-serp" aria-label="<?= e(t('builder.page.preview_title')) ?>" data-site="<?= e($siteName) ?>">
                     <p class="pb-serp-title" data-pb-serp-title></p>
                     <p class="pb-serp-url" data-pb-serp-url></p>
@@ -59,7 +72,7 @@ $home = Url::page((string) $page['locale'], '');
                 <h3 class="pb-add-group"><?= e(t('builder.page.history')) ?></h3>
 <?php if ($revisions !== []): ?>
                 <?php /* What Restore does, said where it is pressed: not a hint behind the toggle (D-088). */ ?>
-                <p class="hint-line" data-pb-history-note><?= e(t('pages.history_hint', ['count' => \App\Modules\Pages\PageRevision::KEEP])) ?></p>
+                <p class="hint-line" data-pb-history-note><?= e(tn('pages.history_hint', \App\Modules\Pages\PageRevision::KEEP)) ?></p>
 <?php endif; ?>
 <?php if ($revisions === []): ?>
                 <p class="pb-add-none"><?= e(t('builder.page.history_none')) ?></p>

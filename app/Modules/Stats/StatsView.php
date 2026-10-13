@@ -56,17 +56,20 @@ final class StatsView
         return self::KEYS[$table] ?? 'path';
     }
 
-    /** A Y-m-d day as the chart and the range show it: "19 Sep", or "19 Sep 2026". */
+    /**
+     * A Y-m-d day as the chart and the range show it, in the admin's language (D-240): "19 Sep"
+     * or "19 Sep 2026"; in Croatian "19. 9." or "19. 9. 2026.".
+     */
     public static function day(string $day, bool $year = false): string
     {
         $date = DateTimeImmutable::createFromFormat('!Y-m-d', $day);
 
-        return $date === false ? $day : $date->format($year ? 'j M Y' : 'j M');
+        return $date === false ? $day : \App\Support\AdminLang::date($date, $year);
     }
 
     public static function percent(float $fraction): string
     {
-        return number_format($fraction * 100) . '%';
+        return \App\Support\AdminLang::number($fraction * 100) . t('format.percent');
     }
 
     /**

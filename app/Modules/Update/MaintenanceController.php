@@ -29,6 +29,7 @@ final class MaintenanceController
         $on = $request->input('state') === 'on';
 
         if ($on) {
+            $maintenance->remember($this->container->get('db'));
             $maintenance->turnOn(Maintenance::MANUAL);
         } else {
             // No reason given: the owner's switch clears whatever is there, including a

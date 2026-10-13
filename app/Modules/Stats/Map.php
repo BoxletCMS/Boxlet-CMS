@@ -72,7 +72,7 @@ final class Map
                 // Five steps by share of the busiest country, so one large country cannot
                 // leave every other one at the same shade.
                 $step = min(self::STEPS, max(1, (int) ceil($count / $most * self::STEPS)));
-                $said = $name . ' · ' . t('stats.map_visitors', ['count' => number_format($count)]);
+                $said = $name . ' · ' . tn('stats.map_visitors', $count, ['count' => \App\Support\AdminLang::number($count)]);
 
                 return '<a href="' . e($link($code)) . '" aria-label="' . e($said) . '">'
                     . '<path class="map-step-' . $step . '" ' . $shape . '><title>' . e($said) . '</title></path></a>';
@@ -177,7 +177,7 @@ final class Map
             // country, by share of the busiest city, and multiplied by what the zoom did to
             // the scale so a dot is the same size on the screen either way.
             $size = (self::MARK_SMALL + ($city['visitors'] / $most) * (self::MARK_LARGE - self::MARK_SMALL)) * $view['scale'];
-            $said = $city['city'] . ' · ' . t('stats.map_visitors', ['count' => number_format($city['visitors'])]);
+            $said = $city['city'] . ' · ' . tn('stats.map_visitors', (int) $city['visitors'], ['count' => \App\Support\AdminLang::number((int) $city['visitors'])]);
             $marks .= '<circle class="map-city" cx="' . round($x, 1) . '" cy="' . round($y, 1) . '" r="' . round($size, 2) . '">'
                 . '<title>' . e($said) . '</title></circle>';
         }

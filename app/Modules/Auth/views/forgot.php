@@ -16,7 +16,7 @@ use App\Support\Url;
 ?>
         <h1><?= e($title) ?></h1>
 <?php if ($sent): ?>
-        <p class="notice" role="status"><?= e(t('account.forgot_sent', ['minutes' => (string) intdiv(\App\Modules\Auth\PasswordReset::LIFETIME_SECONDS, 60)])) ?></p>
+        <p class="notice" role="status"><?= e(tn('account.forgot_sent', intdiv(\App\Modules\Auth\PasswordReset::LIFETIME_SECONDS, 60), ['minutes' => (string) intdiv(\App\Modules\Auth\PasswordReset::LIFETIME_SECONDS, 60)])) ?></p>
 <?php elseif ($noMail): ?>
         <p class="notice notice-warning" role="status"><?= e(t('account.forgot_no_mail')) ?></p>
 <?php else: ?>

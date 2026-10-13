@@ -1,0 +1,47 @@
+<?php
+
+// The Overview (PLAN.md D-052): the admin's first screen.
+return [
+    'overview.intro' => 'Stanje vaše web-stranice, što se nedavno promijenilo i što čeka na vas.',
+    'overview.edit_home' => 'Uredi naslovnu stranicu',
+
+    'overview.pages' => 'Stranice',
+    'overview.pages_all_published' => 'sve objavljene',
+    'overview.pages_drafts' => ':count još nije objavljeno',
+    'overview.pages_drafts_one' => ':count još nije objavljena',
+    'overview.pages_drafts_few' => ':count još nisu objavljene',
+    'overview.pictures' => 'Slike',
+    'overview.visitors' => 'Posjetitelji · 7 dana',
+    'overview.visitors_change' => ':change u odnosu na tjedan prije',
+    'overview.visitors_new' => 'još nema s čime usporediti',
+    'overview.messages' => 'Poruke',
+    'overview.messages_all_read' => 'sve pročitane',
+    'overview.messages_unread' => ':count nepročitanih',
+    'overview.messages_unread_one' => ':count nepročitana',
+    'overview.messages_unread_few' => ':count nepročitane',
+    'overview.languages' => 'Jezici',
+    'overview.languages_main' => 'glavni',
+    'overview.design' => 'Dizajn',
+    'overview.design_note' => 'karakter koji web-stranica nosi',
+    'overview.design_today' => 'promijenjen danas',
+    'overview.design_unchanged' => 'nepromijenjen :days dana',
+    'overview.design_unchanged_one' => 'nepromijenjen :days dan',
+    'overview.design_unchanged_few' => 'nepromijenjen :days dana',
+    'overview.design_unchanged_yesterday' => 'nepromijenjen od jučer',
+
+    'overview.attention' => 'Zahtijeva pažnju',
+    'overview.attention_none' => 'Ništa ne zahtijeva pažnju.',
+    'overview.issue.no_description' => 'Slike bez opisa: :count',
+    'overview.issue.stale' => 'Prijevod stranice „:page“ treba uskladiti s izvornikom',
+    'overview.issue.no_favicon' => 'Nema ikone za kartice preglednika',
+    'overview.issue.no_mail' => 'Poruke iz vaših obrazaca ne šalju vam se e-poštom',
+    'overview.issue.exposed' => 'Svatko može preuzeti privatne datoteke vaše web-stranice, među njima i lozinku baze podataka',
+    'overview.where.media' => 'Mediji · :names',
+    'overview.where.pages' => 'Stranice · :language',
+    'overview.where.branding' => 'Postavke · Vizualni identitet',
+    'overview.where.mail' => 'Postavke · E-pošta',
+    'overview.where.exposed' => 'Vaš hosting · web-poslužitelj zanemaruje datoteku .htaccess pokraj mape public. Usmjerite domenu na mapu public ili zamolite pružatelja hostinga da dopusti datoteke .htaccess.',
+    'overview.and_more' => 'i još :count',
+
+    'overview.most_read' => 'Najčitanije · 14 dana',
+];

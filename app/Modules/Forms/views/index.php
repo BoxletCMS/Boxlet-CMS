@@ -52,7 +52,7 @@ $error = static fn (string $key): string => isset($errors[$key])
                             <form method="post" action="<?= e(Url::admin('forms', $form['id'], 'delete')) ?>">
                                 <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                                 <button type="submit" class="button button-ghost button-danger button-icon" title="<?= e(t('forms.delete')) ?>"
-                                        data-confirm="<?= e(t('forms.delete_confirm', ['name' => $form['name'], 'count' => (string) $form['messages']])) ?>"><?= icon('trash-2') ?><span class="visually-hidden"><?= e(t('forms.delete')) ?></span></button>
+                                        data-confirm="<?= e(tn('forms.delete_confirm', (int) $form['messages'], ['name' => $form['name']])) ?>"><?= icon('trash-2') ?><span class="visually-hidden"><?= e(t('forms.delete')) ?></span></button>
                             </form>
                         </td>
                     </tr>

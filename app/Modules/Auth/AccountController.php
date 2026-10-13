@@ -88,7 +88,7 @@ final class AccountController
         $throttle = new LoginThrottle($db);
         $now = time();
         if ($throttle->isLocked($ipHash, $emailHash, $now)) {
-            return t('auth.throttled', ['minutes' => intdiv(LoginThrottle::WINDOW_SECONDS, 60)]);
+            return tn('auth.throttled', intdiv(LoginThrottle::WINDOW_SECONDS, 60), ['minutes' => intdiv(LoginThrottle::WINDOW_SECONDS, 60)]);
         }
         $right = password_verify($request->input('current_password'), (string) $admin['password_hash']);
         $throttle->record($ipHash, $emailHash, $right, $now);

@@ -77,10 +77,10 @@ final class Bytes
     public static function human(int $bytes): string
     {
         if ($bytes >= 1024 * 1024) {
-            return number_format($bytes / (1024 * 1024), 1) . ' MB';
+            return AdminLang::number($bytes / (1024 * 1024), 1) . ' MB';
         }
         if ($bytes >= 1024) {
-            return number_format($bytes / 1024) . ' KB';
+            return AdminLang::number($bytes / 1024) . ' KB';
         }
 
         return $bytes . ' B';

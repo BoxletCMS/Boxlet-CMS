@@ -52,7 +52,7 @@ final class Chart
 
         $axis = '<ol class="stats-chart-y" aria-hidden="true">';
         foreach ([3, 2, 1, 0] as $n) {
-            $axis .= '<li>' . e(number_format($n * $step)) . '</li>';
+            $axis .= '<li>' . e(\App\Support\AdminLang::number($n * $step)) . '</li>';
         }
         $axis .= '</ol>';
 

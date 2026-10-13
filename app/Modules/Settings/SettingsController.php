@@ -113,6 +113,8 @@ final class SettingsController
     public function saveMessage(Request $request, string $locale, array $params): Response
     {
         Settings::set($this->db(), 'maintenance_message', trim($request->input('maintenance_message')));
+        // Where the closed page can read it without the database (D-241).
+        $this->container->get('maintenance')->remember($this->db());
         $this->container->get('session')->set('flash', t('settings.maintenance_message_saved'));
 
         return Response::redirect(Url::admin('settings'));

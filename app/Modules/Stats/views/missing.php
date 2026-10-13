@@ -28,7 +28,7 @@ use App\Support\Url;
                         <tr>
                             <th scope="row" class="stats-name"><span><?= e($row['path']) ?></span></th>
                             <td><?= e($row['source'] === '' ? t('stats.direct') : $row['source']) ?></td>
-                            <td class="stats-num"><?= e(number_format($row['views'])) ?></td>
+                            <td class="stats-num"><?= e(\App\Support\AdminLang::number($row['views'])) ?></td>
                         </tr>
 <?php endforeach; ?>
                     </tbody>

@@ -214,12 +214,14 @@ final class Characters
         $entry = self::all()[$id] ?? null;
         $translated = t($key);
         $has = $translated !== $key;
+        // A set's own words in the admin's language where it has them (D-240), else English.
+        $lang = \App\Support\AdminLang::code();
         if ($entry === null || $entry['source'] === 'core') {
-            return $has ? $translated : (string) ($entry['set'][$field]['en'] ?? $id);
+            return $has ? $translated : (string) ($entry['set'][$field][$lang] ?? $entry['set'][$field]['en'] ?? $id);
         }
         $own = $entry['set'][$field];
 
-        return (string) ($own['en'] ?? reset($own) ?: ($has ? $translated : ($field === 'name' ? $id : '')));
+        return (string) ($own[$lang] ?? $own['en'] ?? reset($own) ?: ($has ? $translated : ($field === 'name' ? $id : '')));
     }
 
     /**

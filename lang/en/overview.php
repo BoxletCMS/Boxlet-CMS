@@ -21,7 +21,7 @@ return [
     'overview.design_note' => 'the character the site wears',
     'overview.design_today' => 'changed today',
     'overview.design_unchanged' => 'unchanged for :days days',
-    'overview.design_unchanged_one' => 'unchanged since yesterday',
+    'overview.design_unchanged_yesterday' => 'unchanged since yesterday',
 
     'overview.attention' => 'Needs attention',
     'overview.attention_none' => 'Nothing needs attention.',

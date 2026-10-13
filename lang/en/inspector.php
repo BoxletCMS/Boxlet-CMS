@@ -69,7 +69,7 @@ return [
     // Publish's question after a character is loaded (D-068), with a way out of it (D-161).
     'inspector.apply.restyles_one' => 'One section you styled by hand goes back to the character.',
     'inspector.apply.restyles_many' => ':count sections you styled by hand go back to the character.',
-    'inspector.apply.own_layout_one' => 'One block with a layout of your own keeps it.',
+    'inspector.apply.own_layouts_one' => 'One block with a layout of your own keeps it.',
     'inspector.apply.own_layouts_many' => ':count blocks with a layout of their own keep it.',
     'inspector.apply.cancel' => 'Cancel',
     'inspector.apply.cancel_hint' => 'Back to the design as it is published. Nothing changes on the site.',

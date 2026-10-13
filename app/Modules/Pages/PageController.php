@@ -5,6 +5,7 @@ namespace App\Modules\Pages;
 use App\Core\Container;
 use App\Core\Request;
 use App\Core\Response;
+use App\Core\Settings;
 use App\Core\View;
 use App\Modules\Design\Composition;
 use App\Modules\Redirects\Redirects;
@@ -77,9 +78,12 @@ final class PageController
             'title' => $seo['title'] !== '' ? $seo['title'] : (string) $page['title'],
             'description' => $seo['description'],
             'noindex' => $seo['noindex'],
-            // An error page carries no link preview; a real page is where the site's
-            // default sharing picture belongs (D-028).
-            'shareImage' => SiteChrome::shareImage($db),
+            // An error page carries no link preview; a real page is where its own sharing
+            // picture belongs (D-242), else the site's default (D-028).
+            'shareImage' => SiteChrome::shareImage($db, $seo['image']),
+            // What the site is called, for search results and link previews (D-242): on a
+            // language's home page only, which is the page that stands for the site.
+            'website' => $slug === '' ? PageSharing::website(Settings::text($db, 'site_name'), Url::canonical($locale, ''), $locale) : '',
             // The one address this page is indexed under, whatever variant reached it.
             'canonical' => Url::canonical($locale, $slug),
             // What a header laid over the page stands on (D-112).
