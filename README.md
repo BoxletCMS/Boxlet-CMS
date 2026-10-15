@@ -6,6 +6,10 @@ Upload a ZIP, open a page in your browser, answer four questions. Fifteen minute
 have a multilingual site that looks designed, not like a template with the logo swapped. No
 shell, no Composer, no Node, no build step. An FTP client and a browser are enough.
 
+**[⬇ Download the latest Boxlet](https://github.com/BoxletCMS/Boxlet-CMS/releases/latest/download/boxlet.zip)**
+· [What's new](https://github.com/BoxletCMS/Boxlet-CMS/releases/latest)
+· [Try the demo](https://demo.boxletcms.org)
+
 > **v0.1 is the first release.** From here on, updates keep your site as it is: no fresh
 > install between versions, and each update is taken from the admin.
 

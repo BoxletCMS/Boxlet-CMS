@@ -5,7 +5,9 @@
 #   2. builds the release there, with that tag's own tools/release/build.php: vendor/ without
 #      the development tools, and nothing of the project's own papers
 #   3. puts the result in this repository, as a commit and the same tag
-#   4. publishes a GitHub Release here with the ZIP a person uploads to their hosting
+#   4. publishes a GitHub Release here with the ZIP a person uploads to their hosting, attached
+#      twice: as boxlet-<version>.zip, which Boxlet's update check reads, and as boxlet.zip, which
+#      /releases/latest/download/boxlet.zip always fetches
 #
 # No token and no key: the development repository is public, so it is read without one, and
 # this workflow writes only to its own repository, which its own GITHUB_TOKEN may do.
@@ -94,7 +96,11 @@ jobs:
           set -euo pipefail
           flag=""
           if [ "${{ inputs.prerelease }}" = "true" ]; then flag="--prerelease"; fi
-          gh release create "$VERSION" "$RUNNER_TEMP/out/boxlet-$VERSION.zip" \
+          # The same ZIP a second time under a name that never changes, so
+          # /releases/latest/download/boxlet.zip always fetches the newest release (the README's
+          # download link). The update check in Boxlet reads only boxlet-<version>.zip.
+          cp "$RUNNER_TEMP/out/boxlet-$VERSION.zip" "$RUNNER_TEMP/out/boxlet.zip"
+          gh release create "$VERSION" "$RUNNER_TEMP/out/boxlet-$VERSION.zip" "$RUNNER_TEMP/out/boxlet.zip" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Boxlet $VERSION" \
             --notes "Built from [BoxletCMS/boxlet-cms-dev@${SHA:0:7}](https://github.com/BoxletCMS/boxlet-cms-dev/commit/$SHA).
