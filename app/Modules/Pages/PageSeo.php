@@ -73,6 +73,26 @@ final class PageSeo
     }
 
     /**
+     * THE TITLE A PAGE IS SHOWN WITH in a search result and a browser tab (D-004, D-245, the
+     * owner): the search title the owner wrote, exactly as written; else the page's title, and
+     * on a subpage the site's name after it, "Design · Boxlet CMS", so a result names the site
+     * it belongs to. A home page stands for the site already, and a title that already names
+     * the site is not given it twice. builder-page.js shows the same in its search preview.
+     */
+    public static function shownTitle(string $seoTitle, string $pageTitle, string $siteName, bool $home): string
+    {
+        if ($seoTitle !== '') {
+            return $seoTitle;
+        }
+        $siteName = trim($siteName);
+        if ($home || $siteName === '' || mb_stripos($pageTitle, $siteName) !== false) {
+            return $pageTitle;
+        }
+
+        return $pageTitle . ' · ' . $siteName;
+    }
+
+    /**
      * The pages whose own sharing picture is $mediaId, id => title (D-242): for the Media
      * library's "Used on" and its refusal to delete a picture a page still uses. The LIKE
      * narrows, the decode decides, as for a block's picture: "image":7 is also "image":70.

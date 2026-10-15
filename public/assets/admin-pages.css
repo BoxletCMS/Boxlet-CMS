@@ -26,6 +26,18 @@
   white-space: nowrap;
 }
 
+/* The title's link is what is cut short, not only the cell: an inline link kept its whole
+   width past the cell's clipped edge, so on a phone a long title's link stood beyond the window
+   (21-admin-screens, "Restoring the press hall" to 412px at 390, D-270). The Home badge stays
+   beside it. */
+.page-tree .page-name a {
+  display: inline-block;
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
 .page-tree .lang abbr {
   color: var(--ui-ink-muted);
   font-family: var(--ui-mono);

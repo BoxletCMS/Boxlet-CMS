@@ -5,7 +5,7 @@ use App\Support\Url;
 /**
  * The messages sent through one form, newest first (PLAN.md D-046).
  *
- * @var array{id: int, name: string} $form
+ * @var array{id: int, name: string, settings: array{keep: bool}} $form
  * @var list<array{id: int, unread: bool, created: string, summary: string}> $messages
  * @var string $zone
  * @var array{at: string, reason: string}|null $failure the last message the site could not send
@@ -25,6 +25,10 @@ use App\Support\Url;
         <div class="notice notice-warning" role="status">
             <p><?= e(t('messages.mail_failed', ['when' => \App\Support\Dates::local($failure['at'], $zone), 'reason' => $failure['reason']])) ?> <a href="<?= e(Url::admin('settings') . '#mail') ?>"><?= e(t('forms.mail_settings')) ?></a></p>
         </div>
+<?php endif; ?>
+
+<?php if (!$form['settings']['keep']): ?>
+        <p class="notice" role="status"><?= e(t('forms.not_kept')) ?><?= $messages !== [] ? ' ' . e(t('forms.not_kept_earlier')) : '' ?> <a href="<?= e(Url::admin('forms', $form['id'])) ?>"><?= e(t('messages.edit_form')) ?></a></p>
 <?php endif; ?>
 
 <?php if ($messages === []): ?>

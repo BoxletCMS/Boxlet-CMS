@@ -1,0 +1,50 @@
+/* Where an AI translation runs (PLAN.md D-248). Admin tokens only (--ui-*). */
+
+.ai-progress progress {
+  inline-size: 100%;
+  block-size: 0.6rem;
+  accent-color: var(--ui-accent);
+}
+
+.ai-progress-count {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.ai-progress-pages {
+  display: grid;
+  gap: var(--ui-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ai-progress-pages li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ui-2);
+}
+
+.ai-progress-lang {
+  color: var(--ui-ink-muted);
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-xs);
+}
+
+.ai-progress-state {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-sm);
+}
+
+.ai-progress-done {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Said instead of the step button while the script runs the parts by itself (D-259). */
+.ai-progress-running {
+  margin: 0;
+  color: var(--ui-ink-muted);
+}

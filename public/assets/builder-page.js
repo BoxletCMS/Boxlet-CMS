@@ -32,6 +32,17 @@
     field('slug').value = doc.slug;
   }
 
+  /**
+   * The title the page is shown with (PageSeo::shownTitle(), D-245): the search title as
+   * written; else the page title, and on a subpage the site's name after it.
+   */
+  function shownTitle(seoTitle, pageTitle, site, home) {
+    site = site.trim();
+    if (seoTitle !== '') { return seoTitle; }
+    if (home || site === '' || pageTitle.toLowerCase().indexOf(site.toLowerCase()) !== -1) { return pageTitle; }
+    return pageTitle + ' · ' + site;
+  }
+
   function seo() {
     try { return JSON.parse(pb.doc.seo_json || '{}') || {}; } catch (e) { return {}; }
   }
@@ -46,7 +57,7 @@
     address.textContent = url;
     slugHint.textContent = slug === '' ? slugHint.getAttribute('data-home-hint') : (pb.data.page.state === 'draft' && !slugEdited ? slugHint.getAttribute('data-auto-hint') : '');
     var s = seo();
-    serp.querySelector('[data-pb-serp-title]').textContent = (s.title || pb.doc.title || '') + ' · ' + serp.getAttribute('data-site');
+    serp.querySelector('[data-pb-serp-title]').textContent = shownTitle(s.title || '', pb.doc.title || '', serp.getAttribute('data-site') || '', slug === '' && parent.value === '');
     serp.querySelector('[data-pb-serp-url]').textContent = url.replace(/^https?:\/\//, '');
     serp.querySelector('[data-pb-serp-text]').textContent = s.description || '';
     document.querySelector('[data-pb-title]').textContent = pb.doc.title || '';

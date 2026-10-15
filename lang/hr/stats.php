@@ -46,6 +46,7 @@ return [
     'stats.trend' => 'Posjetitelji i pregledi po danima',
     'stats.trend_weekly' => 'Posjetitelji i pregledi po tjednima',
     'stats.trend_week' => 'Posljednjih 7 dana',
+    'stats.chart_label' => 'Grafikon, dan po dan: tipkama strelica lijevo i desno čitate brojke svakog dana.',
     'stats.as_table' => 'Prikaži brojke kao tablicu',
     'stats.day' => 'Dan',
     'stats.week_of' => 'Tjedan od',

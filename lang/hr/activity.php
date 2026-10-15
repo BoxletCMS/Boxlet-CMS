@@ -39,6 +39,7 @@ return [
     'activity.page.reordered' => 'Promijenjen redoslijed stranica',
     'activity.page.placed' => 'Stranica „:name“ premještena u stablu stranica',
     'activity.page.translated' => 'Prevedena stranica „:name“',
+    'activity.page.ai_translated' => 'Prevedeno s AI: :name',
 
     'activity.media.uploaded' => 'Učitana datoteka :name',
     'activity.media.described' => 'Dodan opis za :name',
@@ -56,6 +57,7 @@ return [
     'activity.menu.renamed' => 'Izbornik preimenovan u „:name“',
     'activity.menu.edited' => 'Promijenjene stavke izbornika „:name“',
     'activity.menu.deleted' => 'Obrisan izbornik „:name“',
+    'activity.menu.matched' => 'Izbornici na jeziku :name usklađeni s glavnim jezikom',
     'activity.update.done' => 'Boxlet ažuriran na :name',
     'activity.update.rolled_back' => 'Boxlet vraćen na :name',
     'activity.settings.cache_on' => 'Uključena privremena memorija (cache) stranica',
@@ -89,6 +91,7 @@ return [
 
     'activity.settings.saved' => 'Spremljene postavke web-stranice',
     'activity.settings.mail_saved' => 'Spremljene postavke slanja e-pošte',
+    'activity.settings.ai_saved' => 'Spremljene postavke AI prijevoda',
     'activity.settings.language_added' => 'Dodan jezik :name',
     'activity.settings.language_on' => 'Uključen jezik :name',
     'activity.settings.language_off' => 'Isključen jezik :name',

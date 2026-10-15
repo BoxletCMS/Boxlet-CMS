@@ -3,7 +3,7 @@
 namespace App\Modules\Auth;
 
 use App\Core\Db;
-use App\Modules\Mailer\Secret;
+use App\Support\Secret;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;

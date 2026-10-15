@@ -88,7 +88,7 @@ $vector = static function (string $slot) use ($logoSvg): string {
                  the part wanted. Plain anchors; settings-nav.js only marks where you are. */ ?>
         <div class="settings-layout">
         <nav class="settings-nav" aria-label="<?= e(t('settings.sections')) ?>" data-settings-nav>
-<?php foreach (['general' => 'settings.general', 'branding' => 'settings.branding', 'maintenance' => 'maintenance.title', 'cache' => 'cache.title', 'llms' => 'llms.title', 'languages' => 'languages.title', 'mail' => 'mail.title', 'account' => 'account.title', 'statistics' => 'stats.title'] as $anchor => $key): ?>
+<?php foreach (['general' => 'settings.general', 'branding' => 'settings.branding', 'maintenance' => 'maintenance.title', 'cache' => 'cache.title', 'llms' => 'llms.title', 'languages' => 'languages.title', 'mail' => 'mail.title', 'ai' => 'ai.title', 'account' => 'account.title', 'statistics' => 'stats.title'] as $anchor => $key): ?>
             <a href="#<?= e($anchor) ?>"><?= e(t($key)) ?></a>
 <?php endforeach; ?>
         </nav>
@@ -222,6 +222,8 @@ $vector = static function (string $slot) use ($logoSvg): string {
 <?php require dirname(__DIR__, 2) . '/Languages/views/panel.php'; ?>
 
 <?php require dirname(__DIR__, 2) . '/Mailer/views/panel.php'; ?>
+
+<?php require dirname(__DIR__, 2) . '/Ai/views/panel.php'; ?>
 
 <?php require dirname(__DIR__, 2) . '/Auth/views/two-step-panel.php'; ?>
 

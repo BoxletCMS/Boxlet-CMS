@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Modules\Mailer;
+namespace App\Support;
 
 use RuntimeException;
 
 /**
  * A password or API key kept in the settings table, sealed with the site's APP_KEY
- * (PLAN.md D-045).
+ * (PLAN.md D-045): the mail passwords, and since D-248 the AI provider's key, which made it
+ * Support's rather than the Mailer's.
  *
  * The database is the part of a site most often copied — a backup, a move to another
  * host, a dump handed to someone for help — and .env is not in it. Sealing with the key

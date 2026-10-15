@@ -37,6 +37,7 @@ return [
     'activity.page.reordered' => 'Reordered the pages',
     'activity.page.placed' => 'Moved “:name” in the page tree',
     'activity.page.translated' => 'Translated “:name”',
+    'activity.page.ai_translated' => 'Translated with AI: :name',
 
     'activity.media.uploaded' => 'Uploaded :name',
     'activity.media.described' => 'Described :name',
@@ -54,6 +55,7 @@ return [
     'activity.menu.renamed' => 'Renamed a menu to “:name”',
     'activity.menu.edited' => 'Changed the items of “:name”',
     'activity.menu.deleted' => 'Deleted the menu “:name”',
+    'activity.menu.matched' => 'Matched the menus in :name with the main language',
     'activity.update.done' => 'Updated Boxlet to :name',
     'activity.update.rolled_back' => 'Rolled Boxlet back to :name',
     'activity.settings.cache_on' => 'Turned the page cache on',
@@ -87,6 +89,7 @@ return [
 
     'activity.settings.saved' => 'Saved the site settings',
     'activity.settings.mail_saved' => 'Saved how the site sends mail',
+    'activity.settings.ai_saved' => 'Saved the AI translation settings',
     'activity.settings.language_added' => 'Added :name',
     'activity.settings.language_on' => 'Switched :name on',
     'activity.settings.language_off' => 'Switched :name off',

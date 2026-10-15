@@ -4,6 +4,7 @@ namespace App\Modules\Demo;
 
 use App\Core\Db;
 use App\Modules\Menus\Menu;
+use App\Modules\Menus\MenuCopy;
 use App\Modules\Settings\SiteChrome;
 
 /**
@@ -41,20 +42,17 @@ final class DemoChrome
     }
 
     /**
-     * The menus of a language the demo translated only some pages into: those pages, in the
-     * order the site's own menus have them.
+     * The menus of a language the demo translated only some pages into: the site's own menus
+     * over those pages, as copying a page makes them (MenuCopy, D-262), so each item remembers
+     * its original and copying the rest of the pages fills the menus in the same shape.
      *
      * @param array<string, int> $translated page key => id, in $locale
-     * @param list<array{key: string, menu: string}> $pages
      */
-    public static function translatedMenus(Db $db, string $locale, array $pages, array $translated): void
+    public static function translatedMenus(Db $db, string $locale, array $translated): void
     {
-        $main = Menu::create($db, $locale, 'Main');
-        $footer = Menu::create($db, $locale, 'Footer');
-        foreach ($pages as $page) {
-            if (isset($translated[$page['key']]) && ($page['menu'] === 'main' || $page['menu'] === 'footer')) {
-                Menu::addItem($db, $page['menu'] === 'main' ? $main : $footer, null, $translated[$page['key']], null, null);
-            }
+        $from = (string) ($db->one("SELECT locale FROM menus WHERE locale <> ? ORDER BY id LIMIT 1", [$locale])['locale'] ?? '');
+        if ($from !== '' && $translated !== []) {
+            MenuCopy::sync($db, $from, $locale);
         }
         self::footer($db, $locale, $locale === 'hr' ? 'hr' : 'en');
     }

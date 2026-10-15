@@ -20,6 +20,7 @@ return [
     'site.form.choose' => 'Odaberite…',
     'site.form.error' => 'Ispravite označena polja.',
     'site.form.too_many' => 'Previše poruka u kratkom vremenu. Pokušajte ponovno kasnije.',
+    'site.form.not_sent' => 'Vašu poruku trenutno nije moguće poslati. Pokušajte ponovno malo kasnije.',
     'site.form.optional' => '(neobavezno)',
     'site.form.field_name' => 'Ime',
     'site.form.field_email' => 'E-pošta',

@@ -20,6 +20,7 @@ return [
     'overview.design' => 'Design',
     'overview.design_note' => 'the character the site wears',
     'overview.design_today' => 'changed today',
+    'overview.design_unchanged_one' => 'unchanged for :days day',
     'overview.design_unchanged' => 'unchanged for :days days',
     'overview.design_unchanged_yesterday' => 'unchanged since yesterday',
 

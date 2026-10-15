@@ -20,6 +20,7 @@ return [
     'site.form.choose' => 'Bitte wählen…',
     'site.form.error' => 'Bitte korrigieren Sie die markierten Felder.',
     'site.form.too_many' => 'Zu viele Nachrichten in kurzer Zeit. Bitte versuchen Sie es später erneut.',
+    'site.form.not_sent' => 'Ihre Nachricht konnte gerade nicht gesendet werden. Bitte versuchen Sie es in Kürze erneut.',
     'site.form.optional' => '(optional)',
     'site.form.field_name' => 'Name',
     'site.form.field_email' => 'E-Mail',

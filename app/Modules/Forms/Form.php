@@ -18,7 +18,7 @@ use App\Modules\Pages\Slug;
  * is edited freely, and the key is what ties an answer to its field while the form is sent.
  *
  * @phpstan-type Field array{key: string, type: string, label: string, required: bool, options: list<string>}
- * @phpstan-type FormSettings array{submit: string, success: string, notify: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string}
+ * @phpstan-type FormSettings array{submit: string, success: string, notify: bool, keep: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string}
  * @phpstan-type FormRow array{id: int, locale: string, name: string, fields: list<Field>, settings: FormSettings}
  */
 final class Form
@@ -168,6 +168,10 @@ final class Form
             $key = self::key($label, $taken);
             $fields[] = ['key' => $key, 'type' => 'text', 'label' => $label, 'required' => false, 'options' => []];
         }
+        // A message must reach the owner somewhere (D-269): kept here, emailed, or both.
+        if (($settings['keep'] ?? '') !== '1' && ($settings['notify'] ?? '') !== '1') {
+            $errors['keep'] = t('forms.keep_or_notify');
+        }
         if ($fields === []) {
             $errors['fields'] = t('forms.fields_required');
         } elseif (count($fields) > self::MAX_FIELDS) {
@@ -182,6 +186,7 @@ final class Form
                 'submit' => $text('submit', 60),
                 'success' => $text('success', 500),
                 'notify' => ($settings['notify'] ?? '') === '1',
+                'keep' => ($settings['keep'] ?? '') === '1',
                 'autoreply' => ($settings['autoreply'] ?? '') === '1',
                 'autoreply_subject' => $text('autoreply_subject', 200),
                 'autoreply_body' => $text('autoreply_body', 5000),
@@ -214,8 +219,9 @@ final class Form
     }
 
     /**
-     * Stored settings, every key present. A new form notifies its owner and sends no
-     * reply: a reply to a visitor is words the owner should have written.
+     * Stored settings, every key present. A new form notifies its owner, keeps nothing a
+     * visitor wrote (D-269: the owner's choice, for GDPR) and sends no reply: a reply to a
+     * visitor is words the owner should have written.
      *
      * @return FormSettings
      */
@@ -229,6 +235,8 @@ final class Form
             'submit' => $string('submit'),
             'success' => $string('success'),
             'notify' => ($stored['notify'] ?? true) === true,
+            // What a visitor wrote is kept only when the owner turns it on (D-269, GDPR).
+            'keep' => ($stored['keep'] ?? false) === true,
             'autoreply' => ($stored['autoreply'] ?? false) === true,
             'autoreply_subject' => $string('autoreply_subject'),
             'autoreply_body' => $string('autoreply_body'),

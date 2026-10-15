@@ -13,8 +13,9 @@ use App\Support\Url;
  *
  * With one language on the site there is nothing to choose, and the menu is a plain label.
  *
- * @var list<array{code: string, label: string, page: int|null, current: bool}> $languages
+ * @var list<array{code: string, label: string, page: int|null, current: bool, source: bool}> $languages
  * @var array<string, mixed> $page
+ * @var bool $aiReady whether Translate with AI is offered beside Translate (D-248)
  * @var string $state published, changes or draft (D-173): a published page is translated as it
  *      is published, and with changes not yet published the menu says they stay behind
  */
@@ -35,10 +36,25 @@ $here = (string) $page['locale'];
                         <li lang="<?= e($language['code']) ?>">
 <?php if ($language['current']): ?>
                             <span class="menu-popover-item" aria-current="page"><?= e($language['label']) ?> <span class="hint"><?= e(t('translations.this_page')) ?></span></span>
+<?php if ($aiReady && !$language['source']): ?>
+                        </li>
+                        <li lang="<?= e($language['code']) ?>">
+                            <button type="submit" form="ai-page-<?= e((string) $language['page']) ?>" class="menu-popover-item" data-confirm="<?= e(t('ai.retranslate_confirm')) ?>"><?= e($language['label']) ?> <span class="hint"><?= e(t('ai.translate_this')) ?></span></button>
+<?php endif; ?>
 <?php elseif ($language['page'] !== null): ?>
                             <a class="menu-popover-item" href="<?= e(Url::admin('pages', $language['page'])) ?>"><?= e($language['label']) ?> <span class="hint"><?= e(t('translations.open')) ?></span></a>
+<?php if ($aiReady && !$language['source']): ?>
+                        </li>
+                        <li lang="<?= e($language['code']) ?>">
+                            <button type="submit" form="ai-page-<?= e((string) $language['page']) ?>" class="menu-popover-item" data-confirm="<?= e(t('ai.retranslate_confirm')) ?>"><?= e($language['label']) ?> <span class="hint"><?= e(t('ai.translate')) ?></span></button>
+<?php endif; ?>
 <?php else: ?>
                             <button type="submit" form="translate-<?= e($language['code']) ?>" class="menu-popover-item"><?= e($language['label']) ?> <span class="hint"><?= e(t('translations.translate')) ?></span></button>
+<?php if ($aiReady): ?>
+                        </li>
+                        <li lang="<?= e($language['code']) ?>">
+                            <button type="submit" form="translate-<?= e($language['code']) ?>" name="ai" value="1" class="menu-popover-item"><?= e($language['label']) ?> <span class="hint"><?= e(t('ai.translate')) ?></span></button>
+<?php endif; ?>
 <?php endif; ?>
                         </li>
 <?php endforeach; ?>

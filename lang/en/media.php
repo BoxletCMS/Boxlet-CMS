@@ -54,6 +54,7 @@ return [
     'media.show.undescribed' => 'No description',
     'media.show.none' => 'No picture is left by this filter.',
     'media.show.every' => 'Show every picture',
+    'media.count_one' => ':count file · :size',
     'media.count' => ':count files · :size',
     'media.col.picture' => 'Picture',
     'media.col.file' => 'File',

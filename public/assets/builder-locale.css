@@ -1,0 +1,80 @@
+/* The builder's language menu (PLAN.md D-043, D-248, D-252): the page's language as a button, and
+   under it every language with this page's version there: open it, make it, or translate it with
+   AI. A <details>, so it needs no script. Lost with the old editor's stylesheet in D-175, when the
+   menu stood as a bare list with bullets under the bar; put back from it (found 2026-10-13). */
+
+.builder-locale {
+  position: relative;
+  font-size: var(--ui-text-sm);
+}
+
+span.builder-locale {
+  padding: var(--ui-2) var(--ui-3);
+  color: var(--ui-ink-muted);
+}
+
+.builder-locale > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-2);
+  list-style: none;
+  cursor: pointer;
+}
+
+.builder-locale > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* What a translation will not carry (D-173): said in the menu, before the choice. */
+.menu-popover-note {
+  max-inline-size: 16rem;
+  padding: var(--ui-1) var(--ui-2);
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+.menu-popover-list {
+  position: absolute;
+  top: calc(100% + var(--ui-1));
+  inset-inline-end: 0;
+  z-index: 3;
+  display: grid;
+  gap: var(--ui-1);
+  min-inline-size: 16rem;
+  margin: 0;
+  padding: var(--ui-2);
+  list-style: none;
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-m);
+  box-shadow: var(--ui-shadow-m);
+}
+
+.menu-popover-item {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ui-3);
+  inline-size: 100%;
+  padding: var(--ui-2) var(--ui-3);
+  border: 0;
+  border-radius: var(--ui-radius-s);
+  background: none;
+  color: var(--ui-ink);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.menu-popover-item:hover,
+button.menu-popover-item:hover,
+a.menu-popover-item:focus-visible,
+button.menu-popover-item:focus-visible {
+  background: var(--ui-panel-sunken);
+}
+
+.menu-popover-item[aria-current] {
+  cursor: default;
+  font-weight: 600;
+}

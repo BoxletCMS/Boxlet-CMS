@@ -14,14 +14,20 @@ namespace App\Modules\Stats;
  *
  * The exact figures for each point are in a <title> on a column the width of that point, a
  * tooltip on hover; the screen puts the same figures in a table for everyone else.
+ *
+ * WITH THE SCRIPT (stats-chart.js, D-266, the owner): a line follows the pointer from point to
+ * point, with a dot on each line and a small window with that day's figures, as Plausible and
+ * most statistics draw it; the arrow keys do the same from the keyboard. The points are handed
+ * to it as data on the plot, in the same 100 by 100 box the lines are drawn in.
  */
 final class Chart
 {
     /**
      * @param list<array{day: string, visitors: int, views: int}> $series
      * @param callable(string): string $label a point's day as the axis and tooltip show it
+     * @param (callable(string): string)|null $long a point's day as the window over the chart says it, in full
      */
-    public static function trend(array $series, callable $label): string
+    public static function trend(array $series, callable $label, ?callable $long = null): string
     {
         $count = count($series);
         if ($count === 0) {
@@ -50,6 +56,27 @@ final class Chart
         }
         $svg .= '</svg>';
 
+        // What the script draws over the lines (D-266): the points, and the words it says them with.
+        $top100 = max(1, $top);
+        $data = [];
+        foreach ($series as $i => $point) {
+            $data[] = [
+                'x' => round($x($i), 3),
+                'visitorsY' => round(100 - $point['visitors'] * 100 / $top100, 3),
+                'viewsY' => round(100 - $point['views'] * 100 / $top100, 3),
+                'day' => $long !== null ? $long($point['day']) : $label($point['day']),
+                'visitors' => \App\Support\AdminLang::number($point['visitors']),
+                'views' => \App\Support\AdminLang::number($point['views']),
+            ];
+        }
+        $words = ['visitors' => t('stats.visitors'), 'views' => t('stats.views'), 'label' => t('stats.chart_label')];
+        $area = '<div class="stats-chart-area" data-chart-points="' . e((string) json_encode($data, JSON_UNESCAPED_UNICODE)) . '"'
+            . ' data-chart-words="' . e((string) json_encode($words, JSON_UNESCAPED_UNICODE)) . '">' . $svg
+            . '<div class="stats-chart-cursor" hidden></div>'
+            . '<span class="stats-chart-dot stats-chart-dot-views" hidden></span>'
+            . '<span class="stats-chart-dot stats-chart-dot-visitors" hidden></span>'
+            . '<div class="stats-chart-tip" hidden></div></div>';
+
         $axis = '<ol class="stats-chart-y" aria-hidden="true">';
         foreach ([3, 2, 1, 0] as $n) {
             $axis .= '<li>' . e(\App\Support\AdminLang::number($n * $step)) . '</li>';
@@ -63,7 +90,7 @@ final class Chart
         }
         $days .= '</div>';
 
-        return '<div class="stats-chart-plot">' . $axis . $svg . '</div>' . $days;
+        return '<div class="stats-chart-plot">' . $axis . $area . '</div>' . $days;
     }
 
     /**

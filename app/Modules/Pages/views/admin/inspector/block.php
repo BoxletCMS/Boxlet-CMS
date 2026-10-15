@@ -155,6 +155,9 @@ $staleFrom = $translation !== null && $block['id'] !== null ? ($translation['sta
         </dl>
     </details>
     <button type="submit" form="current-<?= e((string) $block['id']) ?>" class="button button-secondary"><?= e(t('translations.mark_current')) ?></button>
+<?php if ($aiReady ?? false): ?>
+    <button type="submit" form="ai-again-<?= e((string) $block['id']) ?>" class="button button-secondary"><?= icon('languages') ?> <?= e(t('ai.translate_again')) ?></button>
+<?php endif; ?>
 </div>
 <?php endif; ?>
 <?php /* data-block, as the plain editor's group has it: the picker, its cover button, the crop's

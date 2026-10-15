@@ -21,6 +21,7 @@ return [
     'site.form.choose' => 'Escolha…',
     'site.form.error' => 'Corrija os campos assinalados abaixo.',
     'site.form.too_many' => 'Muitas mensagens enviadas daqui em pouco tempo. Tente novamente mais tarde.',
+    'site.form.not_sent' => 'Não foi possível enviar a sua mensagem neste momento. Tente novamente daqui a pouco.',
     'site.form.optional' => '(opcional)',
     'site.form.field_name' => 'Nome',
     'site.form.field_email' => 'E-mail',

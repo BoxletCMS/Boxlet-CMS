@@ -20,6 +20,7 @@ return [
     'site.form.choose' => 'Scegli…',
     'site.form.error' => 'Correggi i campi evidenziati.',
     'site.form.too_many' => 'Troppi messaggi in poco tempo. Riprova più tardi.',
+    'site.form.not_sent' => 'Il tuo messaggio non è stato inviato in questo momento. Riprova tra poco.',
     'site.form.optional' => '(facoltativo)',
     'site.form.field_name' => 'Nome',
     'site.form.field_email' => 'Email',

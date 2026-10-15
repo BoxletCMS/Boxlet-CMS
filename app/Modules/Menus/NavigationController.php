@@ -90,6 +90,37 @@ final class NavigationController
     }
 
     /**
+     * MATCH A LANGUAGE'S MENUS WITH THE MAIN LANGUAGE'S (PLAN.md D-262): what the main
+     * language's menus have and this language's lack, added, for pages it has a version of.
+     * Nothing of the owner's is moved or removed (MenuCopy). Copying a page does the same.
+     *
+     * @param array<string, string> $params
+     */
+    public function match(Request $request, string $locale, array $params): Response
+    {
+        $db = $this->db();
+        $to = trim($request->input('locale'));
+        $main = (string) ($db->one('SELECT code FROM locales WHERE is_primary = 1')['code'] ?? '');
+        $label = $db->one('SELECT label FROM locales WHERE code = ? AND enabled = 1', [$to]);
+        $session = $this->container->get('session');
+        if ($label === null || $to === $main || $main === '') {
+            $session->set('flash', t('translations.unknown_language'));
+            $session->set('flash_kind', 'warning');
+
+            return Response::redirect(Url::admin('navigation') . '#navigation-menus-title');
+        }
+        $added = MenuCopy::sync($db, $main, $to);
+        if ($added > 0) {
+            Activity::record($db, 'menu', 'matched', null, (string) $label['label']);
+        }
+        $session->set('flash', $added > 0
+            ? tn('menus.matched', $added, ['language' => (string) $label['label']])
+            : t('menus.matched_none', ['language' => (string) $label['label']]));
+
+        return Response::redirect(Url::admin('navigation') . '#navigation-menus-title');
+    }
+
+    /**
      * The screen for a state of the header's and footer's words, with the menus under it.
      * MenusController draws it too, when a new menu is refused.
      *
@@ -116,6 +147,8 @@ final class NavigationController
             'errors' => $errors,
             'notice' => $notice,
             'menus' => Menu::all($db),
+            // The languages a menu can be matched into: every one but the main (D-262).
+            'mainLocale' => (string) ($db->one('SELECT code FROM locales WHERE is_primary = 1')['code'] ?? ''),
             'menuErrors' => $menuErrors,
             'locales' => $this->container->get('locales'),
             'shownLocale' => Url::primaryLocale() !== '' ? Url::primaryLocale() : ($locales[0] ?? 'en'),

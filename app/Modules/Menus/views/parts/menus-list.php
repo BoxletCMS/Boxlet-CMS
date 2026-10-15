@@ -9,6 +9,7 @@ use App\Support\Url;
  * @var list<array{id: int, locale: string, name: string, items: int}> $menus
  * @var list<array<string, mixed>> $locales
  * @var array<string, string> $menuErrors
+ * @var string $mainLocale the main language's code, the one other languages' menus are matched with (D-262)
  * @var string $csrf
  * @var Closure(string, string): string $hint
  */
@@ -54,6 +55,32 @@ $menuError = static fn (string $key): string => isset($menuErrors[$key])
 <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
+<?php endif; ?>
+
+<?php
+    // MATCHING ANOTHER LANGUAGE'S MENUS (D-262): one button per language beside the main one.
+    $mainLabel = '';
+    foreach ($locales as $locale) {
+        if ((string) $locale['code'] === $mainLocale) {
+            $mainLabel = (string) $locale['label'];
+        }
+    }
+    $others = array_values(array_filter($locales, static fn (array $locale): bool => (string) $locale['code'] !== $mainLocale));
+?>
+<?php if ($mainLocale !== '' && $others !== []): ?>
+        <div class="panel stack">
+            <h3><?= e(t('menus.match_title')) ?></h3>
+            <?= $hint('menus-match-hint', t('menus.match_intro', ['main' => $mainLabel])) ?>
+            <div class="form-actions">
+<?php foreach ($others as $locale): ?>
+                <form method="post" action="<?= e(Url::admin('navigation', 'match')) ?>">
+                    <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                    <input type="hidden" name="locale" value="<?= e((string) $locale['code']) ?>">
+                    <button type="submit" class="button button-secondary"><?= e(t('menus.match', ['language' => (string) $locale['label'], 'main' => $mainLabel])) ?></button>
+                </form>
+<?php endforeach; ?>
+            </div>
         </div>
 <?php endif; ?>
 

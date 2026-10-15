@@ -8,6 +8,12 @@ return [
     'menus.intro' => 'What visitors are offered, and what it is called there. A menu belongs to one language.',
     'menus.none' => 'No menus yet.',
 
+    'menus.match_title' => 'Menus in other languages',
+    'menus.match_intro' => 'A page copied into another language takes its place in that language’s menus by itself. If the :main menus change later, match them again: what they have and the other language’s lack is added, for pages that language has. Nothing you arranged there is moved or removed.',
+    'menus.match' => 'Match :language with :main',
+    'menus.matched_one' => 'One item was added to the :language menus.',
+    'menus.matched' => ':count items were added to the :language menus.',
+    'menus.matched_none' => 'The :language menus already have everything they can.',
     'menus.new' => 'New menu',
     'menus.name' => 'Name',
     'menus.name_hint' => 'Only you see this name, never visitors: call it Header, Footer or whatever tells you where it goes. The header and footer choose a menu by it.',
@@ -31,6 +37,7 @@ return [
     'menus.col.label' => 'Shown as',
     'menus.col.target' => 'Goes to',
     'menus.col.actions' => 'Actions',
+    'menus.items_count_one' => ':count item',
     'menus.items_count' => ':count items',
 
     'menus.item.add' => 'Add item',

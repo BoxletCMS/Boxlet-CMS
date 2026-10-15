@@ -129,6 +129,7 @@ final class Search
             [t('settings.share_image'), $settings . '#site_share_image', 'branding social sharing'],
             [t('languages.title'), $settings . '#languages', 'language translation'],
             [t('mail.title'), $settings . '#mail', 'mail smtp resend sending'],
+            [t('ai.title'), $settings . '#ai', 'ai claude anthropic translate translation api key'],
             [t('twofactor.title'), $settings . '#two-step', 'security login 2fa code'],
             [t('stats.title'), $settings . '#statistics', 'statistics tracking privacy'],
             [t('maintenance.title'), $settings . '#maintenance', 'closed offline'],

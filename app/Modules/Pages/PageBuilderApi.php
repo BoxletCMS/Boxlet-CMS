@@ -93,6 +93,8 @@ final class PageBuilderApi
             'formChoices' => \App\Modules\Forms\Form::choices($this->db(), (string) $page['locale']),
             'linkPages' => PageLinks::choices($this->db(), (string) $page['locale']),
             'translation' => $kind === 'block' ? TranslationStatus::described($this->db(), $this->registry(), (int) $page['id']) : null,
+            // Translate again with AI beside Mark as up to date (D-248), only with a key saved.
+            'aiReady' => \App\Modules\Ai\AiSettings::ready($this->db(), (string) $this->container->get('config')->get('app.key')),
         ], null);
 
         return Response::json(['html' => $html]);

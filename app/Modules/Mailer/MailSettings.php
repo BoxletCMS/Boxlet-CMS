@@ -2,6 +2,7 @@
 
 namespace App\Modules\Mailer;
 
+use App\Support\Secret;
 use App\Core\Db;
 use App\Core\Settings;
 use Symfony\Component\Mailer\Transport\NullTransport;

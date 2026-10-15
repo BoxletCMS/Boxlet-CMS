@@ -15,6 +15,10 @@ use App\Support\Url;
  * @var string $zone the site's time zone, for the Last edited column
  * @var array{id: int, parent: int|null, position: int}|null $undo where the page just placed was (D-133)
  * @var int $maxLevels how deep the tree may go (PagePlacing::MAX_LEVELS)
+ * @var array<int, array<string, int>> $versions page id => every language's version of it, locale => id (D-247)
+ * @var bool $aiReady whether Translate with AI is offered (D-248)
+ * @var array<int, true> $drafted the pages with a draft: unpublished changes, or never published (D-265)
+ * @var array<int, true> $sources the pages that are originals: AI translates from them, never into them (D-252)
  * @var string $csrf
  */
 // The page above each row among its own siblings: what → places it under (D-133). The list
@@ -92,6 +96,32 @@ foreach ($pages as $row) {
     $bulkAction = Url::admin('pages', 'delete');
     $bulkWords = 'pages.bulk';
     $bulkKeep = ['lang' => $lang, 'q' => $query];
+    // PUBLISH OR UNPUBLISH THE TICKED PAGES (D-254, D-265), each as its row's button does. With
+    // the script each is shown only when it applies to a ticked page, with how many it would
+    // change: Publish to a draft or a page with unpublished changes, Unpublish to a page on the
+    // site; a choice of both shows both. Without it both stand, and each passes over the rest.
+    $bulkExtra = '<button type="submit" class="button button-secondary button-small" formaction="' . e(Url::admin('pages', 'publish')) . '" data-bulk-also data-bulk-when="publishable">'
+        . icon('eye') . ' ' . e(t('pages.bulk.publish')) . '<span data-bulk-n></span></button>'
+        . '<button type="submit" class="button button-secondary button-small" formaction="' . e(Url::admin('pages', 'unpublish')) . '" data-bulk-also data-bulk-when="unpublishable" data-bulk-quiet>'
+        . icon('eye-off') . ' ' . e(t('pages.bulk.unpublish')) . '<span data-bulk-n></span></button>';
+    // COPY INTO A LANGUAGE (D-247): only where the site has more than one, and only into one
+    // the list is not showing — pages filtered to Croatian are in Croatian already (D-254). A
+    // group of its own after Delete, read as a sentence: copy into [language] [and translate
+    // with AI] (the owner, D-265).
+    $bulkAfter = '';
+    $targets = array_values(array_filter($codes, static fn (string $code): bool => $code !== $lang));
+    if (count($codes) > 1 && $targets !== []) {
+        $chosen = $lang === '' ? $codes[1] : $targets[0];
+        $bulkAfter = '<button type="submit" class="button button-secondary button-small" formaction="' . e(Url::admin('pages', 'copy')) . '" data-bulk-also>'
+            . icon('languages') . ' ' . e(t('pages.bulk.copy')) . '</button>'
+            . '<label class="visually-hidden" for="bulk-copy-to">' . e(t('pages.bulk.copy_label')) . '</label>'
+            . '<select id="bulk-copy-to" name="to" class="list-bulk-select">';
+        foreach ($targets as $code) {
+            $bulkAfter .= '<option value="' . e($code) . '"' . ($code === $chosen ? ' selected' : '') . '>' . e($localeLabels[$code] ?? $code) . '</option>';
+        }
+        $bulkAfter .= '</select>'
+            . ($aiReady ? '<label class="checkbox list-bulk-ai"><input type="checkbox" name="ai" value="1"> ' . e(t('ai.bulk')) . '</label>' : '');
+    }
     require dirname(__DIR__, 3) . '/Admin/views/bulk.php';
 ?>
         <div class="table-wrap">
@@ -124,7 +154,7 @@ foreach ($pages as $row) {
                              parent, the title it names as a parent, whether it is a home page,
                              which takes no subpages, and where to send the page. */ ?>
                     <tr data-page-id="<?= $id ?>" data-page-group="<?= e($group) ?>" data-depth="<?= e((string) $page['depth']) ?>" data-locale="<?= e($page['locale']) ?>" data-parent="<?= $page['parent'] > 0 ? e((string) $page['parent']) : '' ?>" data-title="<?= e($page['title']) ?>"<?= $page['slug'] === '' ? ' data-home' : '' ?> data-place="<?= e(Url::admin('pages', $id, 'place')) ?>">
-                        <td class="col-pick"><input type="checkbox" name="ids[]" value="<?= $id ?>" form="pages-bulk" data-bulk-pick aria-label="<?= e(t('pages.bulk.pick', ['title' => $page['title']])) ?>"></td>
+                        <td class="col-pick"><input type="checkbox" name="ids[]" value="<?= $id ?>" form="pages-bulk" data-bulk-pick<?= !$published || isset($drafted[$id]) ? ' data-publishable' : '' ?><?= $published ? ' data-unpublishable' : '' ?> aria-label="<?= e(t('pages.bulk.pick', ['title' => $page['title']])) ?>"></td>
                         <td class="page-order">
 <?php if ($query === ''): ?>
                             <span class="drag-handle" data-page-handle aria-hidden="true"><?= icon('grip-vertical') ?></span>
@@ -190,6 +220,42 @@ foreach ($pages as $row) {
 <?php if ($published): ?>
                                     <a href="<?= e($address) ?>" target="_blank" rel="noopener"><?= icon('external-link') ?> <?= e(t('pages.view_on_site')) ?></a>
 <?php endif; ?>
+<?php /* This page in the site's other languages (D-247): its version opened where there is one,
+         made as the builder's Translate makes it where there is not. */ ?>
+<?php /* A version that exists, translated again from its original with AI (D-252): this page,
+         where it is a translation, and its versions in the other languages. */ ?>
+<?php if ($aiReady && !isset($sources[$id])): ?>
+                                    <form method="post" action="<?= e(Url::admin('pages', $id, 'ai')) ?>">
+                                        <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                                        <button type="submit" data-confirm="<?= e(t('ai.retranslate_confirm')) ?>"><?= icon('languages') ?> <?= e(t('ai.translate_this')) ?></button>
+                                    </form>
+<?php endif; ?>
+<?php foreach ($localeLabels as $code => $label): ?>
+<?php if ($code === $page['locale']) { continue; } ?>
+<?php if (isset($versions[$id][$code])): ?>
+                                    <a href="<?= e(Url::admin('pages', $versions[$id][$code])) ?>"><?= icon('languages') ?> <?= e(t('pages.open_in', ['language' => $label])) ?></a>
+<?php if ($aiReady && !isset($sources[$versions[$id][$code]])): ?>
+                                    <form method="post" action="<?= e(Url::admin('pages', $versions[$id][$code], 'ai')) ?>">
+                                        <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                                        <button type="submit" data-confirm="<?= e(t('ai.retranslate_confirm')) ?>"><?= icon('languages') ?> <?= e(t('ai.translate_into', ['language' => $label])) ?></button>
+                                    </form>
+<?php endif; ?>
+<?php else: ?>
+                                    <form method="post" action="<?= e(Url::admin('pages', $id, 'translate')) ?>">
+                                        <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                                        <input type="hidden" name="locale" value="<?= e($code) ?>">
+                                        <button type="submit"><?= icon('languages') ?> <?= e(t('pages.translate_into', ['language' => $label])) ?></button>
+                                    </form>
+<?php if ($aiReady): ?>
+                                    <form method="post" action="<?= e(Url::admin('pages', $id, 'translate')) ?>">
+                                        <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                                        <input type="hidden" name="locale" value="<?= e($code) ?>">
+                                        <input type="hidden" name="ai" value="1">
+                                        <button type="submit"><?= icon('languages') ?> <?= e(t('ai.translate_into', ['language' => $label])) ?></button>
+                                    </form>
+<?php endif; ?>
+<?php endif; ?>
+<?php endforeach; ?>
                                     <form method="post" action="<?= e(Url::admin('pages', $id, 'delete')) ?>">
                                         <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                                         <button type="submit" class="row-menu-danger" data-confirm="<?= e(t('pages.delete_confirm', ['title' => $page['title']])) ?>"><?= icon('trash-2') ?> <?= e(t('pages.delete')) ?></button>

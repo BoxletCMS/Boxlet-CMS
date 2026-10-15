@@ -6,8 +6,8 @@ Upload a ZIP, open a page in your browser, answer four questions. Fifteen minute
 have a multilingual site that looks designed, not like a template with the logo swapped. No
 shell, no Composer, no Node, no build step. An FTP client and a browser are enough.
 
-> **This is a release candidate for v0.1.** It is what v0.1 will be unless testing finds a
-> fault. From v0.1 on, updates keep your site as it is: no fresh install between versions.
+> **v0.1 is the first release.** From here on, updates keep your site as it is: no fresh
+> install between versions, and each update is taken from the admin.
 
 ![The Boxlet CMS page builder: the demo's home page, its hero selected](https://raw.githubusercontent.com/BoxletCMS/boxlet-cms-dev/main/tools/release/readme/builder.jpg)
 
@@ -187,12 +187,32 @@ It gets there by leaving things out, and by keeping what it can:
   `hreflang` come for free.
 - **Built-in words** such as form labels, buttons and "page not found" are already translated
   into English, German, Spanish, French, Croatian, Italian and Portuguese.
+- **Copying a page into another language** brings its place in that language's menus and its
+  forms with it. Tick several pages to copy, publish or unpublish them at once.
+
+## Translating with AI
+
+- **Optional, with your own key.** Paste an Anthropic API key in Settings → AI translation and
+  choose a model. The list comes from Anthropic, so new models appear on their own. Nothing is
+  sent until a key is saved, and you pay Anthropic only for what you use.
+- **One page, or many at once.** Translate a page from its row or from the editor, or tick
+  several and use Copy into language with "and translate with AI". Each part goes into the
+  page's draft, and nothing is published until you have read it.
+- **Everything a page brings with it:** its title, address and description for search engines,
+  every block's words, its pictures' descriptions, its forms, and that language's menus and
+  header and footer words.
+- **Boxlet keeps the structure.** Links to your own pages lead to the right language's pages,
+  and menus keep their order and levels. Words you wrote yourself are never replaced.
+- **Checked, not trusted.** Markup, `{{tags}}`, addresses and the words you list as never to
+  translate stay as they are. An answer that fails a check keeps the original words and says so.
 
 ## Forms and email
 
 - **A form builder** with text, email, phone, long text, choice and checkbox fields.
-- **Messages are kept in the admin**, and emailed to you as they arrive, with an optional
-  automatic reply to the sender.
+- **Messages are emailed to you** as they arrive, with an optional automatic reply to the
+  sender. Keeping them in the admin as well is your choice for each form, and off until you
+  turn it on: what a visitor writes is not stored on your server unless you decide it should
+  be.
 - **Spam protection with no CAPTCHA:** a hidden field, a timing check and a per-sender limit.
 - **Email through SMTP or [Resend](https://resend.com)**, whose web API still works on hosts
   that block SMTP. A test button tells you it works before a client finds out it doesn't.

@@ -21,6 +21,7 @@ return [
     'design.preset_loaded' => '“:preset” is filled in below. Check the preview, then choose how to apply it.',
     'design.not_saved' => 'Nothing was saved. Fix the decisions marked below.',
     'design.saved' => 'Design saved. The site uses it from now on.',
+    'design.saved_with_composition_one' => 'Design saved, and one section was reset to the “:character” composition.',
     'design.saved_with_composition' => 'Design saved, and :count sections were reset to the “:character” composition.',
     'design.save' => 'Save design',
     'design.update_preview' => 'Update preview',

@@ -78,9 +78,53 @@
   margin-bottom: var(--ui-3);
 }
 
+/* A second group after Delete, set apart by a rule (D-265): on Pages, the language tools, which
+   act on the ticked pages in another way than publishing or deleting them. */
+.list-bulk-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-3);
+  margin-inline-start: var(--ui-3);
+  padding-inline-start: var(--ui-5);
+  border-inline-start: var(--ui-border) solid var(--ui-line);
+}
+
+/* Where the bar is too narrow to keep the group on the same line, the rule would stand alone
+   at the start of the next one: there the group is set apart by its line instead. */
+@media (max-width: 47.5rem) {
+  .list-bulk-group {
+    margin-inline-start: 0;
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+}
+
 .list-bulk-count {
   color: var(--ui-ink-muted);
   font-size: var(--ui-text-sm);
+}
+
+/* The language Pages' "Copy into language" copies into (D-247): a field's select, as admin-forms.css
+   draws one, but as wide as its words and as tall as the small buttons beside it. */
+.admin .list-bulk-select {
+  box-sizing: border-box;
+  inline-size: auto;
+  min-block-size: 2rem;
+  padding: var(--ui-1) var(--ui-2);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-control-soft);
+  border-bottom-color: var(--ui-control-line);
+  border-radius: var(--ui-radius-m);
+  color: var(--ui-ink);
+  font: inherit;
+  font-size: var(--ui-text-sm);
+}
+
+.admin .list-bulk-select:focus {
+  border-color: var(--ui-accent);
+  box-shadow: var(--ui-ring);
+  outline: none;
 }
 
 .col-pick {

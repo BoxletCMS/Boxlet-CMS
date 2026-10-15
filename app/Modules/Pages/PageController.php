@@ -70,12 +70,13 @@ final class PageController
         $firstSurface = $body['firstSurface'];
 
         // D-004. THE ONLY PLACE THE TITLE FALLS BACK. An empty <title> is worse than one
-        // repeating the page's own, so the page title stands in; an empty description is
-        // better than one repeating the title, so it stays empty and the tag is dropped.
+        // repeating the page's own, so the page title stands in, with the site's name after it
+        // on a subpage (D-245); an empty description is better than one repeating the title, so
+        // it stays empty and the tag is dropped.
         $seo = PageSeo::of($page);
 
         $response = $this->render('page', $locale, [
-            'title' => $seo['title'] !== '' ? $seo['title'] : (string) $page['title'],
+            'title' => PageSeo::shownTitle($seo['title'], (string) $page['title'], Settings::text($db, 'site_name'), $slug === ''),
             'description' => $seo['description'],
             'noindex' => $seo['noindex'],
             // An error page carries no link preview; a real page is where its own sharing

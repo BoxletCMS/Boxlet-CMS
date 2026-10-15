@@ -65,6 +65,14 @@
   white-space: nowrap;
 }
 
+/* The link is what is cut short, as on Pages (D-270): left inline, its box ran past the
+   clipped cell and the window's edge on a phone. */
+.media-row-name .media-link {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Numbers, sizes and dimensions in the monospace every figure is set in. */
 .media-table .numeric {
   color: var(--ui-ink-muted);

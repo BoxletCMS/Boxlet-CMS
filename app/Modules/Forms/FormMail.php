@@ -12,13 +12,15 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
- * The two messages a form may send once a visitor's message is stored (PLAN.md D-046): the
+ * The two messages a form may send once a visitor's message is in (PLAN.md D-046): the
  * owner told about it, and the sender answered with the words the owner wrote.
  *
- * THE MESSAGE IS ALREADY SAFE when this runs. Mail that fails — a wrong password, a host
- * that blocks the port — never costs the visitor's message or their thank-you page: the
- * failure is recorded (MailSettings::recordFailure) and shown to the owner in the admin,
- * where the message itself is waiting.
+ * WHERE THE FORM KEEPS ITS MESSAGES (D-269, the owner's choice), the message is already safe
+ * when this runs: mail that fails — a wrong password, a host that blocks the port — never
+ * costs it or the visitor's thank-you page; the failure is recorded (MailSettings::
+ * recordFailure) and shown to the owner in the admin, where the message is waiting. Where it
+ * keeps none, the email is the only copy: the caller asks whether it went, and tells the
+ * visitor it did not.
  *
  * The notification is in the admin's language, for the owner; the reply is the owner's own
  * words, in the form's language.
@@ -26,16 +28,18 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 final class FormMail
 {
     /**
-     * @param array{id: int, locale: string, name: string, fields: list<array<string, mixed>>, settings: array{submit: string, success: string, notify: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string}} $form
+     * @param array{id: int, locale: string, name: string, fields: list<array<string, mixed>>, settings: array{submit: string, success: string, notify: bool, keep: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string}} $form
      * @param list<array{key: string, label: string, type: string, value: string}> $answers
      * @param array<string, mixed>|null $page
+     * @return bool whether the owner's notification went
      */
-    public static function send(Container $container, array $form, array $answers, ?array $page): void
+    public static function send(Container $container, array $form, array $answers, ?array $page): bool
     {
         $db = $container->get('db');
         if (!MailSettings::configured($db)) {
-            return;
+            return false;
         }
+        $notified = false;
         $addresses = MailSettings::addresses($db);
         $site = Settings::text($db, 'site_name');
         $from = new Address($addresses['from'], $addresses['fromName']);
@@ -58,7 +62,12 @@ final class FormMail
                 if ($page !== null) {
                     $lines[] = t('forms.mail.from_page', ['page' => (string) $page['title'], 'url' => Url::canonical((string) $page['locale'], (string) $page['slug'])]);
                 }
-                $lines[] = t('forms.mail.all_messages', ['url' => Url::withOrigin(Url::admin('forms', $form['id'], 'messages'))]);
+                // Only a form that keeps its messages has them in the admin to point at.
+                if ($form['settings']['keep']) {
+                    $lines[] = t('forms.mail.all_messages', ['url' => Url::withOrigin(Url::admin('forms', $form['id'], 'messages'))]);
+                } else {
+                    $lines[] = t('forms.mail.not_kept');
+                }
 
                 $notice = (new Email())
                     ->from($from)
@@ -71,6 +80,7 @@ final class FormMail
                     $notice->replyTo($sender);
                 }
                 $transport->send($notice);
+                $notified = true;
             }
 
             if ($form['settings']['autoreply'] && $form['settings']['autoreply_body'] !== '' && $sender !== '') {
@@ -83,5 +93,7 @@ final class FormMail
         } catch (TransportExceptionInterface | RfcComplianceException $e) {
             MailSettings::recordFailure($db, $e->getMessage());
         }
+
+        return $notified;
     }
 }

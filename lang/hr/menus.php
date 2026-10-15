@@ -8,6 +8,13 @@ return [
     'menus.intro' => 'Što se nudi posjetiteljima i kako se to ondje zove. Izbornik pripada jednom jeziku.',
     'menus.none' => 'Još nema izbornika.',
 
+    'menus.match_title' => 'Izbornici na drugim jezicima',
+    'menus.match_intro' => 'Stranica kopirana na drugi jezik sama dobiva svoje mjesto u izbornicima tog jezika. Ako se izbornici na jeziku :main kasnije promijene, uskladite ih ponovno: dodaje se ono što oni imaju, a drugi jezik nema, za stranice koje taj jezik ima. Ništa što ste ondje složili ne premješta se i ne briše.',
+    'menus.match' => 'Uskladi :language s jezikom :main',
+    'menus.matched_one' => ':count stavka dodana je u izbornike na jeziku :language.',
+    'menus.matched_few' => ':count stavke dodane su u izbornike na jeziku :language.',
+    'menus.matched' => ':count stavki dodano je u izbornike na jeziku :language.',
+    'menus.matched_none' => 'Izbornici na jeziku :language već imaju sve što mogu imati.',
     'menus.new' => 'Novi izbornik',
     'menus.name' => 'Naziv',
     'menus.name_hint' => 'Ovaj naziv vidite samo vi, nikad posjetitelji: nazovite ga Zaglavlje, Podnožje ili kako god vam govori gdje stoji. Zaglavlje i podnožje po njemu biraju izbornik.',

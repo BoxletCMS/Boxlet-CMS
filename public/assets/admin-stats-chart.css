@@ -113,6 +113,115 @@
   fill-opacity: 0.35;
 }
 
+/* With stats-chart.js (D-266): a line at the day under the pointer, a dot on each line, and a
+   window with that day's figures. Placed by the script in percentages of this box, which is the
+   SVG's own: the points are in the same 100 by 100. The column's own shading gives way. */
+.stats-chart-area {
+  position: relative;
+  min-inline-size: 0;
+}
+
+.stats-chart-area:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: var(--ui-2);
+  border-radius: var(--ui-radius-s);
+}
+
+.stats-chart-live .stats-hit:hover {
+  fill: transparent;
+}
+
+.stats-chart-cursor {
+  position: absolute;
+  inset-block: 0;
+  inline-size: 1px;
+  background: var(--ui-line-strong);
+  pointer-events: none;
+}
+
+.stats-chart-dot {
+  position: absolute;
+  inline-size: 0.625rem;
+  block-size: 0.625rem;
+  border: 2px solid var(--ui-panel);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.stats-chart-dot-visitors {
+  background: var(--ui-accent);
+}
+
+.stats-chart-dot-views {
+  background: var(--ui-control-line);
+}
+
+.stats-chart-tip {
+  position: absolute;
+  inset-block-start: 0;
+  z-index: 2;
+  display: grid;
+  gap: var(--ui-1);
+  min-inline-size: 11rem;
+  padding: var(--ui-3);
+  background: var(--ui-panel);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius-m);
+  box-shadow: var(--ui-shadow-m);
+  font-size: var(--ui-text-sm);
+  transform: translateX(var(--ui-3));
+  pointer-events: none;
+}
+
+/* Past the middle, the window stands before the line, so it never runs off the chart. */
+.stats-chart-tip-before {
+  transform: translateX(calc(-100% - var(--ui-3)));
+}
+
+.stats-chart-tip p {
+  margin: 0;
+}
+
+.stats-chart-tip-day {
+  margin-block-end: var(--ui-1);
+  color: var(--ui-ink);
+  font-weight: 600;
+}
+
+.stats-chart-tip-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-2);
+  color: var(--ui-ink-muted);
+}
+
+.stats-chart-tip-row strong {
+  margin-inline-start: auto;
+  padding-inline-start: var(--ui-4);
+  color: var(--ui-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The key of each row: the line's own mark, as the legend draws it. */
+.stats-chart-tip-row span::before {
+  content: "";
+  display: inline-block;
+  inline-size: 0.75rem;
+  block-size: 0.1875rem;
+  margin-inline-end: var(--ui-2);
+  vertical-align: middle;
+  border-radius: var(--ui-radius-s);
+}
+
+.stats-chart-tip-visitors span::before {
+  background: var(--ui-accent);
+}
+
+.stats-chart-tip-views span::before {
+  background: var(--ui-control-line);
+}
+
 .stats-chart-x {
   display: flex;
   justify-content: space-between;

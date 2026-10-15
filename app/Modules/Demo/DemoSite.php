@@ -129,8 +129,10 @@ final class DemoSite
         foreach ((require __DIR__ . '/forms.php')($lang) as $key => $form) {
             $ids[$key] = Form::create($db, $locale, $form['name']);
             $made = Form::find($db, $ids[$key]);
-            if ($form['fields'] !== null && $made !== null) {
-                Form::update($db, $ids[$key], $form['name'], $form['fields'], $made['settings']);
+            // The demo's forms keep their messages (D-269): a fresh demo has no mail set up, and
+            // a form that keeps nothing would turn every visitor away. A new form keeps nothing.
+            if ($made !== null) {
+                Form::update($db, $ids[$key], $form['name'], $form['fields'] ?? $made['fields'], ['keep' => true] + $made['settings']);
             }
         }
 
@@ -151,8 +153,15 @@ final class DemoSite
         if ($db->one('SELECT code FROM locales WHERE code = ?', [$other]) === null) {
             Locales::add($db, $other);
         }
-        // The other language's own forms: a form belongs to one language (Form::choices).
+        // The other language's own forms: a form belongs to one language (Form::choices). Each
+        // remembers the form it is the version of, as a form copied with a page does (D-262).
+        $originals = $media['forms'];
         $media['forms'] = self::forms($db, $other, $other);
+        foreach ($media['forms'] as $key => $id) {
+            if (isset($originals[$key])) {
+                $db->query('UPDATE forms SET source_form_id = ? WHERE id = ?', [$originals[$key], $id]);
+            }
+        }
         $theirs = [];
         foreach (self::pages($other) as $page) {
             $theirs[$page['key']] = $page;
@@ -189,7 +198,7 @@ final class DemoSite
             ], $blocks, $sections);
             $translated[$key] = $id;
         }
-        DemoChrome::translatedMenus($db, $other, $pages, $translated);
+        DemoChrome::translatedMenus($db, $other, $translated);
     }
 
     /**

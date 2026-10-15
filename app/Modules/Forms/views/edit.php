@@ -9,9 +9,10 @@ use App\Support\Url;
  * (FormsController), so it works the same with or without a script. form-builder.js only
  * shows a field's list options when its type is a list.
  *
- * @var array{id: int, locale: string, name: string, fields: list<array{key: string, type: string, label: string, required: bool, options: list<string>}>, settings: array{submit: string, success: string, notify: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string}} $form
+ * @var array{id: int, locale: string, name: string, fields: list<array{key: string, type: string, label: string, required: bool, options: list<string>}>, settings: array{submit: string, success: string, notify: bool, keep: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string}} $form
  * @var string $language the form's language, by name
  * @var array<string, string> $errors
+ * @var bool $mailReady whether the site can send mail (D-269)
  * @var string $csrf
  */
 $error = static fn (string $key): string => isset($errors[$key])
@@ -104,6 +105,19 @@ $settings = $form['settings'];
                         <span class="hint" id="form-success-hint"><?= e(t('forms.success_hint')) ?></span>
                     </div>
                 </div>
+
+                <?php /* KEPT OR ONLY EMAILED (D-269, the owner): what a visitor writes is stored
+                         only when the owner turns this on, off by default for GDPR. One of the
+                         two must be on, or a message would reach nobody (Form::parse). */ ?>
+                <label class="checkbox">
+                    <input type="checkbox" name="settings[keep]" value="1"<?= $settings['keep'] ? ' checked' : '' ?>>
+                    <?= e(t('forms.keep')) ?>
+                </label>
+                <p class="hint"><?= e(t('forms.keep_hint')) ?></p>
+                <?= $error('keep') ?>
+<?php if (!$settings['keep'] && !$mailReady): ?>
+                <p class="notice notice-warning"><?= e(t('forms.mail_missing')) ?> <a href="<?= e(Url::admin('settings') . '#mail') ?>"><?= e(t('forms.mail_settings')) ?></a></p>
+<?php endif; ?>
 
                 <label class="checkbox">
                     <input type="checkbox" name="settings[notify]" value="1"<?= $settings['notify'] ? ' checked' : '' ?>>

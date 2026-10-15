@@ -1,7 +1,8 @@
 /*
  * THE TICKED ROWS (PLAN.md D-218): the bar above Pages' and Media's lists (Admin/views/bulk.php)
  * says how many rows are ticked, keeps Delete off while none is, and asks with the count;
- * the tick in the head ticks every row of the list, or none.
+ * the tick in the head ticks every row of the list, or none. An action that applies to some
+ * rows only is shown when it applies to a ticked one, with how many (D-265).
  *
  * Without it the bar still works: the ticks are real checkboxes of the bar's form, and Delete
  * asks the general question admin.js asks of every data-confirm.
@@ -23,6 +24,20 @@
       var ticked = boxes.filter(function (box) { return box.checked; }).length;
       count.textContent = ticked === 0 ? count.getAttribute('data-none') : count.getAttribute('data-some').replace(':count', String(ticked));
       button.disabled = ticked === 0;
+      // The bar's other actions (Pages' "Copy into language", D-247): off while none is ticked.
+      Array.prototype.forEach.call(form.querySelectorAll('[data-bulk-also]'), function (also) { also.disabled = ticked === 0; });
+      // An action for some of the ticked rows only (Pages' Publish and Unpublish, D-265): shown
+      // when it applies to one, with how many; with none ticked, off, or out of the way when it
+      // says data-bulk-quiet. A row says what applies to it: data-publishable, data-unpublishable.
+      Array.prototype.forEach.call(form.querySelectorAll('[data-bulk-when]'), function (action) {
+        var mark = 'data-' + action.getAttribute('data-bulk-when');
+        var applies = boxes.filter(function (box) { return box.checked && box.hasAttribute(mark); }).length;
+        var n = action.querySelector('[data-bulk-n]');
+        action.hidden = ticked === 0 ? action.hasAttribute('data-bulk-quiet') : applies === 0;
+        if (n) {
+          n.textContent = ticked === 0 ? '' : ' (' + applies + ')';
+        }
+      });
       button.setAttribute('data-confirm', button.getAttribute('data-confirm-some').replace(':count', String(ticked)));
       if (all) {
         all.checked = ticked > 0 && ticked === boxes.length;

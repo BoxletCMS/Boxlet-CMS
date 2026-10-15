@@ -70,6 +70,8 @@ final class StatsController
             'nav' => 'statistics',
             'wide' => true,
             'styles' => ['admin-stats.css', 'admin-stats-chart.css', 'admin-stats-map.css'],
+            // The line and window that follow the pointer over the chart (D-266).
+            'scripts' => ['stats-chart.js'],
             'filter' => $filter,
             'totals' => $totals,
             // DB-IP's licence asks for credit where its countries are shown (CC BY 4.0).

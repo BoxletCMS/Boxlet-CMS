@@ -86,6 +86,15 @@ final class RestoreRows
         $this->foreignKeys(false);
         $pdo->beginTransaction();
         try {
+            // THE TABLE IS THE BACKUP'S, emptied again as its first piece goes in (D-249). schema()
+            // emptied it, but every step is a request of its own, and a request builds the router,
+            // which compiles the stylesheet when settings has none and records tokens_css and
+            // tokens_code: loading settings then stopped on a duplicate key ("Duplicate entry
+            // 'tokens_code'", measured on MySQL), the site closed. What a request wrote between
+            // the steps goes; the backup's rows come in its place.
+            if ($at === 0) {
+                $this->db->query('DELETE FROM ' . BackupTables::quote($this->db, $table));
+            }
             for ($i = 0; $i < self::ROWS_PER_INSERT && ($line = fgets($in)) !== false; $i++) {
                 $row = json_decode($line, true, 512, JSON_THROW_ON_ERROR);
                 $columns = array_keys($row);

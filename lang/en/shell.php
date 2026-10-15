@@ -14,6 +14,7 @@ return [
     'auth.password' => 'Password',
     'auth.submit' => 'Log in',
     'auth.failed' => 'The email or password is incorrect.',
+    'auth.throttled_one' => 'Too many login attempts. Try again in :minutes minute.',
     'auth.throttled' => 'Too many login attempts. Try again in :minutes minutes.',
     'auth.session_ended' => 'Your login ended: it was unused for a while, or the password was changed. Log in again to carry on.',
 

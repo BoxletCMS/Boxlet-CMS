@@ -129,6 +129,21 @@ $container->set('maintenance', fn () => new Maintenance($storage));
 // replace it with one that keeps what it is given.
 // The key is fetched as ['key'] rather than by the dotted 'app.key', for the reason
 // $databasePath gives above: the route guard reads any get('...') ending in an extension.
+// One question to the AI provider (D-248), with the owner's own key and model: Claude, over
+// HTTPS. Tests replace it, so no request leaves them.
+$container->set('ai_ask', fn (Container $c) => static function (string $system, string $user) use ($c): array {
+    $settings = \App\Modules\Ai\AiSettings::forRequest($c->get('db'), (string) (($c->get('config')->get('app', []))['key'] ?? ''))
+        ?? throw new \App\Modules\Ai\AiFailure(t('ai.error.not_ready'));
+
+    return \App\Modules\Ai\ClaudeClient::ask($settings['key'], $settings['model'], $system, $user);
+});
+// The models the owner's key may use, from Anthropic (D-255). Tests replace it too.
+$container->set('ai_models', fn (Container $c) => static function () use ($c): array {
+    $settings = \App\Modules\Ai\AiSettings::forRequest($c->get('db'), (string) (($c->get('config')->get('app', []))['key'] ?? ''))
+        ?? throw new \App\Modules\Ai\AiFailure(t('ai.error.not_ready'));
+
+    return \App\Modules\Ai\ClaudeClient::models($settings['key']);
+});
 $container->set('mail_transport', fn (Container $c) => MailSettings::transport($c->get('db'), (string) (($c->get('config')->get('app', []))['key'] ?? '')));
 // Media (SPEC §5.5). The encoder probes what this server can actually write, so a host
 // without a WebP delegate refuses clearly instead of writing files nobody can open.
@@ -297,6 +312,9 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->post('/admin/pages/{id:\d+}/delete', [PagesController::class, 'delete'], $requireAdmin);
     // The pages ticked in the list, deleted together (D-218).
     $router->post('/admin/pages/delete', [PagesBulkController::class, 'delete'], $requireAdmin);
+    $router->post('/admin/pages/copy', [PagesBulkController::class, 'copy'], $requireAdmin);
+    $router->post('/admin/pages/publish', [PagesBulkController::class, 'publish'], $requireAdmin);
+    $router->post('/admin/pages/unpublish', [PagesBulkController::class, 'unpublish'], $requireAdmin);
 
     // Pictures (SPEC §5.5). The generated variants live under /m/ and are served from
     // disk by the web server; no route here ever answers for one.
@@ -326,6 +344,7 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // posts a whole sibling order, a button posts one move.
     $router->get('/admin/navigation', [NavigationController::class, 'show'], $requireAdmin);
     $router->post('/admin/navigation', [NavigationController::class, 'save'], $requireAdmin);
+    $router->post('/admin/navigation/match', [NavigationController::class, 'match'], $requireAdmin);
     $router->get('/admin/menus', [MenusController::class, 'index'], $requireAdmin);
     $router->post('/admin/menus', [MenusController::class, 'store'], $requireAdmin);
     $router->get('/admin/menus/{id:\d+}', [MenusController::class, 'edit'], $requireAdmin);
@@ -388,6 +407,15 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // Mail (D-045): how the site sends, and a test message to prove it does.
     $router->post('/admin/settings/mail', [MailController::class, 'save'], $requireAdmin);
     $router->post('/admin/settings/mail/test', [MailController::class, 'test'], $requireAdmin);
+    // AI translation (D-248): its panel, the screen that runs it, and Translate again on a block.
+    $router->post('/admin/settings/ai', [\App\Modules\Ai\AiController::class, 'save'], $requireAdmin);
+    $router->post('/admin/settings/ai/test', [\App\Modules\Ai\AiController::class, 'test'], $requireAdmin);
+    $router->get('/admin/translate', [\App\Modules\Ai\AiController::class, 'progress'], $requireAdmin);
+    $router->post('/admin/translate/step', [\App\Modules\Ai\AiController::class, 'step'], $requireAdmin);
+    $router->post('/admin/translate/retry', [\App\Modules\Ai\AiController::class, 'retry'], $requireAdmin);
+    $router->post('/admin/translate/stop', [\App\Modules\Ai\AiController::class, 'stop'], $requireAdmin);
+    $router->post('/admin/pages/{id:\d+}/blocks/{block:\d+}/ai', [\App\Modules\Ai\AiController::class, 'block'], $requireAdmin);
+    $router->post('/admin/pages/{id:\d+}/ai', [\App\Modules\Ai\AiController::class, 'page'], $requireAdmin);
     // Two-step login (D-050): set up, confirm, new recovery codes, off.
     // Your login (D-132): the admin's own email and password, each behind the current one.
     $router->post('/admin/account/email', [AccountController::class, 'email'], $requireAdmin);

@@ -162,6 +162,8 @@ final class FormsController
             'form' => $form,
             'language' => (string) ($labels[$form['locale']] ?? $form['locale']),
             'errors' => $errors,
+            // Whether a message this form does not keep can reach the owner at all (D-269).
+            'mailReady' => \App\Modules\Mailer\MailSettings::configured($this->db()),
         ], $status);
     }
 

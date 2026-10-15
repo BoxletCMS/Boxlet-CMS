@@ -57,7 +57,11 @@ $figures = [
                     <span class="stats-key stats-key-views"><?= e(t('stats.views')) ?></span>
                 </p>
             </div>
-            <?= Chart::trend($series, static fn (string $day): string => StatsView::day($day)) ?>
+            <?= Chart::trend(
+                $series,
+                static fn (string $day): string => StatsView::day($day),
+                static fn (string $day): string => ($chartByWeek ? t('stats.week_of') . ' ' : '') . StatsView::day($day, true),
+            ) ?>
             <details class="stats-numbers">
                 <summary><?= e(t('stats.as_table')) ?></summary>
                 <table class="stats-table">

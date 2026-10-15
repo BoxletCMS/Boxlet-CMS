@@ -20,9 +20,11 @@ use App\Support\Url;
  * on screen for three seconds (FormToken) — a send failing either is answered exactly as a
  * real one is, so a script learns nothing; one sender may send at most five messages in
  * ten minutes; every field is checked. A refused send draws the page again with the
- * answers kept and each problem beside its field. A send that passes is stored, the owner
- * is told and the sender answered where the form says so (FormMail), and the visitor is
- * sent back to the page with the thank-you — a redirect, so reloading does not send twice.
+ * answers kept and each problem beside its field. A send that passes is stored where the
+ * form keeps its messages (D-269), the owner is told and the sender answered where the form
+ * says so (FormMail), and the visitor is sent back to the page with the thank-you — a
+ * redirect, so reloading does not send twice. A form that keeps nothing and could not email
+ * the owner says so to the visitor instead of thanking them.
  */
 final class FormSubmitController
 {
@@ -55,8 +57,11 @@ final class FormSubmitController
 
         // Behind a proxy, every sender would otherwise share one address and one limit (O-20).
         $ipHash = hash_hmac('sha256', ClientIp::of($request, Settings::text($db, 'trusted_proxies')), $appKey);
+        // Counted from the sends, not the kept messages, which a form may not keep (D-269);
+        // a send older than the window is deleted, its use over.
         $since = gmdate('Y-m-d H:i:s', time() - self::WINDOW_MINUTES * 60);
-        $recent = (int) ($db->one('SELECT COUNT(*) AS n FROM form_submissions WHERE ip_hash = ? AND created_at >= ?', [$ipHash, $since])['n'] ?? 0);
+        $db->query('DELETE FROM form_sends WHERE created_at < ?', [$since]);
+        $recent = (int) ($db->one('SELECT COUNT(*) AS n FROM form_sends WHERE ip_hash = ? AND created_at >= ?', [$ipHash, $since])['n'] ?? 0);
 
         $posted = is_array($request->body['f'] ?? null) ? $request->body['f'] : [];
         [$answers, $old, $errors] = self::check($form['fields'], $posted, $form['locale']);
@@ -67,13 +72,23 @@ final class FormSubmitController
             return $this->again($page, $form['id'], $errors, $old, '', 422);
         }
 
-        $db->query(
-            'INSERT INTO form_submissions (form_id, page_id, data_json, ip_hash, created_at) VALUES (?, ?, ?, ?, ?)',
-            [$form['id'], $page === null ? null : (int) $page['id'], json_encode($answers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE), $ipHash, gmdate('Y-m-d H:i:s')],
-        );
+        $now = gmdate('Y-m-d H:i:s');
+        $db->query('INSERT INTO form_sends (form_id, ip_hash, created_at) VALUES (?, ?, ?)', [$form['id'], $ipHash, $now]);
+        // What the visitor wrote is kept only where the owner chose to keep it (D-269, GDPR).
+        if ($form['settings']['keep']) {
+            $db->query(
+                'INSERT INTO form_submissions (form_id, page_id, data_json, ip_hash, created_at) VALUES (?, ?, ?, ?, ?)',
+                [$form['id'], $page === null ? null : (int) $page['id'], json_encode($answers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE), $ipHash, $now],
+            );
+        }
+        $notified = FormMail::send($this->container, $form, $answers, $page);
+        // Kept nowhere and not emailed, the message would be lost behind a thank-you: the
+        // visitor is told, with what they wrote still in the form, to try again.
+        if (!$form['settings']['keep'] && !$notified) {
+            return $this->again($page, $form['id'], [], $old, site_t('site.form.not_sent', $form['locale']), 503);
+        }
         // A visitor's message, logged against its form: the owner's Overview says one came.
         Activity::record($db, 'message', 'received', (int) $form['id'], (string) $form['name']);
-        FormMail::send($this->container, $form, $answers, $page);
 
         return $thanks;
     }
