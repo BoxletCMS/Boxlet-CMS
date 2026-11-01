@@ -1,0 +1,169 @@
+/* THE BOX THAT ASKS ABOUT COOKIES (PLAN.md O-73; the owner: "kutija u kutu"). A card of the
+   site's own design in the corner, over the page and never covering it: the character's card
+   colour, its type, its corners, shadow and buttons. Only tokens, as every visitor stylesheet.
+
+   It sets the --section-* colours a section would, so the site's .button draws in it exactly
+   as on a plain section of the page. */
+
+.consent {
+  --section-bg: var(--color-card);
+  --section-text: var(--color-text);
+  --section-muted: var(--color-muted);
+  --section-link: var(--color-link);
+  --section-button-bg: var(--color-accent);
+  --section-button-text: var(--color-on-accent);
+  --section-border: var(--color-border);
+  position: fixed;
+  inset-block-end: var(--space-m);
+  inset-inline-end: var(--space-m);
+  z-index: 60;
+  display: grid;
+  gap: var(--space-s);
+  box-sizing: border-box;
+  inline-size: min(25rem, calc(100vw - 2 * var(--space-m)));
+  max-block-size: calc(100vh - 2 * var(--space-m));
+  overflow-y: auto;
+  padding: var(--space-l);
+  color: var(--section-text);
+  background: var(--section-bg);
+  border: var(--border-width) solid var(--section-border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-l);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.consent[hidden],
+.consent [hidden] {
+  display: none;
+}
+
+.consent:focus {
+  outline: none;
+}
+
+.consent-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--heading-weight);
+  line-height: var(--leading-heading);
+}
+
+.consent-text,
+.consent-kind-text,
+.consent-none {
+  margin: 0;
+  color: var(--section-muted);
+}
+
+.consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+  margin-block-start: var(--space-xs);
+}
+
+/* Accept and Reject the same button, each half the row: refusing is as easy as agreeing. */
+.consent-button {
+  flex: 1 1 8rem;
+}
+
+/* Settings: the section's link, underlined at rest, never a control only hover reveals. */
+.consent-more {
+  flex-basis: 100%;
+  padding: var(--space-xs) 0 0;
+  color: var(--section-link);
+  background: none;
+  border: 0;
+  font: inherit;
+  text-align: start;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.consent-choices {
+  display: grid;
+  gap: var(--space-s);
+  padding-block: var(--space-s) 0;
+  border-block-start: var(--border-width) solid var(--section-border);
+}
+
+.consent-kind {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.consent-kind-row {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  font-weight: 700;
+}
+
+.consent-kind-row input {
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  margin: 0;
+  accent-color: var(--section-button-bg);
+}
+
+.consent-always {
+  margin-inline-start: auto;
+  color: var(--section-muted);
+  font-weight: 400;
+}
+
+.consent-cookies summary {
+  color: var(--section-link);
+  cursor: pointer;
+}
+
+.consent-cookie-list {
+  display: grid;
+  gap: var(--space-xs);
+  margin: var(--space-xs) 0 0;
+  padding: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+.consent-cookie-list li {
+  padding-block-end: var(--space-xs);
+  border-block-end: var(--border-width) solid var(--section-border);
+}
+
+.consent-cookie-purpose {
+  display: block;
+  color: var(--section-muted);
+}
+
+/* On a phone, the width of the screen less its margins, along the bottom. */
+@media (max-width: 30rem) {
+  .consent {
+    inset-inline: var(--space-s);
+    inset-block-end: var(--space-s);
+    inline-size: auto;
+    padding: var(--space-m);
+  }
+}
+
+/* "Cookie settings" in the footer, as a link among the small print's. A button, since it opens
+   the box rather than going anywhere; shown by site-consent.js, which is what it needs. */
+.consent-open {
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.site-small-print .site-cookies:not(:first-child) {
+  margin-inline-start: var(--space-s);
+}

@@ -4,7 +4,7 @@ use App\Modules\Stats\Tracker;
 use App\Support\Url;
 
 /**
- * The Statistics panel on the Settings screen (PLAN.md D-051): on or off, whether a
+ * Statistics' settings (PLAN.md D-051), on the Statistics screen's Settings tab since D-294: on or off, whether a
  * browser's Do Not Track or Global Privacy Control is honoured, how long counts are kept,
  * and a way to delete them all. Its forms are its own, outside the settings form.
  *

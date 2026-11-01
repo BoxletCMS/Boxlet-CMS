@@ -51,6 +51,7 @@ return [
     'admin.nav.open' => 'Menu',
     'admin.nav.settings' => 'Settings',
     'admin.nav.redirects' => 'Redirects',
+    'admin.nav.scripts' => 'Scripts & cookies',
     'admin.nav.backups' => 'Backups',
     'admin.nav.updates' => 'Updates',
     'admin.logout' => 'Log out',

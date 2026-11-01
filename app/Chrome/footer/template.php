@@ -25,6 +25,8 @@
  */
 $look = is_array($resolved['look'] ?? null) ? $resolved['look'] : [];
 $credit = is_string($resolved['credit'] ?? null) ? $resolved['credit'] : '';
+// "Cookie settings", where the site asks about cookies (O-73).
+$asks = ($resolved['consent'] ?? false) === true;
 /* Each column's menu, resolved by the layout (D-115): column number => entries, [] for none. */
 $menus = is_array($resolved['menus'] ?? null) ? $resolved['menus'] : [];
 /* HOW MANY COLUMNS THE ARRANGEMENT DRAWS (D-115): one for the one-column arrangements, two
@@ -80,10 +82,10 @@ foreach (array_slice($columns, 0, $shown) as $i => $column) {
          one under the other — one box, so the arrangements can place it as one thing. Drawn
          only when it would hold something: the switcher draws nothing with one language
          (its own rule), and an empty small print is nothing. */ ?>
-<?php if (count($locales) > 1 || $content['small_print'] !== '' || $credit !== ''): ?>
+<?php if (count($locales) > 1 || $content['small_print'] !== '' || $credit !== '' || $asks): ?>
     <div class="site-footer-foot">
 <?php require __DIR__ . '/../../Modules/Pages/views/partials/locale-switcher.php'; ?>
-<?php if ($content['small_print'] !== '' || $credit !== ''): ?>
+<?php if ($content['small_print'] !== '' || $credit !== '' || $asks): ?>
     <p class="site-small-print">
 <?php /* Escaped, its tags then drawn (D-201), by PageLayoutData. */ ?>
 <?= $content['small_print'] !== '' ? (is_string($resolved['small_print'] ?? null) ? $resolved['small_print'] : e($content['small_print'])) : '' ?>
@@ -93,6 +95,11 @@ foreach (array_slice($columns, 0, $shown) as $i => $column) {
                  the site; no target, because a visitor who wants a new tab has a browser
                  that gives them one. */ ?>
         <span class="site-credit"><a href="<?= e($credit) ?>" rel="noopener"><?= e(site_t('site.credit', $locale)) ?></a></span>
+<?php endif; ?>
+<?php if ($asks): ?>
+        <?php /* Hidden until site-consent.js can open the box it names: without the script
+                 nothing waits for an answer, and a button that does nothing is not drawn. */ ?>
+        <span class="site-cookies"><button type="button" class="consent-open" data-consent-open hidden><?= e(site_t('site.consent.settings', $locale)) ?></button></span>
 <?php endif; ?>
     </p>
 <?php endif; ?>

@@ -81,6 +81,8 @@ final class StatsQuery
     public function totals(StatsFilter $filter, ?string $from = null, ?string $to = null): array
     {
         [$where, $params] = $filter->where($from, $to);
+        // The conditions from StatsFilter: columns from DIMENSIONS, values as parameters. (D-275)
+        // nosemgrep: boxlet-sql-built
         $row = $this->db->one(
             "SELECT SUM(visitors) AS visitors, SUM(views) AS views,
                     SUM(CASE WHEN device = 'mobile' THEN visitors ELSE 0 END) AS mobile
@@ -110,6 +112,8 @@ final class StatsQuery
         [$where, $params] = $filter->where();
         [$from, $to] = [$filter->from, $filter->to];
         $found = [];
+        // The conditions from StatsFilter: columns from DIMENSIONS, values as parameters. (D-275)
+        // nosemgrep: boxlet-sql-built
         foreach ($this->db->all(
             "SELECT day, SUM(visitors) AS visitors, SUM(views) AS views FROM stats_views
              WHERE {$where} GROUP BY day",
@@ -156,6 +160,8 @@ final class StatsQuery
         [$where, $params] = $filter->where();
 
         if ($column === 'path') {
+            // The conditions from StatsFilter, values as parameters; LIMIT an int. (D-275)
+            // nosemgrep: boxlet-sql-built
             $rows = $this->db->all(
                 "SELECT path AS value, SUM(views) AS total_views FROM stats_views
                  WHERE {$where} GROUP BY path ORDER BY total_views DESC, path{$cap}",
@@ -183,6 +189,8 @@ final class StatsQuery
             'value' => (string) $row['value'],
             'visitors' => (int) $row['total_visitors'],
             'views' => (int) $row['total_views'],
+        // The column from DIMENSIONS, the conditions from StatsFilter, values as parameters; LIMIT an int. (D-275)
+        // nosemgrep: boxlet-sql-built
         ], $this->db->all(
             // Aliases that are not column names, so ORDER BY cannot be read as the column
             // rather than its sum.
@@ -248,6 +256,8 @@ final class StatsQuery
             'path' => (string) $row['path'],
             'source' => (string) $row['source'],
             'views' => (int) $row['total_views'],
+        // The conditions from StatsFilter, values as parameters; LIMIT an int. (D-275)
+        // nosemgrep: boxlet-sql-built
         ], $this->db->all(
             "SELECT path, source, SUM(views) AS total_views FROM stats_missing
              WHERE {$where} GROUP BY path, source ORDER BY total_views DESC, path{$cap}",

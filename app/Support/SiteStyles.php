@@ -14,7 +14,7 @@ namespace App\Support;
  * without the sheets' own comments (D-205). A relative url() in a sheet is relative to
  * assets/, and is given the way there from cache/.
  * A bundle this replaces is removed only once no kept page can still name it (PageCache's
- * day); a folder that cannot be written gives '' and the layout links the nineteen as before.
+ * day); a folder that cannot be written gives '' and the layout links the sheets one by one as before.
  */
 final class SiteStyles
 {
@@ -23,7 +23,7 @@ final class SiteStyles
         'site.css', 'blocks-hero.css', 'blocks-hero-split.css', 'blocks.css', 'blocks-cards.css',
         'blocks-words.css', 'blocks-accordion.css', 'blocks-stats.css', 'blocks-media.css', 'blocks-enlarge.css',
         'blocks-logos.css', 'blocks-embed.css', 'blocks-downloads.css', 'chrome.css',
-        'chrome-footer.css', 'chrome-header.css', 'sections.css', 'sections-edges.css',
+        'chrome-footer.css', 'chrome-header.css', 'chrome-consent.css', 'sections.css', 'sections-edges.css',
         'sections-steps.css', 'sections-columns.css',
     ];
 
@@ -55,7 +55,7 @@ final class SiteStyles
     }
 
     /**
-     * The nineteen, one after another, each named in a comment and without its own: the
+     * The sheets, one after another, each named in a comment and without its own: the
      * sheets explain themselves at length, and a visitor fetched those words with every first
      * visit, 25 of 36 KB once compressed (D-205). The indentation goes too; nothing inside a
      * declaration is touched, and no sheet holds a comment mark inside a string.

@@ -224,27 +224,7 @@ final class DesignTransferController
      */
     private function exported(string $id, string $name, array $decisions, array $look, string $character, array $ownDark = []): Response
     {
-        $dark = Characters::exists($character) ? Characters::dark($character) : [];
-        $ownDark = array_filter(\App\Modules\Design\Tokens::darkOwn($ownDark), static fn (string $v): bool => $v !== '');
-        if ($dark !== [] || $ownDark !== []) {
-            // On the site a value the owner holds for both modes stands over the character's
-            // dark one; in the file the dark version says so, or it would win there.
-            foreach (\App\Modules\Design\Vocabulary\Decisions::DARK as $key) {
-                if (($decisions[$key] ?? '') !== '') {
-                    $dark[$key] = $decisions[$key];
-                }
-            }
-            $dark = $ownDark + $dark;
-        }
-        $composition = null;
-        if (Characters::exists($character)) {
-            $composition = Characters::composition($character);
-            foreach (Characters::look($character) as $choice => $given) {
-                $look[$choice] = ($look[$choice] ?? '') !== '' ? $look[$choice] : $given;
-            }
-        }
-
-        return $this->file($id, $name, DesignSet::export($id, ['en' => $name], [], $decisions, $look, $composition, '', [], $dark));
+        return $this->file($id, $name, \App\Modules\Design\DesignExport::ofDesign($id, $name, $decisions, $look, $character, $ownDark));
     }
 
     /** The file itself, to be saved rather than shown. */

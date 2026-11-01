@@ -34,12 +34,16 @@ final class RestoreRows
         $this->foreignKeys(false);
         try {
             foreach (array_merge(BackupTables::all($this->db), BackupTables::LEFT_OUT) as $table) {
+                // Table names through BackupTables::quote(), never a value. (D-275)
+                // nosemgrep: boxlet-sql-built
                 $this->db->query('DROP TABLE IF EXISTS ' . BackupTables::quote($this->db, $table));
             }
             (new Migrator($this->db, $this->root . '/migrations'))->migrate($migrations);
             // Emptied, the record of migrations among them: some migrations seed rows (the
             // page templates), and the backup brings those rows as they stood on its site.
             foreach (BackupTables::all($this->db) as $table) {
+                // Table names through BackupTables::quote(), never a value. (D-275)
+                // nosemgrep: boxlet-sql-built
                 $this->db->query('DELETE FROM ' . BackupTables::quote($this->db, $table));
             }
         } finally {
@@ -54,6 +58,8 @@ final class RestoreRows
      */
     private function foreignKeys(bool $on): void
     {
+        // Constant text only. (D-275)
+        // nosemgrep: boxlet-sql-built
         $this->db->pdo()->exec($this->db->driver === 'mysql'
             ? 'SET FOREIGN_KEY_CHECKS = ' . ($on ? '1' : '0')
             : 'PRAGMA foreign_keys = ' . ($on ? 'ON' : 'OFF'));
@@ -93,11 +99,15 @@ final class RestoreRows
             // 'tokens_code'", measured on MySQL), the site closed. What a request wrote between
             // the steps goes; the backup's rows come in its place.
             if ($at === 0) {
+                // Table names through BackupTables::quote(), never a value. (D-275)
+                // nosemgrep: boxlet-sql-built
                 $this->db->query('DELETE FROM ' . BackupTables::quote($this->db, $table));
             }
             for ($i = 0; $i < self::ROWS_PER_INSERT && ($line = fgets($in)) !== false; $i++) {
                 $row = json_decode($line, true, 512, JSON_THROW_ON_ERROR);
                 $columns = array_keys($row);
+                // Table and column names through BackupTables::quote(); every value a parameter. (D-275)
+                // nosemgrep: boxlet-sql-built
                 $this->db->query(
                     'INSERT INTO ' . BackupTables::quote($this->db, $table)
                     . ' (' . implode(', ', array_map(fn (int|string $c): string => BackupTables::quote($this->db, (string) $c), $columns)) . ')'

@@ -5,7 +5,6 @@
 
 return [
     'settings.title' => 'Postavke web-stranice',
-    'settings.intro' => 'Kako se ova web-stranica zove, prema kojem vremenu radi, slike koje je predstavljaju i što posjetitelji vide dok je zatvorena zbog održavanja.',
 
     'settings.site_name' => 'Naziv web-stranice',
     'settings.site_name_hint' => 'Vlastiti naziv web-stranice. Prikazuje se na vrhu administracije i koristi se ondje gdje stranica treba navesti web-stranicu kojoj pripada. Ako ostane prazno, administracija prikazuje Boxlet.',
@@ -42,4 +41,10 @@ return [
     'settings.save' => 'Spremi postavke',
     'settings.saved' => 'Postavke su spremljene.',
     'settings.picture_gone' => 'Jedna od odabranih slika više nije u biblioteci, pa je to polje ispražnjeno.',
+    'settings.tab.maintenance' => 'Održavanje',
+    'settings.tab.ai' => 'AI',
+    'settings.ai.tabs' => 'AI postavke',
+    'settings.ai.translation' => 'Prijevod',
+    'settings.ai.access' => 'AI pristup (MCP)',
+    'settings.ai.search' => 'Za AI tražilice',
 ];

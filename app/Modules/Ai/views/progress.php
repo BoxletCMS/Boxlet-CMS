@@ -33,7 +33,7 @@ $state = static fn (int $id, int $pending, int $failed): string => match (true) 
         </div>
         <p class="page-subtitle"><?= e(t('ai.progress.intro')) ?></p>
 <?php if (!$ready): ?>
-        <p class="notice notice-warning"><?= e(t('ai.progress.not_ready')) ?> <a href="<?= e(Url::admin('settings') . '#ai') ?>"><?= e(t('ai.progress.to_settings')) ?></a></p>
+        <p class="notice notice-warning"><?= e(t('ai.progress.not_ready')) ?> <a href="<?= e(Url::admin('settings', 'ai')) ?>"><?= e(t('ai.progress.to_settings')) ?></a></p>
 <?php endif; ?>
 <?php if ($progress['total'] === 0): ?>
         <p><?= e(t('ai.progress.nothing')) ?></p>

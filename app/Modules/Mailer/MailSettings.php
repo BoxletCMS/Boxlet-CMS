@@ -21,7 +21,10 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 final class MailSettings
 {
     /** The ways a site can send. '' is none: forms still store what is sent, and say so. */
-    public const TRANSPORTS = ['', 'smtp', 'resend', 'sendmail'];
+    public const TRANSPORTS = ['', 'smtp', 'resend', 'brevo', 'mailgun', 'sendmail'];
+
+    /** The keys and passwords, stored sealed, never drawn back (O-72 added Brevo's and Mailgun's). */
+    public const SECRETS = ['smtp_password', 'resend_key', 'brevo_key', 'mailgun_key'];
 
     /**
      * STARTTLS or SSL. No "none": Symfony Mailer 6.4 upgrades to TLS whenever the server
@@ -33,7 +36,8 @@ final class MailSettings
     private const KEYS = [
         'mail_transport', 'mail_from_address', 'mail_from_name', 'mail_notify_address',
         'mail_smtp_host', 'mail_smtp_port', 'mail_smtp_encryption', 'mail_smtp_username',
-        'mail_smtp_password', 'mail_resend_key',
+        'mail_smtp_password', 'mail_resend_key', 'mail_brevo_key', 'mail_mailgun_key',
+        'mail_mailgun_domain', 'mail_mailgun_region',
     ];
 
     /**
@@ -54,6 +58,9 @@ final class MailSettings
         }
         if (!in_array($stored['smtp_encryption'], self::ENCRYPTIONS, true)) {
             $stored['smtp_encryption'] = 'starttls';
+        }
+        if (!isset(MailgunTransport::REGIONS[$stored['mailgun_region']])) {
+            $stored['mailgun_region'] = 'us';
         }
 
         return $stored;
@@ -92,8 +99,15 @@ final class MailSettings
             }
         }
         $stored = self::stored($db);
-        if ($transport === 'resend' && $value('resend_key') === '' && $stored['resend_key'] === '') {
-            $errors['resend_key'] = t('mail.resend_key_required');
+        foreach (['resend', 'brevo', 'mailgun'] as $api) {
+            if ($transport === $api && $value($api . '_key') === '' && $stored[$api . '_key'] === '') {
+                $errors[$api . '_key'] = t('mail.' . $api . '_key_required');
+            }
+        }
+        // The domain Mailgun sends from, as its dashboard names it: a host name, nothing more.
+        $domain = strtolower($value('mailgun_domain'));
+        if ($transport === 'mailgun' && preg_match('~^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$~', $domain) !== 1) {
+            $errors['mailgun_domain'] = t('mail.mailgun_domain_invalid');
         }
         if ($errors !== []) {
             return $errors;
@@ -108,8 +122,10 @@ final class MailSettings
             'smtp_port' => $port,
             'smtp_encryption' => in_array($value('smtp_encryption'), self::ENCRYPTIONS, true) ? $value('smtp_encryption') : 'starttls',
             'smtp_username' => $value('smtp_username'),
+            'mailgun_domain' => $domain,
+            'mailgun_region' => isset(MailgunTransport::REGIONS[$value('mailgun_region')]) ? $value('mailgun_region') : 'us',
         ];
-        foreach (['smtp_password', 'resend_key'] as $secret) {
+        foreach (self::SECRETS as $secret) {
             if ($value($secret) !== '') {
                 $write[$secret] = Secret::seal($value($secret), $appKey);
             }
@@ -132,6 +148,8 @@ final class MailSettings
         return match ($stored['transport']) {
             'smtp' => self::smtp($stored, $appKey),
             'resend' => new ResendTransport(Secret::open($stored['resend_key'], $appKey)),
+            'brevo' => new BrevoTransport(Secret::open($stored['brevo_key'], $appKey)),
+            'mailgun' => new MailgunTransport(Secret::open($stored['mailgun_key'], $appKey), $stored['mailgun_domain'], $stored['mailgun_region']),
             'sendmail' => new SendmailTransport(),
             default => new NullTransport(),
         };

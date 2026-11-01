@@ -15,7 +15,7 @@ use App\Support\Url;
         <div class="page-header">
             <h1><?= e($title) ?></h1>
         </div>
-        <p class="page-subtitle"><a href="<?= e(Url::admin('settings') . '#two-step') ?>"><?= e(t('twofactor.back')) ?></a></p>
+        <p class="page-subtitle"><a href="<?= e(Url::admin('settings', 'account') . '#two-step') ?>"><?= e(t('twofactor.back')) ?></a></p>
 
         <div class="panel stack two-step-setup">
             <ol class="two-step-steps">

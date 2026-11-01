@@ -353,3 +353,11 @@
   flex: 1 1 14rem;
   inline-size: auto;
 }
+
+/* Code and keys in a fixed-width face: a script's code (O-73), an AI key and its address (O-78). */
+.code-input {
+  font-family: var(--ui-mono);
+  font-size: var(--ui-text-sm);
+  line-height: 1.5;
+  tab-size: 2;
+}

@@ -170,6 +170,8 @@ final class Migrator
         }
         try {
             foreach ($statements as $statement) {
+                // A migration's own SQL, from migrations/ in the release, never from a request. (D-275)
+                // nosemgrep: boxlet-sql-built
                 $pdo->exec($statement);
             }
             $this->db->query(

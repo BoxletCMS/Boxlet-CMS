@@ -38,7 +38,7 @@ final class Characters
      */
     public const CORE = ['editorial', 'minimal', 'bold', 'soft', 'brutalist', 'terra', 'clinic', 'gallery', 'launch', 'commons', 'zine', 'couture', 'riso'];
 
-    /** @var array<string, array{source: string, set: array<string, mixed>}>|null id => where it came from and what it is */
+    /** @var array<string, array{source: string, set: array<string, mixed>, by_ai?: bool}>|null id => where it came from and what it is */
     private static ?array $all = null;
     /** @var list<array{file: string, reason: string}> */
     private static array $skipped = [];
@@ -86,6 +86,12 @@ final class Characters
     public static function source(string $id): string
     {
         return self::all()[$id]['source'] ?? '';
+    }
+
+    /** Whether an AI client kept this character over MCP (D-290). */
+    public static function byAi(string $id): bool
+    {
+        return self::all()[$id]['by_ai'] ?? false;
     }
 
     /**
@@ -225,7 +231,7 @@ final class Characters
     }
 
     /**
-     * @return array<string, array{source: string, set: array<string, mixed>}>
+     * @return array<string, array{source: string, set: array<string, mixed>, by_ai?: bool}>
      */
     private static function all(): array
     {

@@ -33,6 +33,8 @@ final class ThemeController
         $theme = is_string($wanted) && in_array($wanted, Theme::NAMES, true) ? $wanted : Theme::FALLBACK;
 
         return new Response('', 302, [
+            // back() keeps only this admin's own addresses; anything else goes to the dashboard. (D-275)
+            // nosemgrep: boxlet-request-to-redirect
             'Location' => $this->back($request),
             'Set-Cookie' => Theme::cookie($theme),
         ]);

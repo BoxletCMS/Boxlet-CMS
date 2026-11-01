@@ -4,6 +4,8 @@
 // menus under it. How they look is Appearance's.
 return [
     'navigation.title' => 'Navigacija',
+    'navigation.tabs' => 'Dijelovi navigacije',
+    'navigation.tab_chrome' => 'Zaglavlje i podnožje',
     'navigation.intro' => 'Što piše u zaglavlju i podnožju i kamo vode, na svakom jeziku. Kako izgledaju, postavlja se u odjeljku',
     'navigation.look_where' => 'Izgled →',
     'navigation.header' => 'Zaglavlje',

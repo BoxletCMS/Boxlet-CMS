@@ -106,6 +106,8 @@ return [
     'appearance.library.deleted' => 'Dizajn „:name“ je obrisan. Ono što je na zaslonu ostaje netaknuto.',
     'appearance.library.name_needed' => 'Najprije dajte dizajnu ime.',
     'appearance.library.from' => 'Prema karakteru :character',
+    'appearance.library.by_ai' => 'AI',
+    'appearance.library.by_ai_hint' => 'Spremila AI aplikacija preko AI pristupa (MCP)',
     'appearance.library.by_hand' => 'Izrađen ručno',
 
     // A design as a file, out and in (PLAN.md D-152).

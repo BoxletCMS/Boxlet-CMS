@@ -1,0 +1,72 @@
+/* THE OWNER'S SCRIPTS (PLAN.md O-73): the cookies as rows of four, the check's hidden frame and
+   its list. Admin tokens only (--ui-*). */
+
+.scripts-cookies {
+  display: grid;
+  gap: var(--ui-2);
+}
+
+/* A row of four inputs, each the admin's own (.field input), side by side. */
+.scripts-cookie,
+.scripts-cookie.field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr) minmax(0, 0.8fr);
+  gap: var(--ui-2);
+}
+
+.scripts-cookie-head {
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* On a phone each cookie is a group of four, one under the other, with its labels. */
+@media (max-width: 40rem) {
+  .scripts-cookie {
+    grid-template-columns: minmax(0, 1fr);
+    padding-block-end: var(--ui-2);
+    border-block-end: var(--ui-border) solid var(--ui-line);
+  }
+
+  .scripts-cookie-head {
+    display: none;
+  }
+}
+
+/* `.js .scripts-check.js-only`, not the bare class: .js-only makes what it marks inline-block,
+   and the button, its words and the result are rows. */
+.scripts-check,
+.js .scripts-check.js-only {
+  display: grid;
+  gap: var(--ui-2);
+  justify-items: start;
+  padding-block-start: var(--ui-3);
+  border-block-start: var(--ui-border) solid var(--ui-line);
+}
+
+.scripts-check-list {
+  display: grid;
+  gap: var(--ui-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scripts-check-list li {
+  display: flex;
+  gap: var(--ui-3);
+  align-items: center;
+}
+
+/* The site, opened for the check: there to run, never seen. */
+.scripts-check-frame {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: -200vw;
+  inline-size: 1280px;
+  block-size: 800px;
+  border: 0;
+  visibility: hidden;
+}

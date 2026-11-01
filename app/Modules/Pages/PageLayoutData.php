@@ -46,6 +46,7 @@ use App\Modules\Settings\SiteChrome;
  *     noindex: bool,
  *     designPreview: bool,
  *     fontPreloads: list<string>,
+ *     consent: array{head: string, body: string, box: string},
  *     headerBleed: string,
  *     footerBleed: string,
  *     headerHtml: string,
@@ -58,7 +59,7 @@ final class PageLayoutData
      * What the layout is handed, beside View's own $locale and $content. The test above
      * asserts this list against the template, so it is a fact rather than a comment.
      */
-    public const KEYS = ['title', 'description', 'canonical', 'icon', 'sharing', 'website', 'hreflang', 'breadcrumbs', 'noindex', 'designPreview', 'fontPreloads', 'siteStyles', 'headerBleed', 'footerBleed', 'headerHtml', 'footerHtml'];
+    public const KEYS = ['title', 'description', 'canonical', 'icon', 'sharing', 'website', 'hreflang', 'breadcrumbs', 'noindex', 'designPreview', 'fontPreloads', 'siteStyles', 'consent', 'headerBleed', 'footerBleed', 'headerHtml', 'footerHtml'];
 
     /**
      * A visitor's page, or an error page.
@@ -82,6 +83,8 @@ final class PageLayoutData
         // hreflang is made from.
         $alternates = Alternates::for($db, $page, $container->get('locales'));
         $design = self::design($db);
+        // The owner's scripts, and the box asking about the ones that wait for a yes (O-73).
+        $consent = \App\Modules\Scripts\Consent::forPage($db, $locale);
 
         return [
             'title' => $head['title'],
@@ -104,7 +107,8 @@ final class PageLayoutData
             'designPreview' => false,
             'fontPreloads' => self::fontPreloads($design['decisions']),
             'siteStyles' => self::siteStyles($container),
-        ] + self::chrome($container, $locale, $alternates, $current, $design + ['first_surface' => $head['first_surface'] ?? '']);
+            'consent' => $consent,
+        ] + self::chrome($container, $locale, $alternates, $current, $design + ['first_surface' => $head['first_surface'] ?? '', 'consent' => $consent['box'] !== '']);
     }
 
     /**
@@ -124,7 +128,7 @@ final class PageLayoutData
      * A choice left at "follow the character" follows the character being PREVIEWED, so
      * Bold's sections never stand under Minimal's header.
      *
-     * @param array{look?: array<string, string>, character?: string, menu?: string|null, footer_menus?: array<int, string>, words?: array<string, string>, bleeds?: array<string, string>, own?: array<string, string>, decisions?: array<string, string>, first_surface?: string} $trying
+     * @param array{look?: array<string, string>, character?: string, menu?: string|null, footer_menus?: array<int, string>, words?: array<string, string>, bleeds?: array<string, string>, own?: array<string, string>, decisions?: array<string, string>, first_surface?: string, consent?: bool} $trying
      * @return LayoutData
      */
     public static function forPreview(Container $container, string $locale, string $title, array $trying = []): array
@@ -150,6 +154,8 @@ final class PageLayoutData
             // only for what changes its markup (appearance-stage.js).
             'fontPreloads' => [],
             'siteStyles' => self::siteStyles($container),
+            // No owner's script runs in the design's preview, and nothing is asked there.
+            'consent' => ['head' => '', 'body' => '', 'box' => ''],
         ] + self::chrome($container, $locale, Alternates::for($db, null, $container->get('locales')), '', $trying);
     }
 
@@ -253,7 +259,7 @@ final class PageLayoutData
      * other, and the templates stay free of URL arithmetic (PLAN.md D-032).
      *
      * @param array<int, array<string, mixed>> $locales the languages, as the switcher shows them
-     * @param array{look?: array<string, string>, character?: string, menu?: string|null, footer_menus?: array<int, string>, words?: array<string, string>, bleeds?: array<string, string>, own?: array<string, string>, decisions?: array<string, string>, first_surface?: string} $trying
+     * @param array{look?: array<string, string>, character?: string, menu?: string|null, footer_menus?: array<int, string>, words?: array<string, string>, bleeds?: array<string, string>, own?: array<string, string>, decisions?: array<string, string>, first_surface?: string, consent?: bool} $trying
      *        what an admin preview is showing unsaved; for a visitor's page only the two
      *        bleeds, which are design decisions rather than chrome ones (D-067)
      * @return array{headerBleed: string, footerBleed: string, headerHtml: string, footerHtml: string}
@@ -354,7 +360,10 @@ final class PageLayoutData
         foreach ($footer['columns'] as $i => $column) {
             $hasColumn = $hasColumn || $column['title'] !== '' || $column['text'] !== '' || ($footerMenus[$i + 1] ?? []) !== [];
         }
-        $hasFooter = $hasColumn || $footer['small_print'] !== '' || count($locales) > 1 || $credit !== '';
+        // Where the site asks about cookies, the footer carries "Cookie settings", so a visitor
+        // can take a yes back as easily as they gave it (O-73): a footer there is not optional.
+        $asks = ($trying['consent'] ?? false) === true;
+        $hasFooter = $hasColumn || $footer['small_print'] !== '' || count($locales) > 1 || $credit !== '' || $asks;
 
         // WHICH SIDE OF THE FRAME THE CHROME IS ON (D-067). A design decision, not a chrome
         // one: it is about the shape of the page, and the layout reads it so no rule in the
@@ -377,7 +386,7 @@ final class PageLayoutData
             'footerHtml' => $hasFooter
                 // The footer's edge is a section divider (D-113): the same layer-2 key, the
                 // same classes, drawn by sections.css exactly as on a band.
-                ? $registry->render('footer', $footer, ['surface' => $resolved['footer_surface'], 'divider' => $resolved['footer_edge']], $resolved['footer_layout'], [], false, 'footer', ['menus' => $footerMenus, 'look' => $resolved, 'credit' => $credit, 'own' => isset($own['footer']), 'small_print' => $smallPrint], $locale, $locales)
+                ? $registry->render('footer', $footer, ['surface' => $resolved['footer_surface'], 'divider' => $resolved['footer_edge']], $resolved['footer_layout'], [], false, 'footer', ['menus' => $footerMenus, 'look' => $resolved, 'credit' => $credit, 'own' => isset($own['footer']), 'small_print' => $smallPrint, 'consent' => $asks], $locale, $locales)
                 : '',
         ];
     }

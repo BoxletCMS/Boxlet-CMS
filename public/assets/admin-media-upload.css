@@ -1,0 +1,76 @@
+/*
+ * The library's upload, one file at a time (PLAN.md D-295): a line saying how many are done,
+ * and a row for each file — its name, its bar, what is happening to it. And the line above the
+ * library while pictures left unfinished are finished. The admin's own tokens only.
+ */
+
+.upload-progress {
+  display: grid;
+  gap: var(--ui-3);
+  margin-block-start: var(--ui-4);
+}
+
+.upload-progress-total {
+  margin: 0;
+  color: var(--ui-ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.upload-finishing {
+  margin-block-end: var(--ui-3);
+}
+
+.upload-list {
+  display: grid;
+  gap: var(--ui-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Name, bar, state: the name at most 20rem, so the bar stands beside it rather than across the
+   panel; the bar a fixed width so the rows line up; the state's words after it. */
+.upload-item {
+  display: grid;
+  grid-template-columns: minmax(0, 20rem) 10rem minmax(0, 1fr);
+  gap: var(--ui-3);
+  align-items: center;
+  font-size: var(--ui-text-sm);
+}
+
+.upload-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload-item progress {
+  inline-size: 100%;
+  block-size: 0.5rem;
+  accent-color: var(--ui-accent);
+}
+
+.upload-state {
+  color: var(--ui-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.upload-item[data-state="done"] .upload-state {
+  color: var(--ui-success);
+}
+
+.upload-item[data-state="refused"] .upload-state {
+  color: var(--ui-danger);
+}
+
+/* On a phone the name above, the bar and the state under it. */
+@media (max-width: 40rem) {
+  .upload-item {
+    grid-template-columns: 6rem minmax(0, 1fr);
+  }
+
+  .upload-name {
+    grid-column: 1 / -1;
+  }
+}

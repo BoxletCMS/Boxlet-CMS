@@ -1,0 +1,31 @@
+<?php
+
+// AI access over MCP (PLAN.md O-78).
+return [
+    'mcp.title' => 'AI access (MCP)',
+    'mcp.intro' => 'Lets an AI app such as Claude read this site and write to it through the Model Context Protocol: pages as drafts, pictures, design sets. Drafts wait for you to publish them, design sets for you to try them in Appearance, and nothing is deleted. Each app gets its own key, which reads, writes, or also publishes.',
+    'mcp.endpoint' => 'The address an AI app connects to',
+    'mcp.new_key' => 'The key “:name” is made. Copy it now: it is not shown again, and only its fingerprint is kept.',
+    'mcp.key' => 'Key',
+    'mcp.connect' => 'To connect Claude Code',
+    'mcp.connect_hint' => 'Run this in a terminal. Other apps ask for the address and an Authorization header with this key.',
+    'mcp.col.name' => 'Key',
+    'mcp.col.may' => 'May',
+    'mcp.col.used' => 'Last used (UTC)',
+    'mcp.col.actions' => 'Actions',
+    'mcp.may' => 'It may',
+    'mcp.may.read' => 'Read only',
+    'mcp.may.write' => 'Read, and write drafts, pictures and design sets',
+    'mcp.may.publish' => 'Read, write drafts, pictures and design sets, and publish pages',
+    'mcp.may_hint' => 'Only a key that publishes may put a page live without you.',
+    'mcp.never' => 'Not yet',
+    'mcp.revoked_badge' => 'Revoked',
+    'mcp.revoke' => 'Revoke',
+    'mcp.revoke_confirm' => 'Revoke the key “:name”? An app using it is refused from now on.',
+    'mcp.revoked' => 'The key is revoked.',
+    'mcp.remove' => 'Remove',
+    'mcp.name' => 'Name',
+    'mcp.name_hint' => 'Which app or person has it, so you know which to revoke.',
+    'mcp.key_default' => 'AI app',
+    'mcp.create' => 'Make a key',
+];

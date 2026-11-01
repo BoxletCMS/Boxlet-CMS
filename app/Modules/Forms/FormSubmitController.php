@@ -22,9 +22,11 @@ use App\Support\Url;
  * ten minutes; every field is checked. A refused send draws the page again with the
  * answers kept and each problem beside its field. A send that passes is stored where the
  * form keeps its messages (D-269), the owner is told and the sender answered where the form
- * says so (FormMail), and the visitor is sent back to the page with the thank-you — a
- * redirect, so reloading does not send twice. A form that keeps nothing and could not email
- * the owner says so to the visitor instead of thanking them.
+ * says so (FormMail), it is sent on to the form's web address where there is one
+ * (FormWebhook, O-77), and the visitor is sent back to the page with the thank-you — a
+ * redirect, so reloading does not send twice. A form that keeps nothing, could not email the
+ * owner and has no web address says so to the visitor instead of thanking them; one whose web
+ * address did not take the message keeps it to be sent again, so it is not lost.
  */
 final class FormSubmitController
 {
@@ -74,23 +76,53 @@ final class FormSubmitController
 
         $now = gmdate('Y-m-d H:i:s');
         $db->query('INSERT INTO form_sends (form_id, ip_hash, created_at) VALUES (?, ?, ?)', [$form['id'], $ipHash, $now]);
-        // What the visitor wrote is kept only where the owner chose to keep it (D-269, GDPR).
-        if ($form['settings']['keep']) {
+        // What the visitor wrote is kept only where the owner chose to keep it (D-269, GDPR) —
+        // or, below, where it could not be sent on and must wait to be sent again (O-77).
+        $keep = static function (?string $failed) use ($db, $form, $page, $answers, $ipHash, $now): int {
             $db->query(
-                'INSERT INTO form_submissions (form_id, page_id, data_json, ip_hash, created_at) VALUES (?, ?, ?, ?, ?)',
-                [$form['id'], $page === null ? null : (int) $page['id'], json_encode($answers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE), $ipHash, $now],
+                'INSERT INTO form_submissions (form_id, page_id, data_json, ip_hash, webhook_error, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+                [$form['id'], $page === null ? null : (int) $page['id'], json_encode($answers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE), $ipHash, $failed, $now],
             );
-        }
+
+            return (int) $db->lastInsertId();
+        };
+        $kept = $form['settings']['keep'] ? $keep(null) : 0;
         $notified = FormMail::send($this->container, $form, $answers, $page);
-        // Kept nowhere and not emailed, the message would be lost behind a thank-you: the
-        // visitor is told, with what they wrote still in the form, to try again.
-        if (!$form['settings']['keep'] && !$notified) {
+        if ($form['settings']['webhook'] !== '') {
+            self::prune($db, $form);
+            $failed = FormWebhook::send($this->container, $form, FormWebhook::payload($form, $answers, $page, $now));
+            if ($failed !== '') {
+                $kept > 0
+                    ? $db->query('UPDATE form_submissions SET webhook_error = ? WHERE id = ?', [$failed, $kept])
+                    : $keep($failed);
+                Activity::record($db, 'message', 'webhook_failed', (int) $form['id'], (string) $form['name']);
+            }
+        }
+        // Kept nowhere, not emailed and sent nowhere, the message would be lost behind a
+        // thank-you: the visitor is told, with what they wrote still in the form, to try again.
+        if (!$form['settings']['keep'] && !$notified && $form['settings']['webhook'] === '') {
             return $this->again($page, $form['id'], [], $old, site_t('site.form.not_sent', $form['locale']), 503);
         }
         // A visitor's message, logged against its form: the owner's Overview says one came.
         Activity::record($db, 'message', 'received', (int) $form['id'], (string) $form['name']);
 
         return $thanks;
+    }
+
+    /**
+     * A message kept only because its web address did not take it goes after thirty days
+     * (O-77), where the form keeps nothing else: the owner had a month to send it again.
+     *
+     * @param array{id: int, settings: array{keep: bool}} $form
+     */
+    public static function prune(Db $db, array $form): void
+    {
+        if (!$form['settings']['keep']) {
+            $db->query(
+                'DELETE FROM form_submissions WHERE form_id = ? AND webhook_error IS NOT NULL AND created_at < ?',
+                [$form['id'], gmdate('Y-m-d H:i:s', time() - FormWebhook::KEEP_DAYS * 86400)],
+            );
+        }
     }
 
     /**

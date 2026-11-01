@@ -32,7 +32,7 @@ ob_start();
 <?php $background = (string) ob_get_clean(); ob_start(); ?>
                     <?php /* Which menu, and the button's words and address, are Navigation's
                              (D-180); how they look is here. */ ?>
-                    <p class="hint hint-always navigation-where"><?= e(t('chrome.header_words_where')) ?> <a href="<?= e(Url::admin('navigation')) ?>"><?= e(t('chrome.navigation_link')) ?></a></p>
+                    <p class="hint hint-always navigation-where"><?= e(t('chrome.header_words_where')) ?> <a href="<?= e(Url::admin('navigation', 'header-footer')) ?>"><?= e(t('chrome.navigation_link')) ?></a></p>
                     <?= $lookGroup('nav_style') ?>
                     <?= $lookGroup('nav_ink') ?>
                     <?= $lookGroup('header_button') ?>

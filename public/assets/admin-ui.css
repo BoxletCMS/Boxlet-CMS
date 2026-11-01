@@ -252,3 +252,40 @@
   color: var(--ui-ink-faint);
   cursor: default;
 }
+
+/* ---- tabs (O-74, D-294): Navigation's two, Statistics' two, the AI settings' three --------
+
+   Links, each to its own address. The other tab is legible at rest in the muted ink, raised on
+   hover; the current one is the ink, on the current tint, underlined in the accent, as the
+   Settings screen marks its tab with a bar down its edge. */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-1);
+  margin-block-end: var(--ui-5);
+  border-block-end: var(--ui-border) solid var(--ui-line);
+}
+
+.admin .tabs a {
+  padding: var(--ui-2) var(--ui-3);
+  border-radius: var(--ui-radius-m) var(--ui-radius-m) 0 0;
+  color: var(--ui-ink-muted);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.admin .tabs a:hover {
+  background: var(--ui-panel);
+  color: var(--ui-ink);
+}
+
+.admin .tabs a[aria-current] {
+  background: var(--ui-current);
+  color: var(--ui-ink);
+  box-shadow: inset 0 -2px 0 var(--ui-accent);
+}
+
+/* A tab's opening line stands under the tabs, not pulled up to the h1 as .page-subtitle is. */
+.tabs + .page-subtitle {
+  margin-block-start: 0;
+}

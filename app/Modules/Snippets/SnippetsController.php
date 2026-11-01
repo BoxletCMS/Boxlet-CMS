@@ -64,6 +64,8 @@ final class SnippetsController
         Activity::record($db, 'snippet', 'saved', $id, $name);
         $this->flash(t('snippets.saved', ['name' => $name]));
 
+        // The name only follows # in an address Boxlet builds: it cannot change where the redirect goes. (D-275)
+        // nosemgrep: boxlet-request-to-redirect
         return Response::redirect(Url::admin('snippets') . '#snippet-' . $name);
     }
 

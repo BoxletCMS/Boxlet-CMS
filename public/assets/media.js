@@ -132,7 +132,10 @@
           });
         }
       }
-      if (maxRequest > 0 && total > maxRequest) {
+      // Sent one at a time (media-upload.js, D-295), they never share a request: only each
+      // file's own size can be too much. The form without that script sends them together.
+      var oneByOne = form.hasAttribute('data-drop-anywhere') && typeof window.boxletLibraryUpload === 'function';
+      if (!oneByOne && maxRequest > 0 && total > maxRequest) {
         return fill(form.getAttribute('data-too-large-total'), {
           size: human(total),
           limit: form.getAttribute('data-request-label'),
@@ -159,6 +162,13 @@
       // so a wrong one dropped by accident is caught; declining leaves the picture alone.
       var question = form.getAttribute('data-confirm-send');
       if (question && !window.confirm(question.replace(':file', input.files[0].name))) {
+        input.value = '';
+        return;
+      }
+      // The library's: one file at a time, each with its progress (media-upload.js, D-295).
+      if (form.hasAttribute('data-drop-anywhere') && typeof window.boxletLibraryUpload === 'function') {
+        var files = input.files;
+        window.boxletLibraryUpload(files);
         input.value = '';
         return;
       }

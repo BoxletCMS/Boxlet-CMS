@@ -144,6 +144,11 @@ $container->set('ai_models', fn (Container $c) => static function () use ($c): a
 
     return \App\Modules\Ai\ClaudeClient::models($settings['key']);
 });
+// A form's message sent on to the owner's web address (O-77): checked, pinned, sent. Tests
+// replace it, so no request leaves them.
+$container->set('form_webhook', fn () => static fn (string $url, array $headers, string $body): array => \App\Modules\Forms\FormWebhook::post($url, array_values(array_map('strval', $headers)), $body));
+// A picture an AI client asks the site to fetch (O-78): checked, pinned, read. Tests replace it.
+$container->set('mcp_fetch', fn () => static fn (string $url): array => \App\Modules\Mcp\McpSite::fetch($url));
 $container->set('mail_transport', fn (Container $c) => MailSettings::transport($c->get('db'), (string) (($c->get('config')->get('app', []))['key'] ?? '')));
 // Media (SPEC §5.5). The encoder probes what this server can actually write, so a host
 // without a WebP delegate refuses clearly instead of writing files nobody can open.
@@ -319,7 +324,7 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // Pictures (SPEC §5.5). The generated variants live under /m/ and are served from
     // disk by the web server; no route here ever answers for one.
     $router->get('/admin/media', [MediaController::class, 'index'], $requireAdmin);
-    $router->post('/admin/media', [MediaController::class, 'store'], $requireAdmin);
+    $router->post('/admin/media', [\App\Modules\Media\MediaStoreController::class, 'store'], $requireAdmin);
     // The media browser a picture field opens (D-145): a page of cards, and an upload from
     // inside the editor, cropped on the way in if asked.
     $router->get('/admin/media/pick', [MediaPickController::class, 'index'], $requireAdmin);
@@ -338,11 +343,12 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->post('/admin/media/{id:\d+}/delete', [MediaItemController::class, 'delete'], $requireAdmin);
     // The pictures and files ticked in the list, deleted together (D-218).
     $router->post('/admin/media/delete', [MediaBulkController::class, 'delete'], $requireAdmin);
-    $router->post('/admin/media/{id:\d+}/finish', [MediaController::class, 'finish'], $requireAdmin);
+    $router->post('/admin/media/{id:\d+}/finish', [\App\Modules\Media\MediaStoreController::class, 'finish'], $requireAdmin);
 
     // Menus (D-028, resolving O-7). One ordering route takes both paths, D-011: a drag
     // posts a whole sibling order, a button posts one move.
     $router->get('/admin/navigation', [NavigationController::class, 'show'], $requireAdmin);
+    $router->get('/admin/navigation/header-footer', [NavigationController::class, 'chrome'], $requireAdmin);
     $router->post('/admin/navigation', [NavigationController::class, 'save'], $requireAdmin);
     $router->post('/admin/navigation/match', [NavigationController::class, 'match'], $requireAdmin);
     $router->get('/admin/menus', [MenusController::class, 'index'], $requireAdmin);
@@ -359,6 +365,12 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->get('/admin/redirects', [RedirectsController::class, 'index'], $requireAdmin);
     $router->post('/admin/redirects', [RedirectsController::class, 'store'], $requireAdmin);
     $router->post('/admin/redirects/{id:\d+}/delete', [RedirectsController::class, 'delete'], $requireAdmin);
+    // The owner's scripts and the cookies they set (O-73).
+    $router->get('/admin/scripts', [\App\Modules\Scripts\ScriptsController::class, 'index'], $requireAdmin);
+    $router->post('/admin/scripts', [\App\Modules\Scripts\ScriptsController::class, 'store'], $requireAdmin);
+    $router->get('/admin/scripts/{id:\d+}', [\App\Modules\Scripts\ScriptsController::class, 'edit'], $requireAdmin);
+    $router->post('/admin/scripts/{id:\d+}', [\App\Modules\Scripts\ScriptsController::class, 'update'], $requireAdmin);
+    $router->post('/admin/scripts/{id:\d+}/delete', [\App\Modules\Scripts\ScriptsController::class, 'delete'], $requireAdmin);
 
     // Snippets (D-201): a few words per language, placed in rich text as {{snippet:name}}.
     $snippetName = '{name:' . Snippets::NAME . '}';
@@ -384,6 +396,8 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     $router->get('/admin/forms/{id:\d+}', [FormsController::class, 'edit'], $requireAdmin);
     $router->post('/admin/forms/{id:\d+}', [FormsController::class, 'update'], $requireAdmin);
     $router->post('/admin/forms/{id:\d+}/delete', [FormsController::class, 'delete'], $requireAdmin);
+    $router->post('/admin/forms/{id:\d+}/webhook-test', [FormsController::class, 'testWebhook'], $requireAdmin);
+    $router->post('/admin/forms/{id:\d+}/messages/{message:\d+}/resend', [MessagesController::class, 'resend'], $requireAdmin);
     $router->get('/admin/forms/{id:\d+}/messages', [MessagesController::class, 'index'], $requireAdmin);
     $router->get('/admin/forms/{id:\d+}/messages/{message:\d+}', [MessagesController::class, 'show'], $requireAdmin);
     $router->post('/admin/forms/{id:\d+}/messages/{message:\d+}/delete', [MessagesController::class, 'delete'], $requireAdmin);
@@ -398,6 +412,10 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // Light, dark or the machine's own (D-054): the switch in the strip posts here.
     $router->post('/admin/theme', [ThemeController::class, 'save'], $requireAdmin);
     $router->get('/admin/settings', [SettingsController::class, 'show'], $requireAdmin);
+    // Settings in tabs (D-294), each its own address: General above, these beside it, and AI in three.
+    $router->get('/admin/settings/{tab:maintenance|languages|mail|account}', [SettingsController::class, 'tab'], $requireAdmin);
+    $router->get('/admin/settings/ai', [SettingsController::class, 'ai'], $requireAdmin);
+    $router->get('/admin/settings/ai/{sub:access|search}', [SettingsController::class, 'ai'], $requireAdmin);
     $router->post('/admin/settings', [SettingsController::class, 'save'], $requireAdmin);
     $router->post('/admin/settings/maintenance-message', [SettingsController::class, 'saveMessage'], $requireAdmin);
     $router->post('/admin/settings/cache', [CacheController::class, 'save'], $requireAdmin);
@@ -410,6 +428,10 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // AI translation (D-248): its panel, the screen that runs it, and Translate again on a block.
     $router->post('/admin/settings/ai', [\App\Modules\Ai\AiController::class, 'save'], $requireAdmin);
     $router->post('/admin/settings/ai/test', [\App\Modules\Ai\AiController::class, 'test'], $requireAdmin);
+    // AI access over MCP (O-78): its keys, and whether an AI client may publish.
+    $router->post('/admin/settings/mcp/keys', [\App\Modules\Mcp\McpSettingsController::class, 'create'], $requireAdmin);
+    $router->post('/admin/settings/mcp/keys/{id:\d+}/revoke', [\App\Modules\Mcp\McpSettingsController::class, 'revoke'], $requireAdmin);
+    $router->post('/admin/settings/mcp/keys/{id:\d+}/remove', [\App\Modules\Mcp\McpSettingsController::class, 'remove'], $requireAdmin);
     $router->get('/admin/translate', [\App\Modules\Ai\AiController::class, 'progress'], $requireAdmin);
     $router->post('/admin/translate/step', [\App\Modules\Ai\AiController::class, 'step'], $requireAdmin);
     $router->post('/admin/translate/retry', [\App\Modules\Ai\AiController::class, 'retry'], $requireAdmin);
@@ -427,6 +449,8 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // Visit statistics (D-051): the screen, the Settings panel's settings, and deleting
     // every count.
     $router->get('/admin/statistics', [StatsController::class, 'index'], $requireAdmin);
+    // Its Settings tab (D-294), moved here from the Settings screen; their saves keep their addresses.
+    $router->get('/admin/statistics/settings', [StatsSettingsController::class, 'show'], $requireAdmin);
     // Taking the counts out and putting them back (O-20).
     $router->get('/admin/statistics/export', [StatsDataController::class, 'export'], $requireAdmin);
     $router->post('/admin/settings/statistics', [StatsSettingsController::class, 'save'], $requireAdmin);
@@ -470,6 +494,9 @@ $container->set('router', function (Container $c) use ($request, $cache): Router
     // addressed by the slugs above it too, /usluge/web-dizajn (D-129); the last one finds it.
     // A visitor sending a form (D-046). Unprefixed: the form knows its own language.
     $router->visitorPost('/form/{id:\d+}', [FormSubmitController::class, 'submit']);
+    // An AI client's calls (O-78): no session, guarded by its key, its Origin and its limit.
+    $router->visitorPost('/mcp', [\App\Modules\Mcp\McpController::class, 'handle']);
+    $router->get('/mcp', [\App\Modules\Mcp\McpController::class, 'refuse']);
     // The sitemap for a host where public/sitemap.xml cannot be written (D-049).
     // A file from the library, to save (D-126). Registered before the pages, whose nested
     // addresses (D-129) would otherwise be able to claim /download/{id}/{name}; 'download'

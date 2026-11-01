@@ -35,14 +35,17 @@ final class MessagesController
         if ($form === null) {
             return Response::admin(e(t('forms.not_found')), 404);
         }
+        FormSubmitController::prune($db, $form);
         $messages = [];
-        foreach ($db->all('SELECT id, data_json, read_at, created_at FROM form_submissions WHERE form_id = ? ORDER BY created_at DESC, id DESC', [$form['id']]) as $row) {
+        foreach ($db->all('SELECT id, data_json, read_at, webhook_error, created_at FROM form_submissions WHERE form_id = ? ORDER BY created_at DESC, id DESC', [$form['id']]) as $row) {
             $answers = self::answers((string) $row['data_json']);
             $messages[] = [
                 'id' => (int) $row['id'],
                 'unread' => $row['read_at'] === null,
                 'created' => (string) $row['created_at'],
                 'summary' => self::summary($answers),
+                // Why its web address did not take it, when it did not (O-77).
+                'undelivered' => $row['webhook_error'] === null ? null : (string) $row['webhook_error'],
             ];
         }
 
@@ -65,7 +68,7 @@ final class MessagesController
         $db = $this->db();
         $form = Form::find($db, (int) $params['id']);
         $row = $form === null ? null : $db->one(
-            'SELECT s.id, s.data_json, s.created_at, p.title AS page_title, p.id AS page_id
+            'SELECT s.id, s.data_json, s.webhook_error, s.created_at, p.title AS page_title, p.id AS page_id
              FROM form_submissions s LEFT JOIN pages p ON p.id = s.page_id
              WHERE s.id = ? AND s.form_id = ?',
             [(int) $params['message'], $form['id']],
@@ -84,6 +87,7 @@ final class MessagesController
                 'created' => (string) $row['created_at'],
                 'answers' => self::answers((string) $row['data_json']),
                 'page' => $row['page_id'] === null ? null : ['id' => (int) $row['page_id'], 'title' => (string) $row['page_title']],
+                'undelivered' => $row['webhook_error'] === null ? null : (string) $row['webhook_error'],
             ],
             'zone' => Dates::zone($db),
         ]);
@@ -99,6 +103,43 @@ final class MessagesController
         $this->container->get('session')->set('flash', t('messages.deleted'));
 
         return Response::redirect(Url::admin('forms', $id, 'messages'));
+    }
+
+    /**
+     * SEND AGAIN (O-77): a message its form's web address did not take, sent as it was the first
+     * time. Taken, it is no longer kept where the form keeps nothing (D-269), and is marked
+     * delivered where it does; refused again, the new reason is kept.
+     *
+     * @param array<string, string> $params
+     */
+    public function resend(Request $request, string $locale, array $params): Response
+    {
+        $db = $this->db();
+        $form = Form::find($db, (int) $params['id']);
+        $row = $form === null ? null : $db->one(
+            'SELECT id, page_id, data_json, created_at FROM form_submissions WHERE id = ? AND form_id = ? AND webhook_error IS NOT NULL',
+            [(int) $params['message'], $form['id']],
+        );
+        if ($form === null || $row === null) {
+            return Response::redirect(Url::admin('forms', (int) $params['id'], 'messages'));
+        }
+        $page = $row['page_id'] === null ? null : \App\Modules\Pages\Page::find($db, (int) $row['page_id']);
+        $failed = $form['settings']['webhook'] === ''
+            ? t('forms.webhook_none')
+            : FormWebhook::send($this->container, $form, FormWebhook::payload($form, self::answers((string) $row['data_json']), $page, (string) $row['created_at']));
+        $session = $this->container->get('session');
+        if ($failed === '') {
+            $form['settings']['keep']
+                ? $db->query('UPDATE form_submissions SET webhook_error = NULL WHERE id = ?', [(int) $row['id']])
+                : $db->query('DELETE FROM form_submissions WHERE id = ?', [(int) $row['id']]);
+            $session->set('flash', t($form['settings']['keep'] ? 'messages.resent' : 'messages.resent_gone'));
+        } else {
+            $db->query('UPDATE form_submissions SET webhook_error = ? WHERE id = ?', [$failed, (int) $row['id']]);
+            $session->set('flash', t('messages.resend_failed', ['reason' => $failed]));
+            $session->set('flash_kind', 'error');
+        }
+
+        return Response::redirect(Url::admin('forms', $form['id'], 'messages'));
     }
 
     /**

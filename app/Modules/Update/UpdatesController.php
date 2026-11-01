@@ -117,7 +117,7 @@ final class UpdatesController
             if (!move_uploaded_file((string) $file['tmp_name'], $this->package())) {
                 throw new RuntimeException(t('updates.cannot_write', ['path' => $this->package()]));
             }
-            $this->begin();
+            $this->begin(($request->body['unconfirmed'] ?? '') === '1');
         } catch (Throwable $e) {
             $this->flash($e->getMessage(), 'error');
         }
@@ -210,12 +210,30 @@ final class UpdatesController
         }
     }
 
-    /** The package checked, and the backup that comes before the update begun. */
-    private function begin(): void
+    /**
+     * The package checked, and the backup that comes before the update begun.
+     *
+     * A file uploaded by hand is also compared with the release GitHub publishes (PLAN.md O-76):
+     * whatever it holds runs as the site. One that differs is refused, always. One GitHub does not
+     * know, or that cannot be asked about, goes on only when the owner ticked that they know it
+     * cannot be confirmed — the way for a server that cannot reach GitHub, which is the reason
+     * this form exists. A download from GitHub ($unconfirmed null) was checked as it came.
+     */
+    private function begin(?bool $unconfirmed = null): void
     {
         $current = $this->container->get('version');
         try {
             $version = Package::check($this->package(), $current);
+            if ($unconfirmed !== null) {
+                try {
+                    $verdict = $this->releases()->confirm($this->package(), $version);
+                } catch (RuntimeException) {
+                    $verdict = 'unreachable';
+                }
+                if ($verdict === 'different' || ($verdict !== 'official' && !$unconfirmed)) {
+                    throw new RuntimeException(t('updates.file_' . $verdict, ['version' => $version]));
+                }
+            }
         } catch (Throwable $e) {
             unlink($this->package());
             throw $e;

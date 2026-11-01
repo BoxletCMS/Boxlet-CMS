@@ -11,7 +11,8 @@ use App\Support\Url;
  *
  * @var array<string, string> $mail
  * @var array<string, string> $mailErrors
- * @var array{smtp_password: string, resend_key: string} $mailSecrets what a saved secret shows in its empty field; '' when none is saved
+ * @var array<string, string> $mailSecrets what each saved secret shows in its empty field, by
+ *      MailSettings::SECRETS; '' when none is saved
  * @var string $csrf
  */
 $mailError = static fn (string $key): string => isset($mailErrors[$key])
@@ -27,6 +28,12 @@ $mailField = static function (string $key, string $type, string $label, string $
         . ($hint !== '' ? '<span class="hint" id="' . e($id) . '-hint">' . e($hint) . '</span>' : '')
         . $mailError($key)
         . '</div>';
+};
+/** A key's field: empty, its saved trace as the placeholder, empty on save keeps it. */
+$mailKey = static function (string $key, string $label, string $hint) use ($mailSecrets, $mailField): string {
+    $set = ($mailSecrets[$key] ?? '') !== '';
+
+    return $mailField($key, 'password', $label, $set ? t('mail.secret_set') : $hint, ' autocomplete="new-password" spellcheck="false"' . ($set ? ' placeholder="' . e($mailSecrets[$key]) . '"' : ''));
 };
 ?>
         <div class="panel stack" id="mail">
@@ -55,7 +62,14 @@ $mailField = static function (string $key, string $type, string $label, string $
                 <fieldset class="fieldset mail-group" data-mail-group="smtp">
                     <legend><?= e(t('mail.smtp')) ?></legend>
                     <div class="field-pair">
-                        <?= $mailField('smtp_host', 'text', t('mail.smtp_host'), t('mail.smtp_host_hint'), ' autocomplete="off" spellcheck="false"') ?>
+                        <?= $mailField('smtp_host', 'text', t('mail.smtp_host'), t('mail.smtp_host_hint'), ' autocomplete="off" spellcheck="false" list="mail-smtp-hosts"') ?>
+                        <?php /* The providers' own servers, offered as the host is typed (O-72):
+                                 port 587 and STARTTLS, the defaults below, suit them all. */ ?>
+                        <datalist id="mail-smtp-hosts">
+<?php foreach (['smtp-relay.brevo.com' => 'Brevo', 'smtp.mailgun.org' => 'Mailgun (US)', 'smtp.eu.mailgun.org' => 'Mailgun (EU)', 'smtp.postmarkapp.com' => 'Postmark', 'smtp.sendgrid.net' => 'SendGrid', 'smtp.resend.com' => 'Resend'] as $host => $provider): ?>
+                            <option value="<?= e($host) ?>"><?= e($provider) ?></option>
+<?php endforeach; ?>
+                        </datalist>
                         <?= $mailField('smtp_port', 'text', t('mail.smtp_port'), t('mail.smtp_port_hint'), ' inputmode="numeric" autocomplete="off"') ?>
                     </div>
                     <div class="field">
@@ -78,6 +92,28 @@ $mailField = static function (string $key, string $type, string $label, string $
                              three and last four characters — so the owner sees one is set and
                              which; the field itself stays empty, and empty keeps the key. */ ?>
                     <?= $mailField('resend_key', 'password', t('mail.resend_key'), t($mailSecrets['resend_key'] !== '' ? 'mail.secret_set' : 'mail.resend_key_hint'), ' autocomplete="new-password" spellcheck="false"' . ($mailSecrets['resend_key'] !== '' ? ' placeholder="' . e($mailSecrets['resend_key']) . '"' : '')) ?>
+                </fieldset>
+
+                <fieldset class="fieldset mail-group" data-mail-group="brevo">
+                    <legend><?= e(t('mail.brevo')) ?></legend>
+                    <?= $mailKey('brevo_key', t('mail.api_key'), t('mail.brevo_key_hint')) ?>
+                </fieldset>
+
+                <fieldset class="fieldset mail-group" data-mail-group="mailgun">
+                    <legend><?= e(t('mail.mailgun')) ?></legend>
+                    <?= $mailKey('mailgun_key', t('mail.api_key'), t('mail.mailgun_key_hint')) ?>
+                    <div class="field-pair">
+                        <?= $mailField('mailgun_domain', 'text', t('mail.mailgun_domain'), t('mail.mailgun_domain_hint'), ' autocomplete="off" spellcheck="false"') ?>
+                        <div class="field">
+                            <label for="mail_mailgun_region"><?= e(t('mail.mailgun_region')) ?></label>
+                            <select id="mail_mailgun_region" name="mail_mailgun_region" aria-describedby="mail_mailgun_region-hint">
+<?php foreach (array_keys(\App\Modules\Mailer\MailgunTransport::REGIONS) as $region): ?>
+                                <option value="<?= e($region) ?>"<?= $region === ($mail['mailgun_region'] ?? 'us') ? ' selected' : '' ?>><?= e(t('mail.mailgun_region.' . $region)) ?></option>
+<?php endforeach; ?>
+                            </select>
+                            <span class="hint" id="mail_mailgun_region-hint"><?= e(t('mail.mailgun_region_hint')) ?></span>
+                        </div>
+                    </div>
                 </fieldset>
 
                 <p class="hint mail-group" data-mail-group="sendmail"><?= e(t('mail.sendmail_hint')) ?></p>

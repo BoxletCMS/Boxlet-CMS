@@ -238,8 +238,11 @@ final class PageBuilderController
     private function languages(int $id, string $current): array
     {
         $versions = Translations::of($this->db(), $id);
+        // The ids as parameters, as every value is (D-275): they were cast to int and built in.
+        $marks = implode(', ', array_fill(0, count($versions), '?'));
         $sources = $versions === [] ? [] : array_map('intval', array_column($this->db()->all(
-            "SELECT id FROM pages WHERE translation_status = 'source' AND id IN (" . implode(',', array_map('intval', $versions)) . ')',
+            "SELECT id FROM pages WHERE translation_status = 'source' AND id IN ({$marks})",
+            array_values(array_map('intval', $versions)),
         ), 'id'));
         $languages = [];
         foreach ($this->container->get('locales') as $language) {

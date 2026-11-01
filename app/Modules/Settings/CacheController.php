@@ -40,6 +40,6 @@ final class CacheController
         }
         $session->set('flash_kind', 'success');
 
-        return Response::redirect(Url::admin('settings') . '#cache');
+        return Response::redirect(Url::admin('settings', 'maintenance') . '#cache');
     }
 }

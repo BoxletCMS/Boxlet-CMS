@@ -37,6 +37,8 @@ $figures = [
         <div class="page-header">
             <h1><?= e($title) ?></h1>
         </div>
+<?php $statsTab = 'overview'; ?>
+<?php require __DIR__ . '/tabs.php'; ?>
 <?php require __DIR__ . '/periods.php'; ?>
 
         <ul class="stats-figures" role="list">
@@ -148,7 +150,7 @@ $figures = [
             </div>
         </section>
 
-        <p class="hint stats-note"><?= e(t('stats.note')) ?> <a href="<?= e(Url::admin('settings') . '#statistics') ?>"><?= e(t('stats.settings_link')) ?></a></p>
+        <p class="hint stats-note"><?= e(t('stats.note')) ?> <a href="<?= e(Url::admin('statistics', 'settings')) ?>"><?= e(t('stats.settings_link')) ?></a></p>
 <?php if ($geo): ?>
         <p class="hint stats-note"><a href="https://db-ip.com" target="_blank" rel="noopener"><?= e(t('stats.attribution')) ?></a></p>
 <?php endif; ?>

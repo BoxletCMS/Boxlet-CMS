@@ -5,7 +5,6 @@
 
 return [
     'settings.title' => 'Site settings',
-    'settings.intro' => 'What this site is called, the time it keeps, the pictures that stand for it, and what visitors see while it is closed for maintenance.',
 
     'settings.site_name' => 'Site name',
     'settings.site_name_hint' => 'The site’s own name. It is shown at the top of this admin, and used where a page needs to name the site it belongs to. Left empty, the admin says Boxlet.',
@@ -42,4 +41,10 @@ return [
     'settings.save' => 'Save settings',
     'settings.saved' => 'Settings saved.',
     'settings.picture_gone' => 'One of the pictures chosen is no longer in the library, so that field was cleared.',
+    'settings.tab.maintenance' => 'Maintenance',
+    'settings.tab.ai' => 'AI',
+    'settings.ai.tabs' => 'AI settings',
+    'settings.ai.translation' => 'Translation',
+    'settings.ai.access' => 'AI access (MCP)',
+    'settings.ai.search' => 'For AI search',
 ];

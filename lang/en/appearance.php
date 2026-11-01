@@ -105,6 +105,8 @@ return [
     'appearance.library.deleted' => '“:name” is gone. What is on the screen is untouched.',
     'appearance.library.name_needed' => 'Give the design a name first.',
     'appearance.library.from' => 'From :character',
+    'appearance.library.by_ai' => 'AI',
+    'appearance.library.by_ai_hint' => 'Kept by an AI app over AI access (MCP)',
     'appearance.library.by_hand' => 'Made by hand',
 
     // A design as a file, out and in (PLAN.md D-152).

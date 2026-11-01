@@ -1,0 +1,31 @@
+<?php
+
+// AI pristup preko MCP-a (PLAN.md O-78).
+return [
+    'mcp.title' => 'AI pristup (MCP)',
+    'mcp.intro' => 'Omogućuje AI aplikaciji poput Claudea da čita ovu web-stranicu i piše u nju preko protokola Model Context Protocol: stranice kao nacrte, slike, dizajn setove. Nacrti čekaju da ih vi objavite, dizajn setovi da ih isprobate u Izgledu, i ništa se ne briše. Svaka aplikacija dobiva svoj ključ, koji čita, piše ili i objavljuje.',
+    'mcp.endpoint' => 'Adresa na koju se AI aplikacija spaja',
+    'mcp.new_key' => 'Ključ „:name“ je izrađen. Kopirajte ga sada: više se neće prikazati, a čuva se samo njegov otisak.',
+    'mcp.key' => 'Ključ',
+    'mcp.connect' => 'Za spajanje Claude Codea',
+    'mcp.connect_hint' => 'Pokrenite ovo u terminalu. Druge aplikacije traže adresu i zaglavlje Authorization s ovim ključem.',
+    'mcp.col.name' => 'Ključ',
+    'mcp.col.may' => 'Smije',
+    'mcp.col.used' => 'Zadnje korišten (UTC)',
+    'mcp.col.actions' => 'Radnje',
+    'mcp.may' => 'Smije',
+    'mcp.may.read' => 'Samo čitati',
+    'mcp.may.write' => 'Čitati i pisati nacrte, slike i dizajn setove',
+    'mcp.may.publish' => 'Čitati, pisati nacrte, slike i dizajn setove te objavljivati stranice',
+    'mcp.may_hint' => 'Samo ključ koji smije objavljivati može stranicu objaviti bez vas.',
+    'mcp.never' => 'Još nije',
+    'mcp.revoked_badge' => 'Opozvan',
+    'mcp.revoke' => 'Opozovi',
+    'mcp.revoke_confirm' => 'Želite li opozvati ključ „:name“? Aplikacija koja ga koristi od sada će biti odbijena.',
+    'mcp.revoked' => 'Ključ je opozvan.',
+    'mcp.remove' => 'Ukloni',
+    'mcp.name' => 'Naziv',
+    'mcp.name_hint' => 'Koja ga aplikacija ili osoba ima, da znate koji opozvati.',
+    'mcp.key_default' => 'AI aplikacija',
+    'mcp.create' => 'Izradi ključ',
+];

@@ -3,9 +3,11 @@
 use App\Support\Url;
 
 /**
- * NAVIGATION (PLAN.md D-180): what the header and footer say and where they lead, saved by
- * one Save; the menus under it, each edited on its own page. Provided by AdminView::render().
+ * NAVIGATION (PLAN.md D-180, O-74): two tabs, each at its own address — the menus, each edited
+ * on its own page; and what the header and footer say and where they lead, saved by one Save.
+ * Provided by AdminView::render().
  *
+ * @var string $tab NavigationController::MENUS or ::CHROME
  * @var string $title
  * @var string $csrf
  * @var ?string $notice
@@ -18,17 +20,25 @@ $error = static fn (string $key): string => isset($errors[$key])
     : '';
 require __DIR__ . '/parts/words.php';
 ?>
-        <?php /* One column, as a form is read (D-183): the header, the footer column by
-                 column, the small print, and the menus under them. */ ?>
         <div class="navigation-screen">
         <div class="page-header">
             <h1><?= e($title) ?></h1>
         </div>
-        <p class="page-subtitle"><?= e(t('navigation.intro')) ?> <a href="<?= e(Url::admin('appearance')) ?>"><?= e(t('navigation.look_where')) ?></a></p>
+        <?php /* THE TABS (O-74): links, each to its own address, the current one marked as the
+                 Settings screen marks its section. Legible at rest; hover raises the other. */ ?>
+        <nav class="tabs navigation-tabs" aria-label="<?= e(t('navigation.tabs')) ?>">
+<?php foreach (['menus' => [Url::admin('navigation'), t('menus.title')], 'header-footer' => [Url::admin('navigation', 'header-footer'), t('navigation.tab_chrome')]] as $name => [$href, $label]): ?>
+            <a href="<?= e($href) ?>"<?= $name === $tab ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+<?php endforeach; ?>
+        </nav>
 <?php if ($notice !== null): ?>
         <p class="notice notice-error" role="alert"><?= e($notice) ?></p>
 <?php endif; ?>
 
+<?php if ($tab === 'menus'): ?>
+<?php require __DIR__ . '/parts/menus-list.php'; ?>
+<?php else: ?>
+        <p class="page-subtitle"><?= e(t('navigation.intro')) ?> <a href="<?= e(Url::admin('appearance')) ?>"><?= e(t('navigation.look_where')) ?></a></p>
 <?php if (count($locales) > 1):
     $languages = [];
     foreach ($locales as $locale) {
@@ -43,6 +53,8 @@ require __DIR__ . '/parts/words.php';
         </div>
 <?php endif; ?>
 
+        <?php /* One column, as a form is read (D-183): the header, the footer column by column,
+                 the small print. Saved by a POST to /admin/navigation, which comes back here. */ ?>
         <form method="post" action="<?= e(Url::admin('navigation')) ?>" class="navigation stack" id="navigation-form">
             <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
             <div class="navigation-parts">
@@ -53,6 +65,5 @@ require __DIR__ . '/parts/words.php';
                 <button type="submit" class="button"><?= e(t('navigation.save')) ?></button>
             </div>
         </form>
-
-<?php require __DIR__ . '/parts/menus-list.php'; ?>
+<?php endif; ?>
         </div>

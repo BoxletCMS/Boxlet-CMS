@@ -167,6 +167,8 @@ final class MediaReference
         $choices = [];
         // Pictures only: a document in the library (D-126) is not something a picture field
         // can show.
+        // LIMIT is an int parameter. (D-275)
+        // nosemgrep: boxlet-sql-built
         foreach ($db->all("SELECT id, filename, hash, revision, variants_json FROM media WHERE kind = 'picture' ORDER BY id DESC LIMIT " . $limit) as $row) {
             $choices[] = [
                 'id' => (int) $row['id'],

@@ -6,7 +6,7 @@ use App\Support\Url;
  * One message, as it was sent: each answer under the label it was asked with (D-046).
  *
  * @var array{id: int, name: string} $form
- * @var array{id: int, created: string, answers: list<array{key: string, label: string, type: string, value: string}>, page: array{id: int, title: string}|null} $message
+ * @var array{id: int, created: string, answers: list<array{key: string, label: string, type: string, value: string}>, page: array{id: int, title: string}|null, undelivered: string|null} $message
  * @var string $zone
  * @var string $csrf
  */
@@ -26,6 +26,16 @@ foreach ($message['answers'] as $answer) {
         </div>
         <p class="page-subtitle"><a href="<?= e(Url::admin('forms', $form['id'], 'messages')) ?>"><?= e(t('messages.back', ['form' => $form['name']])) ?></a></p>
 
+<?php if ($message['undelivered'] !== null): ?>
+        <?php /* Its form's web address did not take it (O-77): why, and the way to send it again. */ ?>
+        <div class="notice notice-warning row-actions" role="status">
+            <span><?= e(t('messages.undelivered_why', ['reason' => $message['undelivered']])) ?></span>
+            <form method="post" action="<?= e(Url::admin('forms', $form['id'], 'messages', $message['id'], 'resend')) ?>">
+                <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                <button type="submit" class="button button-secondary button-small"><?= e(t('messages.resend')) ?></button>
+            </form>
+        </div>
+<?php endif; ?>
         <div class="panel stack">
             <p class="hint"><?= e(\App\Support\Dates::local($message['created'], $zone)) ?><?php if ($message['page'] !== null): ?> · <?= e(t('messages.from_page')) ?> <a href="<?= e(Url::admin('pages', $message['page']['id'])) ?>"><?= e($message['page']['title']) ?></a><?php endif; ?></p>
             <dl class="message-answers">

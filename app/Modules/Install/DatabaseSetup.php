@@ -45,6 +45,8 @@ final class DatabaseSetup
             // that holds tables is only reported, since those belong to something else. If the
             // host does not allow it either, the message below says what to do.
             try {
+                // The name was checked against ^[A-Za-z0-9_$-]{1,64}$ above: no backtick can reach it. (D-275)
+                // nosemgrep: boxlet-sql-built
                 $db->query('ALTER DATABASE `' . $mysql['database'] . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
                 $charset = self::charset($db);
             } catch (PDOException) {
@@ -153,6 +155,8 @@ final class DatabaseSetup
     {
         foreach (['migrations', 'admin'] as $table) {
             try {
+                // Table names from the literal list in the loop. (D-275)
+                // nosemgrep: boxlet-sql-built
                 $db->query("SELECT 1 FROM {$table} LIMIT 1");
             } catch (PDOException) {
                 continue; // no such table, as it should be

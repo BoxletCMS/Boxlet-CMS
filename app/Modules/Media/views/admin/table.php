@@ -15,7 +15,7 @@ use App\Support\Url;
             <table class="table media-table">
                 <thead>
                     <tr>
-                        <th scope="col" class="col-pick"><input type="checkbox" class="js-only" data-bulk-all form="media-bulk" aria-label="<?= e(t('media.bulk.all')) ?>" title="<?= e(t('media.bulk.all')) ?>"></th>
+                        <th scope="col" class="col-pick"><span class="pick js-only"><input type="checkbox" class="pick-box" data-bulk-all form="media-bulk" aria-label="<?= e(t('media.bulk.all')) ?>" title="<?= e(t('media.bulk.all')) ?>"><span class="pick-mark" aria-hidden="true"></span></span></th>
                         <th scope="col" class="col-thumb"><span class="visually-hidden"><?= e(t('media.col.picture')) ?></span></th>
                         <th scope="col"><?= e(t('media.col.file')) ?></th>
                         <th scope="col" class="col-dimensions"><?= e(t('media.col.dimensions')) ?></th>
@@ -30,9 +30,9 @@ use App\Support\Url;
     $link = Url::admin('media', $row['id']);
     $name = $row['filename'] . ($row['ext'] !== '' ? '.' . $row['ext'] : '');
     ?>
-                    <tr class="media-row" data-media-id="<?= e((string) $row['id']) ?>">
-                        <td class="col-pick"><input type="checkbox" name="ids[]" value="<?= e((string) $row['id']) ?>" form="media-bulk" data-bulk-pick aria-label="<?= e(t('media.bulk.pick', ['name' => $name])) ?>"></td>
-                        <td class="media-row-thumb">
+                    <tr class="media-row" data-media-id="<?= e((string) $row['id']) ?>"<?= $row['kind'] !== 'file' && !$row['complete'] ? ' data-media-unfinished' : '' ?>>
+                        <td class="col-pick"><span class="pick"><input type="checkbox" class="pick-box" name="ids[]" value="<?= e((string) $row['id']) ?>" form="media-bulk" data-bulk-pick aria-label="<?= e(t('media.bulk.pick', ['name' => $name])) ?>"><span class="pick-mark" aria-hidden="true"></span></span></td>
+                        <td class="media-row-thumb" data-media-thumb="72x54">
 <?php if ($row['kind'] === 'file'): ?>
                             <span class="media-row-file" aria-hidden="true"><?= icon(\App\Modules\Media\MediaFileType::icon($row['ext'])) ?><span class="media-row-file-ext"><?= e(strtoupper($row['ext'])) ?></span></span>
 <?php elseif ($row['thumb'] !== null): ?>
@@ -44,7 +44,7 @@ use App\Support\Url;
                         <td class="row-title media-row-name">
                             <a class="media-link" href="<?= e($link) ?>"><span class="media-name"><?= e($row['filename']) ?></span><?= $row['ext'] !== '' ? '<span class="media-ext">.' . e($row['ext']) . '</span>' : '' ?></a>
 <?php if (!$row['complete']): ?>
-                            <span class="badge badge-warning"><?= e(t('media.unfinished')) ?></span>
+                            <span class="badge badge-warning" data-media-pending><?= e(t('media.unfinished')) ?></span>
 <?php endif; ?>
                         </td>
 <?php if ($row['kind'] === 'file'): ?>

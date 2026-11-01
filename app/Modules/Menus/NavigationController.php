@@ -26,11 +26,20 @@ use App\Support\Url;
  * The form's field names are the ones Appearance used (`header_menu`, `footer_menu_N`,
  * ChromeWords::field()), so the words' checking and storing are SiteChrome's and ChromeWords'
  * as before.
+ *
+ * TWO TABS (PLAN.md O-74, the owner: "prevelika zbrka"; Menus first, "menus prvi"): the menus at
+ * /admin/navigation, the header's and footer's words at /admin/navigation/header-footer. Each
+ * its own address, so a save, a refusal or a link comes back to the tab it belongs to, and
+ * both work without a script. The words are still saved by a POST to /admin/navigation.
  */
 final class NavigationController
 {
     /** Which menu the header shows, posted by name. A field name is not a settings key. */
     public const MENU = 'header_menu';
+
+    /** The two tabs, by the address each is at: the menus, and the header's and footer's words. */
+    public const MENUS = 'menus';
+    public const CHROME = 'header-footer';
 
     public function __construct(private readonly Container $container)
     {
@@ -42,6 +51,16 @@ final class NavigationController
     public function show(Request $request, string $locale, array $params): Response
     {
         return $this->render($this->stored(), [], []);
+    }
+
+    /**
+     * The header's and footer's words: the second tab.
+     *
+     * @param array<string, string> $params
+     */
+    public function chrome(Request $request, string $locale, array $params): Response
+    {
+        return $this->render($this->stored(), [], [], 200, null, self::CHROME);
     }
 
     /**
@@ -57,7 +76,7 @@ final class NavigationController
             'words' => $words['values'],
         ];
         if ($words['errors'] !== []) {
-            return $this->render($state, $words['errors'], [], 422, t('navigation.not_saved'));
+            return $this->render($state, $words['errors'], [], 422, t('navigation.not_saved'), self::CHROME);
         }
 
         // A menu is chosen by name, and a name no menu carries any more is cleared rather
@@ -86,7 +105,7 @@ final class NavigationController
         $session->set('flash', $message);
         $session->set('flash_kind', $goneMenu || $goneFooterMenu ? 'warning' : 'success');
 
-        return Response::redirect(Url::admin('navigation'));
+        return Response::redirect(Url::admin('navigation', self::CHROME));
     }
 
     /**
@@ -107,7 +126,7 @@ final class NavigationController
             $session->set('flash', t('translations.unknown_language'));
             $session->set('flash_kind', 'warning');
 
-            return Response::redirect(Url::admin('navigation') . '#navigation-menus-title');
+            return Response::redirect(Url::admin('navigation'));
         }
         $added = MenuCopy::sync($db, $main, $to);
         if ($added > 0) {
@@ -117,18 +136,18 @@ final class NavigationController
             ? tn('menus.matched', $added, ['language' => (string) $label['label']])
             : t('menus.matched_none', ['language' => (string) $label['label']]));
 
-        return Response::redirect(Url::admin('navigation') . '#navigation-menus-title');
+        return Response::redirect(Url::admin('navigation'));
     }
 
     /**
-     * The screen for a state of the header's and footer's words, with the menus under it.
-     * MenusController draws it too, when a new menu is refused.
+     * One tab of the screen, for a state of the header's and footer's words. MenusController
+     * draws the menus' tab too, when a new menu is refused.
      *
      * @param array{menu: string, footer_menus: array<int, string>, words: array<string, array<string, mixed>>} $state
      * @param array<string, string> $errors the words', keyed by the field at fault
      * @param array<string, string> $menuErrors the new menu's
      */
-    public function render(array $state, array $errors, array $menuErrors, int $status = 200, ?string $notice = null): Response
+    public function render(array $state, array $errors, array $menuErrors, int $status = 200, ?string $notice = null, string $tab = self::MENUS): Response
     {
         $db = $this->db();
         $locales = $this->locales();
@@ -137,9 +156,11 @@ final class NavigationController
             'title' => t('navigation.title'),
             'nav' => 'menus',
             'wide' => true,
-            // The footer's words are rich text (D-113): TipTap and the field script that binds it.
+            'tab' => $tab,
+            // The footer's words are rich text (D-113): TipTap and the field script that binds
+            // it, on the tab that has them.
             'styles' => ['admin-pages.css', 'admin-richtext.css', 'admin-richtext-tags.css', 'admin-navigation.css'],
-            'scripts' => ['vendor/tiptap.bundle.min.js', 'richtext-link.js', 'richtext.js', 'navigation.js'],
+            'scripts' => $tab === self::CHROME ? ['vendor/tiptap.bundle.min.js', 'richtext-link.js', 'richtext.js', 'navigation.js'] : [],
             'menu' => $state['menu'],
             'footerMenus' => $state['footer_menus'],
             'menuNames' => Menu::names($db),

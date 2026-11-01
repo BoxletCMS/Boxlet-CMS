@@ -9,17 +9,13 @@ use App\Core\Response;
 use App\Core\Settings;
 use App\Modules\Admin\Activity;
 use App\Modules\Admin\AdminView;
+use App\Modules\Ai\AiController;
+use App\Modules\Mcp\McpSettingsController;
 use App\Modules\Auth\TwoFactor;
 use App\Modules\Languages\Locales;
 use App\Modules\Mailer\MailController;
-use App\Modules\Mailer\MailSettings;
 use App\Modules\Pages\LlmsTxt;
 use App\Modules\Media\MediaReference;
-use App\Modules\Stats\Geo;
-use App\Modules\Stats\GeoDownload;
-use App\Modules\Stats\PrivacyText;
-use App\Modules\Stats\Tracker;
-use App\Support\Bytes;
 use App\Support\PageCache;
 use App\Support\Dates;
 use App\Support\Url;
@@ -28,6 +24,11 @@ use DateTimeZone;
 /**
  * Site settings (PLAN.md D-028): what the installer wrote, edited afterwards, plus the
  * pictures a site falls back to and the maintenance message.
+ *
+ * IN TABS, EACH ITS OWN ADDRESS (D-294; the owner, 2026-10-24: one long page of anchors was
+ * confusing): General at /admin/settings, then Languages, Email, AI (translation, AI access,
+ * AI search), Your login and Maintenance under /admin/settings/…, as Navigation's tabs are
+ * (D-281). Each gathers only what it shows. Statistics' settings are on the Statistics screen.
  *
  * No new table. `settings` is `key` and value_json (migration 0003) and holds all of it
  * through App\Core\Settings, which is also what the installer and the admin shell use.
@@ -117,7 +118,7 @@ final class SettingsController
         $this->container->get('maintenance')->remember($this->db());
         $this->container->get('session')->set('flash', t('settings.maintenance_message_saved'));
 
-        return Response::redirect(Url::admin('settings'));
+        return Response::redirect(Url::admin('settings', 'maintenance'));
     }
 
     /**
@@ -156,113 +157,98 @@ final class SettingsController
     }
 
     /**
+     * General, the tab /admin/settings opens on: the site's name, its time, its pictures (D-294).
+     *
      * @param array<string, mixed> $values
      * @param array<string, string> $errors
      */
     private function form(array $values, array $errors, ?string $notice, int $status = 200): Response
     {
-        return AdminView::render($this->container, __DIR__ . '/views', 'settings', [
-            'title' => t('settings.title'),
-            'nav' => 'settings',
+        return $this->render('general', [
             // The picker's own stylesheets and script, the same set the page editor loads.
-            'styles' => ['admin-media.css', 'admin-picker.css', 'admin-browser.css', 'vendor/cropper.min.css', 'admin-crop.css', 'admin-two-step.css', 'admin-settings.css'],
-            'scripts' => ['vendor/cropper.min.js', 'media-browser-upload.js', 'media-browser.js', 'media-picker.js', 'mail-settings.js', 'ai-settings.js', 'settings-nav.js', 'auto-continue.js', 'file-sends.js', 'geo-download.js'],
+            'styles' => ['admin-media.css', 'admin-picker.css', 'admin-browser.css', 'vendor/cropper.min.css', 'admin-crop.css'],
+            // settings-anchors.js: an address kept from the one long page (#mail, #ai…) opens its tab.
+            'scripts' => ['vendor/cropper.min.js', 'media-browser-upload.js', 'media-browser.js', 'media-picker.js', 'file-sends.js', 'settings-anchors.js'],
             'values' => $values,
             'errors' => $errors,
             'notice' => $notice,
             'pictures' => MediaReference::choices($this->db()),
             'timezones' => DateTimeZone::listIdentifiers(),
-            'maintenanceOn' => $this->container->get('maintenance')->isOn(),
-            // The page cache (D-053): on unless switched off, and how many pages it holds.
-            'pageCache' => ['on' => Settings::get($this->db(), 'page_cache', '1') !== '0', 'count' => PageCache::count()],
-            // llms.txt (D-151): on unless switched off, and whether the owner has one of their own.
-            'llms' => [
+            // The SVG logos (D-142), shown under the pickers they stand in for.
+            'logoSvg' => LogoSvg::all($this->db()),
+            'lastSaved' => $this->lastSaved(),
+        ], $status);
+    }
+
+    /**
+     * A tab other than General (D-294): each its own address, and only what it shows gathered.
+     * The route admits only these names.
+     *
+     * @param array<string, string> $params
+     */
+    public function tab(Request $request, string $locale, array $params): Response
+    {
+        $db = $this->db();
+
+        return match ($params['tab'] ?? '') {
+            'languages' => $this->render('languages', ['languages' => Locales::all($db), 'addable' => Locales::addable($db)]),
+            'mail' => $this->render('mail', ['scripts' => ['mail-settings.js']] + MailController::panel($this->container)),
+            'account' => $this->render('account', [
+                'styles' => ['admin-two-step.css'],
+                'twoStep' => $this->twoStep(),
+                // Your login (D-132): the address the admin logs in with.
+                'accountEmail' => (string) ($db->one('SELECT email FROM admin WHERE id = ?', [(int) $this->container->get('session')->get('admin_id')])['email'] ?? ''),
+            ]),
+            'maintenance' => $this->render('maintenance', [
+                'values' => $this->stored(),
+                'maintenanceOn' => $this->container->get('maintenance')->isOn(),
+                // The page cache (D-053): on unless switched off, and how many pages it holds.
+                'pageCache' => ['on' => Settings::get($db, 'page_cache', '1') !== '0', 'count' => PageCache::count()],
+            ]),
+            default => throw new \LogicException('No settings tab ' . ($params['tab'] ?? '') . '; the route admits only the tabs here.'),
+        };
+    }
+
+    /**
+     * AI, in three: translation, AI access over MCP, and llms.txt for AI search (D-294).
+     *
+     * @param array<string, string> $params
+     */
+    public function ai(Request $request, string $locale, array $params): Response
+    {
+        $sub = $params['sub'] ?? 'translation';
+        $data = match ($sub) {
+            'translation' => ['scripts' => ['ai-settings.js']] + AiController::panel($this->container),
+            'access' => McpSettingsController::panel($this->container),
+            'search' => ['llms' => [
+                // llms.txt (D-151): on unless switched off, and whether the owner has one of their own.
                 'on' => LlmsTxt::on($this->db()),
                 'ownersOwn' => LlmsTxt::ownersOwn($this->publicPath()),
                 'exists' => is_file($this->publicPath() . '/llms.txt'),
-            ],
-            // The SVG logos (D-142), shown under the pickers they stand in for.
-            'logoSvg' => LogoSvg::all($this->db()),
-            'languages' => Locales::all($this->db()),
-            'addable' => Locales::addable($this->db()),
-            'twoStep' => $this->twoStep(),
-            // Your login (D-132): the address the admin logs in with.
-            'accountEmail' => (string) ($this->db()->one('SELECT email FROM admin WHERE id = ?', [(int) $this->container->get('session')->get('admin_id')])['email'] ?? ''),
-            'lastSaved' => $this->lastSaved(),
-            'trustedProxies' => Settings::text($this->db(), 'trusted_proxies'),
-            'stats' => $stats = Tracker::settings($this->db()),
-            'geo' => $geo = Geo::status($storage = (string) $this->container->get('config')->get('app.storage_path')),
-            // A database that is part-way down (D-055, D-237): the panel draws how far it got
-            // and a Continue, which geo-download.js presses by itself.
-            'geoDownload' => GeoDownload::progress($storage),
-            'geoKind' => GeoDownload::kind($storage),
-            // What the last download, upload or cancel said, shown beside the maps' buttons
-            // rather than at the top of the page (D-237).
-            'geoNotice' => $this->geoNotice(),
-            'privacy' => PrivacyText::all($stats, $geo !== null),
-            'uploadLimit' => Bytes::limits()['fileLabel'],
-        ] + $this->mail() + $this->ai(), $status);
+            ]],
+            default => throw new \LogicException('No AI tab ' . $sub . '; the route admits only the tabs here.'),
+        };
+
+        return $this->render('ai', ['aiTab' => $sub] + $data);
     }
 
     /**
-     * The Mail panel's values (D-045): what is stored, or what was typed into a refused
-     * save, with its errors — shown once. Secrets never reach the screen, only whether
-     * one is set.
+     * The screen: its tabs down the left, the one asked for beside them.
      *
-     * @return array{mail: array<string, string>, mailErrors: array<string, string>, mailSecrets: array{smtp_password: string, resend_key: string}}
+     * @param array<string, mixed> $data
      */
-    private function mail(): array
+    private function render(string $tab, array $data, int $status = 200): Response
     {
-        $stored = MailSettings::stored($this->db());
-        $appKey = (string) $this->container->get('config')->get('app.key');
-        $session = $this->container->get('session');
-        $refused = $session->get('mail_form');
-        $session->remove('mail_form');
-        $old = is_array($refused) && is_array($refused['old'] ?? null) ? $refused['old'] : [];
-        $errors = is_array($refused) && is_array($refused['errors'] ?? null) ? $refused['errors'] : [];
+        $styles = is_array($data['styles'] ?? null) ? $data['styles'] : [];
+        $scripts = is_array($data['scripts'] ?? null) ? $data['scripts'] : [];
 
-        $values = [];
-        foreach (MailController::FIELDS as $field) {
-            $values[$field] = in_array($field, ['smtp_password', 'resend_key'], true)
-                ? ''
-                : (is_string($old[$field] ?? null) ? $old[$field] : $stored[$field]);
-        }
-
-        return [
-            'mail' => $values,
-            'mailErrors' => array_filter($errors, 'is_string'),
-            // What each saved secret shows in its empty field: a trace, never the secret.
-            'mailSecrets' => [
-                'smtp_password' => MailSettings::trace($stored['smtp_password'], $appKey, false),
-                'resend_key' => MailSettings::trace($stored['resend_key'], $appKey, true),
-            ],
-        ];
-    }
-
-    /**
-     * The AI translation panel's values (D-248): what is stored, or what was typed into a refused
-     * save, with its errors, shown once. The key never reaches the screen, only its ends.
-     *
-     * @return array{ai: array{provider: string, model: string, keep: string, voice: string}, aiErrors: array<string, string>, aiKeyTrace: string, aiUsage: array{in: int, out: int}, aiModels: array<string, string>}
-     */
-    private function ai(): array
-    {
-        $stored = \App\Modules\Ai\AiSettings::stored($this->db());
-        $session = $this->container->get('session');
-        $refused = $session->get('ai_form');
-        $session->remove('ai_form');
-        $old = is_array($refused) && is_array($refused['old'] ?? null) ? $refused['old'] : [];
-        $errors = is_array($refused) && is_array($refused['errors'] ?? null) ? $refused['errors'] : [];
-        $pick = static fn (string $name): string => is_string($old[$name] ?? null) ? $old[$name] : $stored[$name];
-        $model = ($old['model'] ?? '') === 'other' && is_string($old['model_other'] ?? null) ? $old['model_other'] : $pick('model');
-
-        return [
-            'ai' => ['provider' => $pick('provider'), 'model' => $model, 'keep' => $pick('keep'), 'voice' => $pick('voice')],
-            'aiErrors' => array_filter($errors, 'is_string'),
-            'aiKeyTrace' => MailSettings::trace($stored['key'], (string) $this->container->get('config')->get('app.key'), true),
-            'aiUsage' => \App\Modules\Ai\AiSettings::usage($this->db()),
-            'aiModels' => \App\Modules\Ai\AiSettings::models($this->db()),
-        ];
+        return AdminView::render($this->container, __DIR__ . '/views', 'settings', [
+            'title' => t('settings.title'),
+            'nav' => 'settings',
+            'tab' => $tab,
+            'styles' => [...$styles, 'admin-settings.css'],
+            'scripts' => $scripts,
+        ] + $data, $status);
     }
 
     /**
@@ -294,19 +280,5 @@ final class SettingsController
     private function db(): Db
     {
         return $this->container->get('db');
-    }
-
-    /**
-     * The words a geo action left for the panel, once (D-237).
-     *
-     * @return array{text: string, error: bool}|null
-     */
-    private function geoNotice(): ?array
-    {
-        $session = $this->container->get('session');
-        $notice = $session->get('geo_notice');
-        $session->remove('geo_notice');
-
-        return is_array($notice) && is_string($notice['text'] ?? null) ? ['text' => $notice['text'], 'error' => ($notice['error'] ?? false) === true] : null;
     }
 }

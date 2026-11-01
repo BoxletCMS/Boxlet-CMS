@@ -14,12 +14,14 @@ use App\Support\Url;
  * @var int $page which page of the list this is, from 1
  * @var int $pages how many pages the list has
  * @var int $total how many rows the filter leaves, on every page together
+ * @var string $view 'list' or 'grid' (O-75)
  * @var string $search
  * @var int $remakeLeft pictures still owed a remake (D-048)
  * @var array{file: int, request: int, fileLabel: string, requestLabel: string} $limits
  * @var string $csrf
  *
- * The list is a table (admin/table.php); the grid in admin/cards.php is the picker's.
+ * The list is a table (admin/table.php), or a grid of the cards the picker shows too
+ * (admin/cards.php), with the same ticks (O-75).
  */
 ?>
         <div class="page-header">
@@ -55,6 +57,13 @@ use App\Support\Url;
                 <a href="<?= e(Url::admin('media') . (($query = array_filter(['q' => $search, 'show' => $value, 'kind' => $kind])) !== [] ? '?' . http_build_query($query) : '')) ?>"<?= $show === $value ? ' aria-current="page"' : '' ?>><?= e(t($key)) ?></a>
 <?php endforeach; ?>
             </nav>
+            <?php /* A list or a grid (O-75): links, so each has an address; the choice is kept
+                     for the session. */ ?>
+            <nav class="segmented" aria-label="<?= e(t('media.view')) ?>">
+<?php foreach (['list' => ['media.view.list', 'list'], 'grid' => ['media.view.grid', 'layout-grid']] as $value => [$key, $glyph]): ?>
+                <a href="<?= e(Url::withQuery(Url::admin('media'), array_filter(['q' => $search, 'show' => $show, 'kind' => $kind, 'page' => $page > 1 ? (string) $page : '', 'view' => $value]))) ?>"<?= $view === $value ? ' aria-current="page"' : '' ?>><?= icon($glyph) ?> <?= e(t($key)) ?></a>
+<?php endforeach; ?>
+            </nav>
             <span class="list-count"><?= e(tn('media.count', count($pictures), ['size' => \App\Support\Bytes::human($bytes)])) ?></span>
         </div>
 
@@ -73,7 +82,17 @@ use App\Support\Url;
     $bulkExtra = '';
     $bulkAfter = '';
     require dirname(__DIR__, 3) . '/Admin/views/bulk.php';
-    require __DIR__ . '/table.php';
+    if ($view === 'grid') {
+        // The library's cards: the rows, which carry what each is used on and whether it is
+        // described, each with its tick.
+        $pictures = $rows;
+        $picking = false;
+        // The table's tick in its head, as a line of its own: a grid has no head.
+        echo '<label class="checkbox media-grid-all js-only"><span class="pick"><input type="checkbox" class="pick-box" data-bulk-all form="media-bulk"><span class="pick-mark" aria-hidden="true"></span></span> <span>' . e(t('media.grid.all')) . '</span></label>';
+        require __DIR__ . '/cards.php';
+    } else {
+        require __DIR__ . '/table.php';
+    }
 ?>
 <?php if ($pages > 1):
     $at = static fn (int $n): string => Url::withQuery(Url::admin('media'), array_filter(['q' => $search, 'show' => $show, 'kind' => $kind, 'page' => $n > 1 ? (string) $n : '']));
@@ -108,7 +127,10 @@ use App\Support\Url;
               data-request-label="<?= e($limits['requestLabel']) ?>"
               data-too-large="<?= e(t('media.too_large_named')) ?>"
               data-too-large-total="<?= e(t('media.too_large_total')) ?>"
-              data-uploading="<?= e(t('media.uploading')) ?>">
+              data-uploading="<?= e(t('media.uploading')) ?>"
+              <?php /* One file a request, each with its progress (D-295): media-upload.js's words. */ ?>
+              data-upload-words="<?= e((string) json_encode(['waiting' => t('media.upload.waiting'), 'sending' => t('media.upload.sending'), 'sizes' => t('media.upload.sizes'), 'done' => t('media.upload.done'), 'unfinished' => t('media.upload.unfinished'), 'failed' => t('media.upload.failed'), 'progress' => t('media.upload.progress'), 'finishing' => t('media.upload.finishing')], JSON_UNESCAPED_UNICODE)) ?>"
+              data-finish-url="<?= e(Url::admin('media')) ?>">
             <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
             <?php /* The zone is the file input's label, so a click anywhere in it opens the
                      file chooser without a script. */ ?>
@@ -120,6 +142,12 @@ use App\Support\Url;
             <input type="file" id="media-files" name="files[]" multiple class="visually-hidden"
                    accept="<?= e($accept) ?>" data-media-input>
             <p class="field-error" data-media-error role="alert" hidden></p>
+            <?php /* Each file sent, as it goes (D-295); drawn by media-upload.js. */ ?>
+            <div class="upload-progress" data-upload-progress hidden>
+                <p class="upload-progress-total" role="status" data-upload-total></p>
+                <ol class="upload-list" data-upload-list></ol>
+                <p data-upload-after hidden><a class="button button-secondary" href="<?= e(Url::admin('media')) ?>"><?= e(t('media.upload.show')) ?></a></p>
+            </div>
             <?php /* Only without a script, where nothing uploads by itself. */ ?>
             <button type="submit" class="button no-js-only"><?= e(t('media.upload_submit')) ?></button>
         </form>

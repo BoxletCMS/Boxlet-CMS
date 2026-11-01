@@ -95,8 +95,11 @@ final class Search
             [t('admin.nav.dashboard'), Url::admin(), 'dashboard home start'],
             [t('admin.nav.pages'), Url::admin('pages'), ''],
             [t('admin.nav.media'), Url::admin('media'), 'pictures images photos library'],
-            [t('admin.nav.menus'), Url::admin('navigation'), 'menus menu header footer button small print'],
+            [t('admin.nav.menus'), Url::admin('navigation'), 'menus menu'],
+            // Navigation's second tab (O-74): the words a search for them should land on.
+            [t('navigation.tab_chrome'), Url::admin('navigation', 'header-footer'), 'navigation header footer button small print words'],
             [t('admin.nav.forms'), Url::admin('forms'), 'contact messages'],
+            [t('admin.nav.scripts'), Url::admin('scripts'), 'scripts javascript code cookies consent banner analytics tracking gdpr'],
             [t('admin.nav.appearance'), Url::admin('appearance'), 'design character colours colors fonts type header footer chrome'],
             [t('admin.nav.settings'), Url::admin('settings'), ''],
             [t('activity.title'), Url::admin('activity'), 'log history changes'],
@@ -127,12 +130,17 @@ final class Search
             [t('settings.logo'), $settings . '#site_logo', 'branding'],
             [t('settings.favicon'), $settings . '#site_favicon', 'branding icon tab'],
             [t('settings.share_image'), $settings . '#site_share_image', 'branding social sharing'],
-            [t('languages.title'), $settings . '#languages', 'language translation'],
-            [t('mail.title'), $settings . '#mail', 'mail smtp resend sending'],
-            [t('ai.title'), $settings . '#ai', 'ai claude anthropic translate translation api key'],
-            [t('twofactor.title'), $settings . '#two-step', 'security login 2fa code'],
-            [t('stats.title'), $settings . '#statistics', 'statistics tracking privacy'],
-            [t('maintenance.title'), $settings . '#maintenance', 'closed offline'],
+            // Each tab at its own address since D-294, and those the one long page's list missed.
+            [t('maintenance.title'), Url::admin('settings', 'maintenance'), 'closed offline'],
+            [t('cache.title'), Url::admin('settings', 'maintenance') . '#cache', 'cache speed fast'],
+            [t('languages.title'), Url::admin('settings', 'languages'), 'language translation'],
+            [t('mail.title'), Url::admin('settings', 'mail'), 'mail smtp resend brevo mailgun sending'],
+            [t('ai.title'), Url::admin('settings', 'ai'), 'ai claude anthropic translate translation api key'],
+            [t('mcp.title'), Url::admin('settings', 'ai', 'access'), 'ai mcp claude code key access agent'],
+            [t('llms.title'), Url::admin('settings', 'ai', 'search'), 'ai llms.txt search crawler'],
+            [t('account.title'), Url::admin('settings', 'account'), 'email password login account'],
+            [t('twofactor.title'), Url::admin('settings', 'account') . '#two-step', 'security login 2fa code'],
+            [t('stats.settings_link'), Url::admin('statistics', 'settings'), 'statistics tracking privacy'],
         ] as [$label, $href, $words]) {
             $entries[] = ['kind' => 'setting', 'label' => $label, 'hint' => t('admin.nav.settings'), 'href' => $href, 'words' => $words];
         }

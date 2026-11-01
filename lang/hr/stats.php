@@ -171,4 +171,7 @@ return [
     // The suggested privacy-policy text.
     'stats.privacy_title' => 'Što reći posjetiteljima',
     'stats.privacy_intro' => 'Predloženi odlomak za vaša pravila o privatnosti, napisan prema gornjim postavkama. Kopirajte ga na svoju stranicu o privatnosti i prilagodite. To je polazište, a ne pravni savjet.',
+    'stats.tabs' => 'Statistika',
+    'stats.tab.overview' => 'Pregled',
+    'stats.tab.settings' => 'Postavke',
 ];

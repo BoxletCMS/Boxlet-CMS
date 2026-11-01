@@ -37,7 +37,7 @@ final class StatsController
         $db = $this->container->get('db');
         $settings = Tracker::settings($db);
         if (!$settings['enabled']) {
-            return Response::redirect(Url::admin('settings') . '#statistics');
+            return Response::redirect(Url::admin('statistics', 'settings'));
         }
 
         $status = Geo::status((string) $this->container->get('config')->get('app.storage_path'));

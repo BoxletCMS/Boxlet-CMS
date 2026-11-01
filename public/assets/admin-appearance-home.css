@@ -161,6 +161,19 @@
   white-space: nowrap;
 }
 
+/* Kept by an AI client (D-290): a word in the quiet tag a custom character's tile wears. */
+.design-row-ai {
+  display: inline-block;
+  padding: 0 var(--ui-1);
+  border: var(--ui-border) solid var(--ui-control-line);
+  border-radius: var(--ui-radius-s);
+  color: var(--ui-ink-muted);
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 /* The name and the button on one line; an input carries an intrinsic width of about twenty
    characters, which is wider than this column would like, so it may shrink. */
 .design-keep {

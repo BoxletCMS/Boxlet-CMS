@@ -84,7 +84,7 @@ final class LanguagesController
             $session->set('flash_kind', 'error');
         }
 
-        return Response::redirect(Url::admin('settings') . '#languages');
+        return Response::redirect(Url::admin('settings', 'languages'));
     }
 
     private function label(string $code): string

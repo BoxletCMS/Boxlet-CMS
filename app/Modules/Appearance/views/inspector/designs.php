@@ -8,8 +8,10 @@ use App\Support\Url;
  * YOUR DESIGNS (PLAN.md D-061, D-152, D-157): the designs the owner keeps, keeping the one on
  * the screen, and a design brought in as a file. At the foot of the home, where the rail's
  * second half used to be a column of its own. Required by inspector/home.php, in its scope.
+ * One an AI client kept over MCP says so (D-290), and an AI client's link lands here, by the
+ * group's id.
  *
- * @var list<array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>}> $library
+ * @var list<array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, by_ai: bool}> $library
  * @var list<array{file: string, reason: string}> $skipped the custom design files left out
  * @var Closure(string): string $error
  * @var Closure(array<string, string>, string): string $chips
@@ -22,7 +24,7 @@ ob_start();
                                 <?= $chips(App\Modules\Design\Tokens::resolve($saved['decisions'] + $saved['look'], $saved['character']), 'saved-' . $saved['id']) ?>
                                 <span class="design-row-text">
                                     <span class="design-row-name" title="<?= e($saved['name']) ?>"><?= e($saved['name']) ?></span>
-                                    <span class="design-row-from"><?= e(Characters::exists($saved['character']) ? t('appearance.library.from', ['character' => Characters::label($saved['character'])]) : t('appearance.library.by_hand')) ?></span>
+                                    <span class="design-row-from"><?php if ($saved['by_ai']): ?><span class="design-row-ai" title="<?= e(t('appearance.library.by_ai_hint')) ?>"><?= e(t('appearance.library.by_ai')) ?></span> <?php endif; ?><?= e(Characters::exists($saved['character']) ? t('appearance.library.from', ['character' => Characters::label($saved['character'])]) : t('appearance.library.by_hand')) ?></span>
                                 </span>
                                 <button type="submit" form="design-form" name="action" value="library:use:<?= e((string) $saved['id']) ?>" class="button button-quiet"><?= e(t('inspector.use')) ?><span class="visually-hidden">: <?= e($saved['name']) ?></span></button>
                                 <?php /* Overwrite: the name comes from the design itself, so "save what

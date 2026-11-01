@@ -24,6 +24,8 @@ final class MediaFiles
     public static function choices(Db $db, int $limit = 200): array
     {
         $choices = [];
+        // LIMIT is an int parameter. (D-275)
+        // nosemgrep: boxlet-sql-built
         foreach ($db->all("SELECT id, filename, path, size FROM media WHERE kind = 'file' ORDER BY id DESC LIMIT " . $limit) as $row) {
             $extension = strtolower(pathinfo((string) $row['path'], PATHINFO_EXTENSION));
             $choices[(int) $row['id']] = (string) $row['filename'] . '.' . $extension . ' · ' . Bytes::human((int) $row['size']);

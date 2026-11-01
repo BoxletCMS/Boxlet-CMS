@@ -22,7 +22,7 @@ final class CharacterSources
      * Boxlet's own, read as they are: trusted, not validated, because validating asks for the
      * default character, which is one of them (tests hold them instead).
      *
-     * @return array<string, array{source: string, set: array<string, mixed>}>
+     * @return array<string, array{source: string, set: array<string, mixed>, by_ai?: bool}>
      */
     public static function core(): array
     {
@@ -54,20 +54,20 @@ final class CharacterSources
     }
 
     /**
-     * The imported sets, by slug. None where there is no table yet: before migration 0032,
-     * during an install, in a script.
+     * The imported sets, by slug, each saying whether an AI client kept it (D-290). None where
+     * there is no table yet: before migration 0032, during an install, in a script.
      *
-     * @return list<array{name: string, text: string}>
+     * @return list<array{name: string, text: string, by_ai: bool}>
      */
     public static function rows(Db $db): array
     {
         try {
-            $rows = $db->all('SELECT slug, set_json FROM design_characters ORDER BY slug');
+            $rows = $db->all('SELECT slug, set_json, source FROM design_characters ORDER BY slug');
         } catch (Throwable) {
             return [];
         }
 
-        return array_values(array_map(static fn (array $row): array => ['name' => (string) $row['slug'], 'text' => (string) $row['set_json']], $rows));
+        return array_values(array_map(static fn (array $row): array => ['name' => (string) $row['slug'], 'text' => (string) $row['set_json'], 'by_ai' => $row['source'] === 'ai'], $rows));
     }
 
     /**
@@ -75,10 +75,10 @@ final class CharacterSources
      * the reason. A set without a composition is a design, not a character; an id already
      * in $taken belongs to what came before (core, then custom files, then imports).
      *
-     * @param list<array{name: string, text: string}> $items
+     * @param list<array{name: string, text: string, by_ai?: bool}> $items
      * @param array<string, mixed> $taken id => anything, the characters already read
      * @param list<array{file: string, reason: string}> $skipped
-     * @return array<string, array{source: string, set: array<string, mixed>}>
+     * @return array<string, array{source: string, set: array<string, mixed>, by_ai?: bool}>
      */
     public static function read(array $items, string $source, Blocks $registry, array $taken, array &$skipped): array
     {
@@ -93,7 +93,7 @@ final class CharacterSources
             } elseif (isset($taken[$set['id']]) || isset($found[$set['id']])) {
                 $skipped[] = ['file' => $item['name'], 'reason' => t('characters.id_taken', ['id' => $set['id']])];
             } else {
-                $found[$set['id']] = ['source' => $source, 'set' => $set];
+                $found[$set['id']] = ['source' => $source, 'set' => $set, 'by_ai' => $item['by_ai'] ?? false];
             }
         }
         $name = static fn (array $entry): string => (string) ($entry['set']['name']['en'] ?? reset($entry['set']['name']));

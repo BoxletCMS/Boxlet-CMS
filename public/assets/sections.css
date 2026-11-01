@@ -338,6 +338,11 @@
    read as the space between two sections. */
 .section-column {
   display: grid;
+  /* One track, and it is minmax(0, 1fr) for the reason the section's are (O-71): an implicit
+     track's minimum is auto, so a word wider than the column — "AFFORDABLE" in Couture's
+     headings in a quarter, 493 pixels in a column of 308 — widened the track, ran over the next
+     column and off the page, and the headings' break-word never had to break it. */
+  grid-template-columns: minmax(0, 1fr);
   align-content: start;
   gap: var(--space-l);
 }

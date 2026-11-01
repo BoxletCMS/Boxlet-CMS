@@ -4,6 +4,8 @@
 // menus under it. How they look is Appearance's.
 return [
     'navigation.title' => 'Navigation',
+    'navigation.tabs' => 'Parts of Navigation',
+    'navigation.tab_chrome' => 'Header & footer',
     'navigation.intro' => 'What the header and footer say and where they lead, in each language. How they look is set in',
     'navigation.look_where' => 'Appearance →',
     'navigation.header' => 'Header',

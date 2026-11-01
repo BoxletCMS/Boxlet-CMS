@@ -52,6 +52,8 @@ final class PlaceQuery
             'value' => (string) $row['value'],
             'visitors' => (int) $row['total_visitors'],
             'views' => (int) $row['total_views'],
+        // The column from StatsQuery::PLACES, the conditions from StatsFilter (DIMENSIONS, values as parameters). (D-275)
+        // nosemgrep: boxlet-sql-built
         ], $this->db->all(
             "SELECT {$column} AS value, SUM(visitors) AS total_visitors, SUM(views) AS total_views
              FROM stats_places WHERE {$where}
@@ -73,6 +75,8 @@ final class PlaceQuery
     public function markers(StatsFilter $filter): array
     {
         [$where, $params] = $filter->placeWhere();
+        // The conditions from StatsFilter (DIMENSIONS, values as parameters). (D-275)
+        // nosemgrep: boxlet-sql-built
         $rows = $this->db->all(
             "SELECT city, country, MIN(latitude) AS latitude, MIN(longitude) AS longitude, SUM(visitors) AS visitors
              FROM stats_places

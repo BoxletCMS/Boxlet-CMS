@@ -326,6 +326,8 @@ final class MediaLibrary
     private function rows(string $sql, array $params = []): array
     {
         $rows = [];
+        // The text is built in this class from literal conditions; every value is a parameter. (D-275)
+        // nosemgrep: boxlet-sql-built
         foreach ($this->db->all($sql, $params) as $row) {
             $rows[] = $row;
         }

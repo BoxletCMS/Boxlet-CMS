@@ -1,0 +1,143 @@
+/* MEDIA AS A GRID (PLAN.md O-75): the library's cards, beside its table. The card itself is
+   admin-media.css's, the picker's too; this is what the library adds to it — the tick, a file
+   drawn as one, and a line for what the table's Used and Described columns say. Admin tokens
+   only (--ui-*). */
+
+.media-card-library {
+  position: relative;
+}
+
+/* The card's ⋯, on the picture's other corner from the tick: the list's own menu, its button
+   smaller than a row's and on the panel with a soft shadow, so it reads on a light picture and
+   a dark one alike (D-297; the owner, 2026-10-24: a little smaller). */
+.media-card-menu {
+  position: absolute;
+  inset-block-start: calc(var(--ui-3) + var(--ui-1));
+  inset-inline-end: calc(var(--ui-3) + var(--ui-1));
+  z-index: 1;
+}
+
+.media-card-menu > summary {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  background: var(--ui-panel);
+  box-shadow: var(--ui-shadow-s);
+}
+
+.media-card-menu > summary svg {
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+}
+
+/* THE TICK (D-297; the owner, 2026-10-24: the square frame around it was not liked, and the
+   list's to match the grid's). Drawn by the admin rather than the browser, in the grid, the
+   list and Select all: a rounded box on the panel with the control's edge and a soft shadow,
+   there at rest on any picture; ticked, it fills with the accent and its mark is drawn over it
+   in the ink that stands on the accent; partly ticked (Select all), a dash. The mark is the
+   box's neighbour, as an input has no ::before in every browser, and both stand in one grid
+   cell, so a list needs no positioning. A control is never revealed by hover. */
+.pick {
+  display: inline-grid;
+  vertical-align: middle;
+}
+
+.js .pick.js-only {
+  display: inline-grid;
+}
+
+.pick > * {
+  grid-area: 1 / 1;
+}
+
+.pick-box {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  margin: 0;
+  appearance: none;
+  border: 1.5px solid var(--ui-control-line);
+  border-radius: var(--ui-radius-s);
+  background: var(--ui-panel);
+  box-shadow: var(--ui-shadow-s);
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.pick-box:hover {
+  border-color: var(--ui-accent);
+}
+
+.pick-box:checked,
+.pick-box:indeterminate {
+  border-color: var(--ui-accent);
+  background: var(--ui-accent);
+}
+
+.pick-box:focus-visible {
+  outline: none;
+  box-shadow: var(--ui-ring);
+}
+
+/* The mark: cut from the ink on the accent by a mask, so its colour is the token's in either
+   theme. It lets a click through to the box under it. */
+.pick-mark {
+  display: none;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  background: var(--ui-on-accent);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 0.875rem no-repeat;
+  pointer-events: none;
+}
+
+.pick-box:checked + .pick-mark {
+  display: block;
+}
+
+.pick-box:indeterminate + .pick-mark {
+  display: block;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8h8' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* On a card, the tick stands on the picture's corner, level with the ⋯ opposite. */
+.media-card-pick-at {
+  position: absolute;
+  inset-block-start: calc(var(--ui-3) + var(--ui-1) + 0.125rem);
+  inset-inline-start: calc(var(--ui-3) + var(--ui-1) + 0.125rem);
+  z-index: 1;
+}
+
+/* A file is its kind's icon and extension in the square a picture takes. */
+.media-thumb-file {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--ui-1);
+  color: var(--ui-ink-muted);
+}
+
+.media-thumb-file .icon {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+}
+
+.media-card-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-1) var(--ui-2);
+  align-items: center;
+  margin: 0;
+  color: var(--ui-ink-muted);
+  font-size: var(--ui-text-xs);
+}
+
+.media-grid-all {
+  margin-block-end: var(--ui-3);
+}
+
+/* Two to a row on a phone: at 11rem a card is the screen's width there, and a library one
+   picture at a time is not browsed but scrolled. */
+@media (max-width: 30rem) {
+  .media-grid:has(> .media-card-library) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ui-3);
+  }
+}

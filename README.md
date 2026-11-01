@@ -9,8 +9,8 @@ shell, no Composer, no Node, no build step. An FTP client and a browser are enou
 **[⬇ Download the latest Boxlet](https://github.com/BoxletCMS/Boxlet-CMS/releases/latest)** ·
 [Try the demo](https://demo.boxletcms.org)
 
-> **v0.1 is the first release.** From here on, updates keep your site as it is: no fresh
-> install between versions, and each update is taken from the admin.
+> **v0.2 is out.** Updates keep your site as it is: no fresh install between versions, and
+> each update is taken from the admin, with a backup made first.
 
 ![The Boxlet CMS page builder: the demo's home page, its hero selected](https://raw.githubusercontent.com/BoxletCMS/boxlet-cms-dev/main/tools/release/readme/builder.jpg)
 
@@ -44,12 +44,18 @@ visitor's cookie jar stayed empty.
 - **Videos and maps load only when pressed.** Until a visitor presses Play, nothing of
   YouTube's, Vimeo's or Google's is loaded, and YouTube then comes from
   `youtube-nocookie.com`. A map can be OpenStreetMap instead, which stores nothing.
-- **Almost no JavaScript** on the public site: four small scripts, each loaded only on a page
+- **Almost no JavaScript** on the public site: five small scripts, each loaded only on a page
   that needs it. One folds the menu on a phone, one starts a video or a map when it is
-  pressed, one brings a section in as it is scrolled to, and one opens a picture larger,
-  where you asked for those.
+  pressed, one brings a section in as it is scrolled to, one opens a picture larger, and one
+  asks about cookies, where you asked for those.
 - **A suggested privacy-policy paragraph** for the statistics, written from your own
   settings, in every language the site speaks.
+
+- **Your own scripts, asked about properly.** Add Google Analytics, a pixel or a chat window
+  under Scripts & cookies, and Boxlet recognises the common ones and lists the cookies they
+  set. A statistics or marketing script runs only after a visitor agrees to it, in a box drawn
+  from your site's own design, with Reject as easy as Accept; until then nothing of it is
+  loaded. Cookieless statistics such as Plausible need no box at all, and Boxlet says so.
 
 So in the usual case you don't need a consent banner at all. The fine print is that Boxlet
 takes care of what *Boxlet* does. If you embed a Google Map or a Vimeo video, that provider
@@ -144,8 +150,10 @@ This is the part Boxlet is really about.
 - **Files as well.** PDFs, documents, spreadsheets and ZIPs sit in the same library,
   each with its own icon. The Downloads block offers them to visitors and counts the
   downloads.
-- **Tidy up in one go.** Tick pictures and files to delete them together. Anything a page
-  still shows is kept, and Boxlet tells you where it is used.
+- **Drop as many as you like.** Each file goes up on its own, with its own progress, and
+  every size is made before it says done, even on a host with a short time limit.
+- **A list or a grid,** and tidy up in one go: tick pictures and files to delete them
+  together. Anything a page still shows is kept, and Boxlet tells you where it is used.
 
 ## Fast without trying
 
@@ -209,6 +217,21 @@ It gets there by leaving things out, and by keeping what it can:
 - **Checked, not trusted.** Markup, `{{tags}}`, addresses and the words you list as never to
   translate stay as they are. An answer that fails a check keeps the original words and says so.
 
+## Working with your AI assistant (MCP)
+
+- **Claude and other AI apps can work on your site** through the Model Context Protocol. Make a
+  key in Settings → AI → AI access and connect: for Claude Code it is one line, shown with the
+  key.
+- **They read** your pages, block by block, your pictures and your design; **they write**
+  pages as drafts, pictures fetched from an address, and design sets for you to try in
+  Appearance.
+- **You stay in charge.** Every change waits for you: a draft until you publish it, a design
+  until you apply it. Nothing is deleted and every change is in the activity log. Each key is
+  made to read only, to write drafts, or to publish as well, so each app has only what you
+  gave it.
+- **Runs on ordinary hosting.** No long-running connection: each call is one request, so
+  shared hosting serves it like any page.
+
 ## Forms and email
 
 - **A form builder** with text, email, phone, long text, choice and checkbox fields.
@@ -216,9 +239,12 @@ It gets there by leaving things out, and by keeping what it can:
   sender. Keeping them in the admin as well is your choice for each form, and off until you
   turn it on: what a visitor writes is not stored on your server unless you decide it should
   be.
+- **Messages sent on to a web address (a webhook)**, signed JSON for Zapier, Make, n8n or your
+  own code. One the address does not take is kept until you send it again.
 - **Spam protection with no CAPTCHA:** a hidden field, a timing check and a per-sender limit.
-- **Email through SMTP or [Resend](https://resend.com)**, whose web API still works on hosts
-  that block SMTP. A test button tells you it works before a client finds out it doesn't.
+- **Email through SMTP, [Resend](https://resend.com), [Brevo](https://www.brevo.com) or
+  [Mailgun](https://www.mailgun.com)**, whose web APIs still work on hosts that block SMTP.
+  A test button tells you it works before a client finds out it doesn't.
 
 ## An admin that's nice to be in
 

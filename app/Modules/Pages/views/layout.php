@@ -15,7 +15,7 @@ use App\Support\Url;
  * @var bool $noindex keep this page out of search engines: the owner's choice, and always
  *                   for a preview (D-170)
  * @var list<string> $fontPreloads the two families' first files, preloaded (D-185)
- * @var string $siteStyles the nineteen visitor stylesheets as one file, '' when it could not be written (D-204)
+ * @var string $siteStyles the visitor stylesheets as one file, '' when it could not be written (D-204)
  * @var bool $designPreview drawn inside the Appearance preview, where the editor-only marks
  *                         show (D-170)
  * @var array{url: string, type: string}|null $icon the site's tab icon (D-028)
@@ -30,6 +30,9 @@ use App\Support\Url;
  * @var string $headerBleed 'sheet' to draw the header inside the sheet, 'full' to let it
  *                          reach the window's edge (D-067)
  * @var string $footerBleed the same, for the footer
+ * @var array{head: string, body: string, box: string} $consent the owner's scripts for the head
+ *                         and the end of the body, those waiting for consent inert in a
+ *                         <template>, and the box that asks, '' where nothing waits (O-73)
  */
 ?>
 <!doctype html>
@@ -78,8 +81,8 @@ use App\Support\Url;
     <link rel="preload" href="<?= e($font) ?>" as="font" type="font/woff2" crossorigin>
 <?php endforeach; ?>
     <link rel="stylesheet" href="<?= e(Url::stylesheet()) ?>">
-<?php /* The nineteen sheets as one file (D-204): one request a first visit waits for, not
-         nineteen. Linked one by one only where the bundle could not be written. */ ?>
+<?php /* The visitor sheets as one file (D-204): one request a first visit waits for, not
+         one each. Linked one by one only where the bundle could not be written. */ ?>
 <?php if ($siteStyles !== ''): ?>
     <link rel="stylesheet" href="<?= e($siteStyles) ?>">
 <?php else: ?>
@@ -107,6 +110,13 @@ use App\Support\Url;
 <?php if (str_contains($content, 'data-enlarge')): ?>
     <script src="<?= e(Url::versioned('assets/site-lightbox.js')) ?>" defer></script>
 <?php endif; ?>
+<?php /* And the box that asks about cookies, where one of the owner's scripts waits for a yes
+         (O-73). Without it, what waits never runs. */ ?>
+<?php if ($consent['box'] !== ''): ?>
+    <script src="<?= e(Url::versioned('assets/site-consent.js')) ?>" defer></script>
+<?php endif; ?>
+<?php /* The owner's own scripts for the head, last, after everything the page needs (O-73). */ ?>
+<?= $consent['head'] ?>
 <?php if ($designPreview): ?>
     <?php /* PRESSING A PART OF THE PICTURE OPENS ITS SETTINGS (D-181, README 5.7): the parts
              the preview marks (AppearancePreview::region()) and their outlines. */ ?>
@@ -144,6 +154,8 @@ use App\Support\Url;
 <?= $footerHtml ?>
 <?php endif; ?>
     </div>
+<?= $consent['box'] ?>
+<?= $consent['body'] ?>
 <?php /* NO SECOND FOOTER HERE. The site has exactly one and the chrome footer is it — it
          carries the language switcher through the same partial this layout used to include.
          Rendering the switcher here as well would put two of them on every translated page,

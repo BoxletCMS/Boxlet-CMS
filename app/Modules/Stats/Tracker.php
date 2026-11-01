@@ -205,6 +205,8 @@ final class Tracker
     public static function erase(Db $db): void
     {
         foreach (['stats_views', 'stats_page_visitors', 'stats_seen', 'stats_missing', 'stats_places'] as $table) {
+            // Table names from the literal list in the loop. (D-275)
+            // nosemgrep: boxlet-sql-built
             $db->query("DELETE FROM {$table}");
         }
         $db->query('DELETE FROM settings WHERE `key` = ?', ['stats_salt']);
@@ -260,6 +262,8 @@ final class Tracker
     {
         $where = implode(' AND ', array_map(static fn (string $column): string => "{$column} = ?", array_keys($key)));
         $update = "UPDATE {$table} SET {$increment} WHERE {$where}";
+        // Table and columns are literals at every caller (Tracker, NewDay); values are parameters. (D-275)
+        // nosemgrep: boxlet-sql-built
         if ($db->query($update, array_values($key))->rowCount() > 0) {
             return;
         }
@@ -268,11 +272,15 @@ final class Tracker
         $columns = implode(', ', array_keys($row));
         $marks = implode(', ', array_fill(0, count($row), '?'));
         try {
+            // Table and columns are literals at every caller (Tracker, NewDay); values are parameters. (D-275)
+            // nosemgrep: boxlet-sql-built
             $db->query("INSERT INTO {$table} ({$columns}) VALUES ({$marks})", array_values($row));
         } catch (PDOException $e) {
             if (!self::duplicate($e)) {
                 throw $e;
             }
+            // Table and columns are literals at every caller (Tracker, NewDay); values are parameters. (D-275)
+            // nosemgrep: boxlet-sql-built
             $db->query($update, array_values($key));
         }
     }

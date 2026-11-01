@@ -86,7 +86,7 @@ final class Overview
             'label' => t('overview.languages'),
             'value' => (string) count($locales),
             'note' => implode(', ', $codes),
-            'href' => Url::admin('settings') . '#languages',
+            'href' => Url::admin('settings', 'languages'),
             'word' => false,
         ];
 
@@ -154,7 +154,7 @@ final class Overview
             $issues[] = [
                 'title' => t('overview.issue.no_mail'),
                 'where' => t('overview.where.mail'),
-                'href' => Url::admin('settings') . '#mail',
+                'href' => Url::admin('settings', 'mail'),
             ];
         }
 

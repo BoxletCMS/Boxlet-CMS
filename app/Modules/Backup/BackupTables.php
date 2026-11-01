@@ -54,6 +54,8 @@ final class BackupTables
     {
         if ($db->driver === 'sqlite') {
             $key = [];
+            // The table's name through quote(), never a value. (D-275)
+            // nosemgrep: boxlet-sql-built
             foreach ($db->all('PRAGMA table_info(' . self::quote($db, $table) . ')') as $column) {
                 if ((int) $column['pk'] > 0) {
                     $key[] = (string) $column['name'];
@@ -90,12 +92,18 @@ final class BackupTables
             $column = self::quote($db, $key);
 
             return array_values($after === null
+                // Table and column names through quote(); LIMIT a constant. (D-275)
+                // nosemgrep: boxlet-sql-built
                 ? $db->all("SELECT * FROM {$name} ORDER BY {$column} LIMIT " . self::ROWS_PER_READ)
+                // Table and column names through quote(); LIMIT a constant; the value a parameter. (D-275)
+                // nosemgrep: boxlet-sql-built
                 : $db->all("SELECT * FROM {$name} WHERE {$column} > ? ORDER BY {$column} LIMIT " . self::ROWS_PER_READ, [$after]));
         }
         $columns = self::columns($db, $table);
         $order = implode(', ', array_map(static fn (string $c): string => self::quote($db, $c), $columns));
 
+        // Names through quote(); LIMIT a constant, OFFSET an int. (D-275)
+        // nosemgrep: boxlet-sql-built
         return array_values($db->all("SELECT * FROM {$name} ORDER BY {$order} LIMIT " . self::ROWS_PER_READ . ' OFFSET ' . $offset));
     }
 
@@ -105,6 +113,8 @@ final class BackupTables
     public static function columns(Db $db, string $table): array
     {
         if ($db->driver === 'sqlite') {
+            // The table's name through quote(), never a value. (D-275)
+            // nosemgrep: boxlet-sql-built
             return array_values(array_map(static fn (array $c): string => (string) $c['name'], $db->all('PRAGMA table_info(' . self::quote($db, $table) . ')')));
         }
 

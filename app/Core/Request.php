@@ -52,6 +52,13 @@ final class Request
                 $headers[strtolower(str_replace('_', '-', $name))] = (string) $_SERVER[$name];
             }
         }
+        // Apache hands Authorization to PHP under CGI or FPM only as the variable public/.htaccess
+        // sets, renamed REDIRECT_… by each rewrite it passes through (PLAN.md O-78).
+        foreach (['REDIRECT_HTTP_AUTHORIZATION', 'REDIRECT_REDIRECT_HTTP_AUTHORIZATION'] as $name) {
+            if (!isset($headers['authorization']) && is_string($_SERVER[$name] ?? null) && $_SERVER[$name] !== '') {
+                $headers['authorization'] = $_SERVER[$name];
+            }
+        }
 
         $https = strtolower((string) ($_SERVER['HTTPS'] ?? 'off')) !== 'off' && ($_SERVER['HTTPS'] ?? '') !== ''
             || (string) ($_SERVER['SERVER_PORT'] ?? '') === '443';

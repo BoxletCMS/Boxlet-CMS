@@ -23,5 +23,5 @@ use App\Support\Url;
 <?php endforeach; ?>
             </ul>
             <p class="hint"><?= e(t('twofactor.codes_once')) ?></p>
-            <p><a class="button" href="<?= e(Url::admin('settings') . '#two-step') ?>"><?= e(t('twofactor.codes_saved')) ?></a></p>
+            <p><a class="button" href="<?= e(Url::admin('settings', 'account') . '#two-step') ?>"><?= e(t('twofactor.codes_saved')) ?></a></p>
         </div>

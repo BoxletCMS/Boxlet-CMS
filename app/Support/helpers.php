@@ -41,11 +41,15 @@ function t(string $key, array $replace = []): string
 {
     $strings = \App\Support\AdminLang::strings(\App\Support\AdminLang::code());
     $text = $strings[$key] ?? $key;
+    // strtr, not str_replace in turn (D-295): the longest name first, and nothing it has put
+    // in read again. In turn, :page was filled inside :pages, and the library said "Page 1 of
+    // 1s"; and a value holding ":name" would have been filled a second time.
+    $pairs = [];
     foreach ($replace as $name => $value) {
-        $text = str_replace(':' . $name, (string) $value, $text);
+        $pairs[':' . $name] = (string) $value;
     }
 
-    return $text;
+    return strtr($text, $pairs);
 }
 
 /**

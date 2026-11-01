@@ -35,6 +35,6 @@ final class LlmsController
         $session->set('flash', t($on ? 'llms.turned_on' : 'llms.turned_off'));
         $session->set('flash_kind', 'success');
 
-        return Response::redirect(Url::admin('settings') . '#llms');
+        return Response::redirect(Url::admin('settings', 'ai', 'search'));
     }
 }

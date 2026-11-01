@@ -19,11 +19,9 @@
   justify-content: flex-start;
 }
 
-.navigation-menus {
-  margin-block-start: var(--ui-6);
-}
+/* The two tabs (O-74) are the shared .tabs, in admin-ui.css since D-294. */
 
-.navigation-menus > h2 {
+.navigation-menus > .page-subtitle {
   margin: 0;
 }
 

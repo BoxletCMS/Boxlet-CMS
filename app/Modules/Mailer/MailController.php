@@ -25,7 +25,8 @@ final class MailController
     /** The panel's fields, as posted: mail_{field}. */
     public const FIELDS = [
         'transport', 'from_address', 'from_name', 'notify_address', 'smtp_host', 'smtp_port',
-        'smtp_encryption', 'smtp_username', 'smtp_password', 'resend_key',
+        'smtp_encryption', 'smtp_username', 'smtp_password', 'resend_key', 'brevo_key',
+        'mailgun_key', 'mailgun_domain', 'mailgun_region',
     ];
 
     public function __construct(private readonly Container $container)
@@ -44,7 +45,9 @@ final class MailController
         $errors = MailSettings::save($this->db(), $input, $this->appKey());
         $session = $this->container->get('session');
         if ($errors !== []) {
-            unset($input['smtp_password'], $input['resend_key']);
+            foreach (MailSettings::SECRETS as $secret) {
+                unset($input[$secret]);
+            }
             $session->set('mail_form', ['errors' => $errors, 'old' => $input]);
             $session->set('flash', t('mail.not_saved'));
             $session->set('flash_kind', 'error');
@@ -53,7 +56,7 @@ final class MailController
             $session->set('flash', t('mail.saved'));
         }
 
-        return Response::redirect(Url::admin('settings') . '#mail');
+        return Response::redirect(Url::admin('settings', 'mail'));
     }
 
     /**
@@ -71,7 +74,7 @@ final class MailController
             $session->set('flash', t('mail.test_not_configured'));
             $session->set('flash_kind', 'error');
 
-            return Response::redirect(Url::admin('settings') . '#mail');
+            return Response::redirect(Url::admin('settings', 'mail'));
         }
 
         $site = Settings::text($db, 'site_name');
@@ -89,7 +92,7 @@ final class MailController
             $session->set('flash_kind', 'error');
         }
 
-        return Response::redirect(Url::admin('settings') . '#mail');
+        return Response::redirect(Url::admin('settings', 'mail'));
     }
 
     private function appKey(): string
@@ -100,5 +103,41 @@ final class MailController
     private function db(): Db
     {
         return $this->container->get('db');
+    }
+
+    /**
+     * The Email tab's values (D-045, D-294): what is stored, or what was typed into a refused
+     * save, with its errors — shown once. Secrets never reach the screen, only whether
+     * one is set.
+     *
+     * @return array{mail: array<string, string>, mailErrors: array<string, string>, mailSecrets: array<string, string>}
+     */
+    public static function panel(Container $container): array
+    {
+        $stored = MailSettings::stored($container->get('db'));
+        $appKey = (string) $container->get('config')->get('app.key');
+        $session = $container->get('session');
+        $refused = $session->get('mail_form');
+        $session->remove('mail_form');
+        $old = is_array($refused) && is_array($refused['old'] ?? null) ? $refused['old'] : [];
+        $errors = is_array($refused) && is_array($refused['errors'] ?? null) ? $refused['errors'] : [];
+
+        $values = [];
+        foreach (self::FIELDS as $field) {
+            $values[$field] = in_array($field, MailSettings::SECRETS, true)
+                ? ''
+                : (is_string($old[$field] ?? null) ? $old[$field] : $stored[$field]);
+        }
+
+        return [
+            'mail' => $values,
+            'mailErrors' => array_filter($errors, 'is_string'),
+            // What each saved secret shows in its empty field: a trace, never the secret.
+            // A key by its ends, a password by dots only.
+            'mailSecrets' => array_combine(MailSettings::SECRETS, array_map(
+                static fn (string $secret): string => MailSettings::trace($stored[$secret], $appKey, $secret !== 'smtp_password'),
+                MailSettings::SECRETS,
+            )),
+        ];
     }
 }

@@ -21,6 +21,10 @@
  * it. So the view is noted as the form is sent, and taken back once by the page that answers.
  * Arriving any other way — from the admin's menu, a link, a bookmark — opens the home.
  *
+ * A GROUP ON THE HOME, BY ITS ID. A link may name one, as an AI client's does for a design it
+ * kept (#group-designs, D-290). The address is set back to the home before the browser would
+ * scroll to it, so this does it, once, on load: the group opened and brought into view.
+ *
  * THE SECTION WITH THE PROBLEM OPENS BY ITSELF. A refused publish puts its messages beside
  * the controls at fault, and a message inside a view that is not shown is a message nobody
  * reads.
@@ -158,7 +162,15 @@
     },
   };
 
+  /** A control group on the home the address names by its id, if it names one. */
+  function groupOnHome() {
+    var id = window.location.hash.replace(/^#/, '');
+    var group = /^group-[a-z-]+$/.test(id) ? document.getElementById(id) : null;
+    return group && views.home.contains(group) ? group : null;
+  }
+
   inspector.classList.add('views-ready');
+  var group = groupOnHome();
   var first = viewWithAProblem() || fromHash() || returning();
   if (!views[first]) {
     first = 'home';
@@ -172,4 +184,13 @@
     pushedFromHome = true;
   }
   show(first);
+  if (group && first === 'home') {
+    group.open = true;
+    group.scrollIntoView({ block: 'start' });
+    // Again once the page has loaded: what stands above the group grows as its fonts and the
+    // swatches arrive, and pushed it most of a screen down (measured).
+    window.addEventListener('load', function () {
+      group.scrollIntoView({ block: 'start' });
+    }, { once: true });
+  }
 })();

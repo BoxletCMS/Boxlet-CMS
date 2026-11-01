@@ -15,6 +15,12 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # The Authorization header, which Apache does not hand to PHP run as CGI or FPM, as most
+    # shared hosts run it: an AI client's key arrives in it (PLAN.md O-78). PHP finds it as
+    # HTTP_AUTHORIZATION, or REDIRECT_HTTP_AUTHORIZATION once a rewrite has passed it on.
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
     # Asked for as /public/… where Boxlet sits in the web root itself, behind the .htaccess
     # beside public/ (D-138). The same page without public/ is the real address, so this
     # one is sent there for good rather than answering the page at two addresses. The first

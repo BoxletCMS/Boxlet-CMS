@@ -6,20 +6,55 @@ use App\Core\Container;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Settings;
+use App\Modules\Admin\AdminView;
 use App\Support\Bytes;
 use App\Support\Url;
 use DateTimeImmutable;
 use RuntimeException;
 
 /**
- * The Statistics panel's actions (PLAN.md D-051): its settings, deleting every count, and
- * the country database. Switching the module off keeps what was counted; only erase
+ * Statistics' Settings tab and its actions (PLAN.md D-051, D-294): its settings, deleting every
+ * count, and the country database. Switching the module off keeps what was counted; only erase
  * deletes it.
  */
 final class StatsSettingsController
 {
     public function __construct(private readonly Container $container)
     {
+    }
+
+    /**
+     * Statistics' Settings tab (D-294): moved here from the one long Settings page, beside the
+     * counts they govern. Overview is the other tab; while counting is off it sends here.
+     *
+     * @param array<string, string> $params
+     */
+    public function show(Request $request, string $locale, array $params): Response
+    {
+        $db = $this->container->get('db');
+        $storage = (string) $this->container->get('config')->get('app.storage_path');
+        $stats = Tracker::settings($db);
+        $geo = Geo::status($storage);
+
+        return AdminView::render($this->container, __DIR__ . '/views', 'settings', [
+            'title' => t('stats.title'),
+            'nav' => 'statistics',
+            'statsTab' => 'settings',
+            'styles' => ['admin-settings.css'],
+            'scripts' => ['auto-continue.js', 'file-sends.js', 'geo-download.js'],
+            'stats' => $stats,
+            'trustedProxies' => Settings::text($db, 'trusted_proxies'),
+            'geo' => $geo,
+            // A database that is part-way down (D-055, D-237): the panel draws how far it got
+            // and a Continue, which geo-download.js presses by itself.
+            'geoDownload' => GeoDownload::progress($storage),
+            'geoKind' => GeoDownload::kind($storage),
+            // What the last download, upload or cancel said, shown beside the maps' buttons
+            // rather than at the top of the page (D-237).
+            'geoNotice' => $this->geoNotice(),
+            'privacy' => PrivacyText::all($stats, $geo !== null),
+            'uploadLimit' => Bytes::limits()['fileLabel'],
+        ]);
     }
 
     /**
@@ -220,7 +255,7 @@ final class StatsSettingsController
             $session->set('geo_notice', ['text' => $notice, 'error' => $error]);
         }
 
-        return Response::redirect(Url::admin('settings') . '#geo');
+        return Response::redirect(Url::admin('statistics', 'settings') . '#geo');
     }
 
     private function storage(): string
@@ -235,6 +270,20 @@ final class StatsSettingsController
             $this->container->get('session')->set('flash_kind', 'error');
         }
 
-        return Response::redirect(Url::admin('settings') . '#statistics');
+        return Response::redirect(Url::admin('statistics', 'settings'));
+    }
+
+    /**
+     * The words a geo action left for the panel, once (D-237).
+     *
+     * @return array{text: string, error: bool}|null
+     */
+    private function geoNotice(): ?array
+    {
+        $session = $this->container->get('session');
+        $notice = $session->get('geo_notice');
+        $session->remove('geo_notice');
+
+        return is_array($notice) && is_string($notice['text'] ?? null) ? ['text' => $notice['text'], 'error' => ($notice['error'] ?? false) === true] : null;
     }
 }

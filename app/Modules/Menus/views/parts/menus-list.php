@@ -3,8 +3,8 @@
 use App\Support\Url;
 
 /**
- * The list of menus, and the form that starts another: the foot of Navigation (D-180).
- * Required by navigation.php, in its scope.
+ * The list of menus, and the form that starts another: Navigation's first tab (D-180, O-74),
+ * named by the tab, so it carries no heading of its own. Required by navigation.php, in its scope.
  *
  * @var list<array{id: int, locale: string, name: string, items: int}> $menus
  * @var list<array<string, mixed>> $locales
@@ -17,8 +17,7 @@ $menuError = static fn (string $key): string => isset($menuErrors[$key])
     ? '<p class="field-error" role="alert">' . e($menuErrors[$key]) . '</p>'
     : '';
 ?>
-        <section class="stack navigation-menus" aria-labelledby="navigation-menus-title">
-        <h2 id="navigation-menus-title"><?= e(t('menus.title')) ?></h2>
+        <section class="stack navigation-menus" aria-label="<?= e(t('menus.title')) ?>">
         <p class="page-subtitle"><?= e(t('menus.intro')) ?></p>
 
 <?php if ($menus === []): ?>
@@ -70,7 +69,7 @@ $menuError = static fn (string $key): string => isset($menuErrors[$key])
 ?>
 <?php if ($mainLocale !== '' && $others !== []): ?>
         <div class="panel stack">
-            <h3><?= e(t('menus.match_title')) ?></h3>
+            <h2><?= e(t('menus.match_title')) ?></h2>
             <?= $hint('menus-match-hint', t('menus.match_intro', ['main' => $mainLabel])) ?>
             <div class="form-actions">
 <?php foreach ($others as $locale): ?>
@@ -85,7 +84,7 @@ $menuError = static fn (string $key): string => isset($menuErrors[$key])
 <?php endif; ?>
 
         <div class="panel stack">
-            <h3><?= e(t('menus.new')) ?></h3>
+            <h2><?= e(t('menus.new')) ?></h2>
             <form method="post" action="<?= e(Url::admin('menus')) ?>" class="stack">
                 <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                 <div class="field">

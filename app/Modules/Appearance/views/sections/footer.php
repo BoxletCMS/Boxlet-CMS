@@ -28,7 +28,7 @@ ob_start();
 <?php $arrangement = (string) ob_get_clean(); ob_start(); ?>
                     <?php /* The columns' words and menus and the small print are Navigation's
                              (D-180); how they look is here. */ ?>
-                    <p class="hint hint-always navigation-where"><?= e(t('chrome.footer_words_where')) ?> <a href="<?= e(Url::admin('navigation')) ?>"><?= e(t('chrome.navigation_link')) ?></a></p>
+                    <p class="hint hint-always navigation-where"><?= e(t('chrome.footer_words_where')) ?> <a href="<?= e(Url::admin('navigation', 'header-footer')) ?>"><?= e(t('chrome.navigation_link')) ?></a></p>
                     <?= $lookGroup('footer_surface') ?>
                     <?= $ownColour('footer_colour') ?>
                     <?= $lookGroup('footer_edge') ?>

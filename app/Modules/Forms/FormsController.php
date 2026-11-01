@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Modules\Admin\Activity;
 use App\Modules\Admin\AdminView;
+use App\Support\Secret;
 use App\Support\Url;
 
 /**
@@ -100,6 +101,12 @@ final class FormsController
             $parsed['errors']['name'] = t('forms.name_required');
         }
 
+        // The secret a form's messages are signed with: its own, kept; made when an address is
+        // first given (O-77). Never posted, so never taken from what was posted.
+        $parsed['settings']['webhook_secret'] = $form['settings']['webhook_secret'];
+        if ($parsed['settings']['webhook'] !== '' && $parsed['settings']['webhook_secret'] === '') {
+            $parsed['settings']['webhook_secret'] = Secret::seal(FormWebhook::newSecret(), $this->appKey());
+        }
         $candidate = ['name' => $name, 'fields' => $parsed['fields'], 'settings' => $parsed['settings']] + $form;
         if ($parsed['errors'] !== []) {
             return $this->screen($candidate, $parsed['errors'], 422);
@@ -129,6 +136,33 @@ final class FormsController
         $this->container->get('session')->set('flash', t('forms.deleted'));
 
         return Response::redirect(Url::admin('forms'));
+    }
+
+    /**
+     * SEND A TEST (O-77): what a message to this form would send, with each field's label as its
+     * value, to the address saved, signed as a real one is but marked form.test. Said in the
+     * flash: taken, or why not.
+     *
+     * @param array<string, string> $params
+     */
+    public function testWebhook(Request $request, string $locale, array $params): Response
+    {
+        $form = Form::find($this->db(), (int) $params['id']);
+        if ($form === null) {
+            return Response::admin(e(t('forms.not_found')), 404);
+        }
+        $session = $this->container->get('session');
+        if ($form['settings']['webhook'] === '') {
+            $session->set('flash', t('forms.webhook_none'));
+            $session->set('flash_kind', 'warning');
+        } else {
+            $answers = array_map(static fn (array $field): array => ['key' => $field['key'], 'label' => $field['label'], 'type' => $field['type'], 'value' => $field['label']], $form['fields']);
+            $failed = FormWebhook::send($this->container, $form, FormWebhook::payload($form, $answers, null, gmdate('Y-m-d H:i:s'), FormWebhook::TEST_EVENT));
+            $session->set('flash', $failed === '' ? t('forms.webhook_test_sent') : t('forms.webhook_test_failed', ['reason' => $failed]));
+            $session->set('flash_kind', $failed === '' ? 'success' : 'error');
+        }
+
+        return Response::redirect(Url::admin('forms', $form['id']) . '#webhook');
     }
 
     /**
@@ -164,7 +198,14 @@ final class FormsController
             'errors' => $errors,
             // Whether a message this form does not keep can reach the owner at all (D-269).
             'mailReady' => \App\Modules\Mailer\MailSettings::configured($this->db()),
+            // The secret the receiver checks signatures with, shown to be copied there (O-77).
+            'webhookSecret' => Secret::open((string) ($form['settings']['webhook_secret'] ?? ''), $this->appKey()),
         ], $status);
+    }
+
+    private function appKey(): string
+    {
+        return (string) $this->container->get('config')->get('app.key');
     }
 
     private function db(): Db

@@ -18,6 +18,9 @@ final class Releases
 {
     public const LIST = 'https://api.github.com/repos/BoxletCMS/Boxlet-CMS/releases?per_page=30';
 
+    /** Where the owner downloads a release by hand: GitHub's page for the newest (O-76). */
+    public const LATEST = 'https://github.com/BoxletCMS/Boxlet-CMS/releases/latest';
+
     /**
      * @param Closure(string): string|null $get fetches a URL's body; the network by default,
      *        a test's own list otherwise
@@ -81,6 +84,35 @@ final class Releases
             unlink($target);
             throw new RuntimeException(t('updates.digest'));
         }
+    }
+
+    /**
+     * Whether $file is the ZIP GitHub publishes as $version (PLAN.md O-76): 'official' when its
+     * SHA-256 is the published digest, 'different' when a release of that version publishes
+     * another, 'unknown' when none publishes one. A ZIP uploaded by hand runs as the site, and
+     * until this nothing checked it against anything. GitHub out of reach throws, as in newest().
+     *
+     * @return 'official'|'different'|'unknown'
+     */
+    public function confirm(string $file, string $version): string
+    {
+        $list = json_decode(($this->get ?? self::fetch(...))(self::LIST), true);
+        if (!is_array($list)) {
+            throw new RuntimeException(t('updates.github_unreadable'));
+        }
+        foreach ($list as $release) {
+            if (!is_array($release) || ($release['draft'] ?? false) || ($release['tag_name'] ?? '') !== $version) {
+                continue;
+            }
+            foreach ((array) ($release['assets'] ?? []) as $asset) {
+                if (is_array($asset) && ($asset['name'] ?? '') === 'boxlet-' . $version . '.zip'
+                    && preg_match('~^sha256:([0-9a-f]{64})$~', (string) ($asset['digest'] ?? ''), $digest) === 1) {
+                    return hash_equals($digest[1], (string) hash_file('sha256', $file)) ? 'official' : 'different';
+                }
+            }
+        }
+
+        return 'unknown';
     }
 
     private static function fetch(string $url): string

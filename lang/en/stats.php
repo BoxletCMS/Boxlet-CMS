@@ -167,4 +167,7 @@ return [
     // The suggested privacy-policy text.
     'stats.privacy_title' => 'What to tell your visitors',
     'stats.privacy_intro' => 'A suggested paragraph for your privacy policy, written for the settings above. Copy it into your own privacy page and adapt it. It is a starting point, not legal advice.',
+    'stats.tabs' => 'Statistics',
+    'stats.tab.overview' => 'Overview',
+    'stats.tab.settings' => 'Settings',
 ];

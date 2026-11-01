@@ -75,6 +75,8 @@ final class StatsExport
     {
         $data = ['boxlet' => 'statistics', 'version' => 1, 'exported' => gmdate('Y-m-d H:i:s'), 'tables' => []];
         foreach (self::TABLES as $table) {
+            // Table names from self::TABLES. (D-275)
+            // nosemgrep: boxlet-sql-built
             $data['tables'][$table] = $db->all("SELECT * FROM {$table} ORDER BY day");
         }
 

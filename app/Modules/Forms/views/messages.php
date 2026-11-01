@@ -6,7 +6,7 @@ use App\Support\Url;
  * The messages sent through one form, newest first (PLAN.md D-046).
  *
  * @var array{id: int, name: string, settings: array{keep: bool}} $form
- * @var list<array{id: int, unread: bool, created: string, summary: string}> $messages
+ * @var list<array{id: int, unread: bool, created: string, summary: string, undelivered: string|null}> $messages
  * @var string $zone
  * @var array{at: string, reason: string}|null $failure the last message the site could not send
  * @var string $title
@@ -23,12 +23,20 @@ use App\Support\Url;
 
 <?php if ($failure !== null): ?>
         <div class="notice notice-warning" role="status">
-            <p><?= e(t('messages.mail_failed', ['when' => \App\Support\Dates::local($failure['at'], $zone), 'reason' => $failure['reason']])) ?> <a href="<?= e(Url::admin('settings') . '#mail') ?>"><?= e(t('forms.mail_settings')) ?></a></p>
+            <p><?= e(t('messages.mail_failed', ['when' => \App\Support\Dates::local($failure['at'], $zone), 'reason' => $failure['reason']])) ?> <a href="<?= e(Url::admin('settings', 'mail')) ?>"><?= e(t('forms.mail_settings')) ?></a></p>
         </div>
 <?php endif; ?>
 
+<?php
+    // Kept because the form kept them then, or because its web address did not take them (O-77).
+    $undelivered = array_filter($messages, static fn (array $m): bool => $m['undelivered'] !== null);
+    $earlier = count($messages) > count($undelivered);
+?>
 <?php if (!$form['settings']['keep']): ?>
-        <p class="notice" role="status"><?= e(t('forms.not_kept')) ?><?= $messages !== [] ? ' ' . e(t('forms.not_kept_earlier')) : '' ?> <a href="<?= e(Url::admin('forms', $form['id'])) ?>"><?= e(t('messages.edit_form')) ?></a></p>
+        <p class="notice" role="status"><?= e(t('forms.not_kept')) ?><?= $earlier ? ' ' . e(t('forms.not_kept_earlier')) : '' ?> <a href="<?= e(Url::admin('forms', $form['id'])) ?>"><?= e(t('messages.edit_form')) ?></a></p>
+<?php endif; ?>
+<?php if ($undelivered !== []): ?>
+        <p class="notice notice-warning" role="status"><?= e(tn('messages.undelivered_note', count($undelivered), ['days' => (string) \App\Modules\Forms\FormWebhook::KEEP_DAYS])) ?></p>
 <?php endif; ?>
 
 <?php if ($messages === []): ?>
@@ -54,8 +62,17 @@ use App\Support\Url;
 <?php if ($message['unread']): ?>
                             <span class="badge badge-accent"><?= e(t('messages.new')) ?></span>
 <?php endif; ?>
+<?php if ($message['undelivered'] !== null): ?>
+                            <span class="badge badge-warning" title="<?= e($message['undelivered']) ?>"><?= e(t('messages.undelivered')) ?></span>
+<?php endif; ?>
                         </td>
                         <td class="row-actions">
+<?php if ($message['undelivered'] !== null): ?>
+                            <form method="post" action="<?= e(Url::admin('forms', $form['id'], 'messages', $message['id'], 'resend')) ?>">
+                                <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
+                                <button type="submit" class="button button-secondary button-small"><?= e(t('messages.resend')) ?></button>
+                            </form>
+<?php endif; ?>
                             <form method="post" action="<?= e(Url::admin('forms', $form['id'], 'messages', $message['id'], 'delete')) ?>">
                                 <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                                 <button type="submit" class="button button-ghost button-danger button-icon" title="<?= e(t('messages.delete')) ?>" data-confirm="<?= e(t('messages.delete_confirm')) ?>"><?= icon('trash-2') ?><span class="visually-hidden"><?= e(t('messages.delete')) ?></span></button>

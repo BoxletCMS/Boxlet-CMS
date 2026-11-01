@@ -57,6 +57,7 @@ $rail = [
     'administration' => array_filter([
         ['nav' => 'settings', 'href' => Url::admin('settings'), 'icon' => 'settings', 'label' => t('admin.nav.settings'), 'count' => null],
         ['nav' => 'redirects', 'href' => Url::admin('redirects'), 'icon' => 'signpost', 'label' => t('admin.nav.redirects'), 'count' => null],
+        ['nav' => 'scripts', 'href' => Url::admin('scripts'), 'icon' => 'cookie', 'label' => t('admin.nav.scripts'), 'count' => null],
         ['nav' => 'backups', 'href' => Url::admin('backups'), 'icon' => 'database-backup', 'label' => t('admin.nav.backups'), 'count' => null],
         ['nav' => 'updates', 'href' => Url::admin('updates'), 'icon' => 'cloud-download', 'label' => t('admin.nav.updates'), 'count' => null],
         $statsOn ? ['nav' => 'statistics', 'href' => Url::admin('statistics'), 'icon' => 'chart-column', 'label' => t('admin.nav.statistics'), 'count' => null] : null,
@@ -146,7 +147,7 @@ foreach ($rail as $entries) {
 <?php endforeach; ?>
             </nav>
 <?php if ($adminEmail !== ''): ?>
-            <a class="rail-user" href="<?= e(Url::admin('settings') . '#account') ?>" title="<?= e(t('admin.your_login')) ?>">
+            <a class="rail-user" href="<?= e(Url::admin('settings', 'account')) ?>" title="<?= e(t('admin.your_login')) ?>">
                 <span class="rail-avatar" aria-hidden="true"><?= e(strtoupper(mb_substr($adminEmail, 0, 1))) ?></span>
                 <span class="rail-who">
                     <span class="rail-email"><?= e($adminEmail) ?></span>

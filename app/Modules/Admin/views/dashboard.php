@@ -27,7 +27,7 @@ use App\Support\Url;
         <p class="page-subtitle"><?= e(t('overview.intro')) ?></p>
 <?php if ($maintenance): ?>
         <p class="notice notice-warning"><?= e(t('admin.dashboard.maintenance')) ?>
-            <a href="<?= e(Url::admin('settings')) ?>"><?= e(t('admin.dashboard.maintenance_link')) ?></a></p>
+            <a href="<?= e(Url::admin('settings', 'maintenance')) ?>"><?= e(t('admin.dashboard.maintenance_link')) ?></a></p>
 <?php endif; ?>
 
         <?php /* The figures: tiles on a hairline grid, each the way into the screen it counts,

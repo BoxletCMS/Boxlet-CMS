@@ -9,10 +9,11 @@ use App\Support\Url;
  * (FormsController), so it works the same with or without a script. form-builder.js only
  * shows a field's list options when its type is a list.
  *
- * @var array{id: int, locale: string, name: string, fields: list<array{key: string, type: string, label: string, required: bool, options: list<string>}>, settings: array{submit: string, success: string, notify: bool, keep: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string}} $form
+ * @var array{id: int, locale: string, name: string, fields: list<array{key: string, type: string, label: string, required: bool, options: list<string>}>, settings: array{submit: string, success: string, notify: bool, keep: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string, webhook: string, webhook_secret: string}} $form
  * @var string $language the form's language, by name
  * @var array<string, string> $errors
  * @var bool $mailReady whether the site can send mail (D-269)
+ * @var string $webhookSecret the secret its messages are signed with, opened; '' before an address (O-77)
  * @var string $csrf
  */
 $error = static fn (string $key): string => isset($errors[$key])
@@ -116,14 +117,14 @@ $settings = $form['settings'];
                 <p class="hint"><?= e(t('forms.keep_hint')) ?></p>
                 <?= $error('keep') ?>
 <?php if (!$settings['keep'] && !$mailReady): ?>
-                <p class="notice notice-warning"><?= e(t('forms.mail_missing')) ?> <a href="<?= e(Url::admin('settings') . '#mail') ?>"><?= e(t('forms.mail_settings')) ?></a></p>
+                <p class="notice notice-warning"><?= e(t('forms.mail_missing')) ?> <a href="<?= e(Url::admin('settings', 'mail')) ?>"><?= e(t('forms.mail_settings')) ?></a></p>
 <?php endif; ?>
 
                 <label class="checkbox">
                     <input type="checkbox" name="settings[notify]" value="1"<?= $settings['notify'] ? ' checked' : '' ?>>
                     <?= e(t('forms.notify')) ?>
                 </label>
-                <p class="hint"><?= e(t('forms.notify_hint')) ?> <a href="<?= e(Url::admin('settings') . '#mail') ?>"><?= e(t('forms.mail_settings')) ?></a></p>
+                <p class="hint"><?= e(t('forms.notify_hint')) ?> <a href="<?= e(Url::admin('settings', 'mail')) ?>"><?= e(t('forms.mail_settings')) ?></a></p>
 
                 <label class="checkbox">
                     <input type="checkbox" name="settings[autoreply]" value="1"<?= $settings['autoreply'] ? ' checked' : '' ?>>
@@ -139,6 +140,33 @@ $settings = $form['settings'];
                     <textarea id="form-autoreply-body" name="settings[autoreply_body]" rows="5" aria-describedby="form-autoreply-body-hint"><?= e($settings['autoreply_body']) ?></textarea>
                     <span class="hint" id="form-autoreply-body-hint"><?= e(t('forms.autoreply_body_hint')) ?></span>
                 </div>
+            </div>
+
+            <?php /* SENT ON TO A WEB ADDRESS (O-77): each message as signed JSON, for Zapier, Make,
+                     n8n or the owner's own code. The secret is made with the first address and
+                     shown here to be copied to the receiver; Send a test posts this same form
+                     to its own action, and sends what is saved. */ ?>
+            <div class="panel stack" id="webhook">
+                <h2><?= e(t('forms.webhook')) ?></h2>
+                <div class="field">
+                    <label for="form-webhook"><?= e(t('forms.webhook_url')) ?></label>
+                    <input type="url" id="form-webhook" name="settings[webhook]" value="<?= e($settings['webhook']) ?>" maxlength="500" placeholder="https://" autocomplete="off" spellcheck="false" aria-describedby="form-webhook-hint">
+                    <span class="hint" id="form-webhook-hint"><?= e(t('forms.webhook_hint')) ?></span>
+                    <?= $error('webhook') ?>
+                </div>
+<?php if ($webhookSecret !== ''): ?>
+                <div class="field">
+                    <label for="form-webhook-secret"><?= e(t('forms.webhook_secret')) ?></label>
+                    <input type="text" id="form-webhook-secret" value="<?= e($webhookSecret) ?>" readonly spellcheck="false" aria-describedby="form-webhook-secret-hint">
+                    <span class="hint" id="form-webhook-secret-hint"><?= e(t('forms.webhook_secret_hint')) ?></span>
+                </div>
+<?php endif; ?>
+<?php if ($settings['webhook'] !== ''): ?>
+                <p class="hint"><?= e(t('forms.webhook_privacy')) ?></p>
+                <div>
+                    <button type="submit" formaction="<?= e(Url::admin('forms', $form['id'], 'webhook-test')) ?>" class="button button-secondary"><?= e(t('forms.webhook_test')) ?></button>
+                </div>
+<?php endif; ?>
             </div>
 
             <div class="form-actions">

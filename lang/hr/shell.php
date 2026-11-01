@@ -52,6 +52,7 @@ return [
     'admin.nav.open' => 'Izbornik',
     'admin.nav.settings' => 'Postavke',
     'admin.nav.redirects' => 'Preusmjeravanja',
+    'admin.nav.scripts' => 'Skripte i kolačići',
     'admin.nav.backups' => 'Sigurnosne kopije',
     'admin.nav.updates' => 'Ažuriranja',
     'admin.logout' => 'Odjavi se',

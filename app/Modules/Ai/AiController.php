@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Modules\Admin\Activity;
 use App\Modules\Admin\AdminView;
+use App\Modules\Mailer\MailSettings;
 use App\Modules\Pages\BlockForm;
 use App\Support\Url;
 
@@ -53,7 +54,7 @@ final class AiController
             $this->refreshModels();
         }
 
-        return Response::redirect(Url::admin('settings') . '#ai');
+        return Response::redirect(Url::admin('settings', 'ai'));
     }
 
     /**
@@ -84,7 +85,7 @@ final class AiController
             $session->set('flash_kind', 'error');
         }
 
-        return Response::redirect(Url::admin('settings') . '#ai');
+        return Response::redirect(Url::admin('settings', 'ai'));
     }
 
     /**
@@ -253,5 +254,31 @@ final class AiController
     private function db(): Db
     {
         return $this->container->get('db');
+    }
+
+    /**
+     * The AI tab's Translation values (D-248, D-294): what is stored, or what was typed into a refused
+     * save, with its errors, shown once. The key never reaches the screen, only its ends.
+     *
+     * @return array{ai: array{provider: string, model: string, keep: string, voice: string}, aiErrors: array<string, string>, aiKeyTrace: string, aiUsage: array{in: int, out: int}, aiModels: array<string, string>}
+     */
+    public static function panel(Container $container): array
+    {
+        $stored = AiSettings::stored($container->get('db'));
+        $session = $container->get('session');
+        $refused = $session->get('ai_form');
+        $session->remove('ai_form');
+        $old = is_array($refused) && is_array($refused['old'] ?? null) ? $refused['old'] : [];
+        $errors = is_array($refused) && is_array($refused['errors'] ?? null) ? $refused['errors'] : [];
+        $pick = static fn (string $name): string => is_string($old[$name] ?? null) ? $old[$name] : $stored[$name];
+        $model = ($old['model'] ?? '') === 'other' && is_string($old['model_other'] ?? null) ? $old['model_other'] : $pick('model');
+
+        return [
+            'ai' => ['provider' => $pick('provider'), 'model' => $model, 'keep' => $pick('keep'), 'voice' => $pick('voice')],
+            'aiErrors' => array_filter($errors, 'is_string'),
+            'aiKeyTrace' => MailSettings::trace($stored['key'], (string) $container->get('config')->get('app.key'), true),
+            'aiUsage' => AiSettings::usage($container->get('db')),
+            'aiModels' => AiSettings::models($container->get('db')),
+        ];
     }
 }

@@ -2,7 +2,7 @@
 
 // llms.txt, the site described for AI tools (PLAN.md D-151).
 return [
-    'llms.title' => 'AI tools',
+    'llms.title' => 'For AI search (llms.txt)',
     'llms.intro' => 'Boxlet writes llms.txt: your site’s name, the home page’s description, and every published page with its description, as a short text that AI assistants and agents read to understand the site. It is made from what you have already written and kept up to date as you publish. It does not decide whether AI companies may train on your pages; that is robots.txt.',
     'llms.on' => 'Describe the site for AI tools (llms.txt)',
     'llms.view' => 'See llms.txt',

@@ -69,7 +69,7 @@ ob_start();
                                 <li class="character-tile<?= $preset === $basis ? ' is-current' : '' ?>">
                                     <?= $chips(Presets::get($preset), 'preset-' . $preset) ?>
                                     <span class="tile-name" title="<?= e($name) ?>"><?= e($name) ?></span>
-                                    <span class="tile-tags"><?php if ($preset === $activeCharacter): ?><span class="tile-live"><?= e(t('design.preset.current')) ?></span><?php endif; ?><?php if (Characters::source($preset) !== 'core'): ?><span class="tile-custom"><?= e(t('appearance.custom')) ?></span><?php endif; ?></span>
+                                    <span class="tile-tags"><?php if ($preset === $activeCharacter): ?><span class="tile-live"><?= e(t('design.preset.current')) ?></span><?php endif; ?><?php if (Characters::byAi($preset)): ?><span class="tile-custom" title="<?= e(t('appearance.library.by_ai_hint')) ?>"><?= e(t('appearance.library.by_ai')) ?></span><?php elseif (Characters::source($preset) !== 'core'): ?><span class="tile-custom"><?= e(t('appearance.custom')) ?></span><?php endif; ?></span>
                                     <?php /* The whole tile loads it, under the menu rather than over it. */ ?>
                                     <button type="submit" form="design-form" name="action" value="preset:<?= e($preset) ?>" class="tile-use"<?= $preset === $basis ? ' aria-current="true"' : '' ?>>
                                         <span class="visually-hidden"><?= e(t('design.load_preset')) ?>: <?= e($name) ?></span></button>

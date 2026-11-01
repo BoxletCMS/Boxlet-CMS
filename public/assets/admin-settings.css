@@ -38,6 +38,12 @@
   box-shadow: inset 2px 0 0 var(--ui-accent);
 }
 
+/* Statistics' settings on their own tab (D-294), as wide as a settings tab's column beside its
+   list: 64rem less the list and the gap, so a line of a hint is as long as it was. */
+.stats-settings {
+  max-inline-size: 52rem;
+}
+
 .settings-sections,
 .settings-form {
   display: grid;

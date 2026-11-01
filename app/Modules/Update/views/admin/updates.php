@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Update\Releases;
 use App\Support\Bytes;
 use App\Support\Url;
 
@@ -57,12 +58,17 @@ $development = $current === App\Support\Version::DEVELOPMENT;
 
         <div class="panel stack">
             <h2><?= e(t('updates.file_title')) ?></h2>
-            <p class="hint"><?= e(t('updates.file_intro', ['limit' => Bytes::human($limit)])) ?></p>
+            <p class="hint"><?= e(t('updates.file_intro', ['limit' => Bytes::human($limit)])) ?> <a href="<?= e(Releases::LATEST) ?>" target="_blank" rel="noopener"><?= e(t('updates.file_latest')) ?></a></p>
+            <p class="notice notice-warning"><?= e(t('updates.file_warning')) ?> <?= e(t('updates.file_checked')) ?></p>
             <form method="post" action="<?= e(Url::admin('updates', 'upload')) ?>" enctype="multipart/form-data" class="stack">
                 <input type="hidden" name="_csrf" value="<?= e($csrf) ?>">
                 <div class="field">
                     <label for="package"><?= e(t('updates.file_label')) ?></label>
                     <input type="file" id="package" name="package" accept=".zip,application/zip" required>
+                </div>
+                <div class="field">
+                    <label class="checkbox"><input type="checkbox" name="unconfirmed" value="1"> <span><?= e(t('updates.file_unconfirmed')) ?></span></label>
+                    <span class="hint"><?= e(t('updates.file_unconfirmed_hint')) ?></span>
                 </div>
                 <div>
                     <button type="submit" class="button button-secondary" data-confirm="<?= e(t('updates.confirm_file')) ?>"><?= icon('cloud-upload') ?> <?= e(t('updates.file_go')) ?></button>

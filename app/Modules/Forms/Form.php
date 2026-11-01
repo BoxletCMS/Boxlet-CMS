@@ -18,7 +18,7 @@ use App\Modules\Pages\Slug;
  * is edited freely, and the key is what ties an answer to its field while the form is sent.
  *
  * @phpstan-type Field array{key: string, type: string, label: string, required: bool, options: list<string>}
- * @phpstan-type FormSettings array{submit: string, success: string, notify: bool, keep: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string}
+ * @phpstan-type FormSettings array{submit: string, success: string, notify: bool, keep: bool, autoreply: bool, autoreply_subject: string, autoreply_body: string, webhook: string, webhook_secret: string}
  * @phpstan-type FormRow array{id: int, locale: string, name: string, fields: list<Field>, settings: FormSettings}
  */
 final class Form
@@ -168,9 +168,14 @@ final class Form
             $key = self::key($label, $taken);
             $fields[] = ['key' => $key, 'type' => 'text', 'label' => $label, 'required' => false, 'options' => []];
         }
-        // A message must reach the owner somewhere (D-269): kept here, emailed, or both.
-        if (($settings['keep'] ?? '') !== '1' && ($settings['notify'] ?? '') !== '1') {
+        // A message must reach the owner somewhere (D-269): kept here, emailed, or sent on to
+        // a web address (O-77).
+        $webhook = mb_substr(trim((string) ($settings['webhook'] ?? '')), 0, 600);
+        if (($settings['keep'] ?? '') !== '1' && ($settings['notify'] ?? '') !== '1' && $webhook === '') {
             $errors['keep'] = t('forms.keep_or_notify');
+        }
+        if (FormWebhook::invalid($webhook) !== '') {
+            $errors['webhook'] = FormWebhook::invalid($webhook);
         }
         if ($fields === []) {
             $errors['fields'] = t('forms.fields_required');
@@ -190,6 +195,9 @@ final class Form
                 'autoreply' => ($settings['autoreply'] ?? '') === '1',
                 'autoreply_subject' => $text('autoreply_subject', 200),
                 'autoreply_body' => $text('autoreply_body', 5000),
+                'webhook' => $webhook,
+                // Never posted: the controller keeps the form's own, or makes one (O-77).
+                'webhook_secret' => '',
             ],
             'errors' => $errors,
         ];
@@ -240,6 +248,9 @@ final class Form
             'autoreply' => ($stored['autoreply'] ?? false) === true,
             'autoreply_subject' => $string('autoreply_subject'),
             'autoreply_body' => $string('autoreply_body'),
+            // Where each message is sent on, and the sealed secret it is signed with (O-77).
+            'webhook' => $string('webhook'),
+            'webhook_secret' => $string('webhook_secret'),
         ];
     }
 

@@ -102,7 +102,7 @@ final class AccountController
         $session->set('flash', $message);
         $session->set('flash_kind', $error ? 'error' : 'success');
 
-        return Response::redirect(Url::admin('settings') . '#account');
+        return Response::redirect(Url::admin('settings', 'account'));
     }
 
     private function adminId(): int

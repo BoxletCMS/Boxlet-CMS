@@ -33,7 +33,7 @@ final class DesignLibrary
     /**
      * Every saved design, newest change first, ready for the strip that lists them.
      *
-     * @return list<array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, dark: array<string, string>}>
+     * @return list<array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, dark: array<string, string>, by_ai: bool}>
      */
     public static function all(Db $db): array
     {
@@ -50,7 +50,7 @@ final class DesignLibrary
      * written by an older version — or edited by hand — can never reach the screen as
      * something the design layer does not accept.
      *
-     * @return array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, dark: array<string, string>}|null
+     * @return array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, dark: array<string, string>, by_ai: bool}|null
      */
     public static function find(Db $db, int $id): ?array
     {
@@ -69,9 +69,10 @@ final class DesignLibrary
      * @param array<string, string> $decisions
      * @param array<string, string> $look
      * @param array<string, string> $dark the owner's dark colours (D-187)
+     * @param bool $byAi kept by an AI client (D-290); the owner's save makes it theirs again
      * @return int the row's id
      */
-    public static function save(Db $db, string $name, array $decisions, array $look, string $character = '', array $dark = []): int
+    public static function save(Db $db, string $name, array $decisions, array $look, string $character = '', array $dark = [], bool $byAi = false): int
     {
         $name = self::cleanName($name);
         $now = gmdate('Y-m-d H:i:s');
@@ -81,19 +82,20 @@ final class DesignLibrary
         $lookJson = json_encode(self::cleanLook($look), JSON_THROW_ON_ERROR);
         $darkJson = json_encode(array_filter(Tokens::darkOwn($dark), static fn (string $v): bool => $v !== ''), JSON_THROW_ON_ERROR | JSON_FORCE_OBJECT);
         $character = Presets::exists($character) ? $character : '';
+        $source = $byAi ? 'ai' : '';
 
         if ($existing !== null) {
             $db->query(
-                'UPDATE design_library SET decisions_json = ?, look_json = ?, dark_json = ?, character_name = ?, updated_at = ? WHERE id = ?',
-                [$decisionsJson, $lookJson, $darkJson, $character, $now, (int) $existing['id']],
+                'UPDATE design_library SET decisions_json = ?, look_json = ?, dark_json = ?, character_name = ?, source = ?, updated_at = ? WHERE id = ?',
+                [$decisionsJson, $lookJson, $darkJson, $character, $source, $now, (int) $existing['id']],
             );
 
             return (int) $existing['id'];
         }
 
         $db->query(
-            'INSERT INTO design_library (name, character_name, decisions_json, look_json, dark_json, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [$name, $character, $decisionsJson, $lookJson, $darkJson, $now, $now],
+            'INSERT INTO design_library (name, character_name, decisions_json, look_json, dark_json, source, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [$name, $character, $decisionsJson, $lookJson, $darkJson, $source, $now, $now],
         );
 
         return (int) $db->lastInsertId();
@@ -125,7 +127,7 @@ final class DesignLibrary
 
     /**
      * @param array<string, mixed> $row
-     * @return array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, dark: array<string, string>}
+     * @return array{id: int, name: string, character: string, decisions: array<string, string>, look: array<string, string>, dark: array<string, string>, by_ai: bool}
      */
     private static function shape(array $row): array
     {
@@ -143,6 +145,7 @@ final class DesignLibrary
             'decisions' => self::decisionsOnly(Tokens::validate(is_array($decisions) ? $decisions : [])['decisions']),
             'look' => self::cleanLook(is_array($look) ? $look : []),
             'dark' => Tokens::darkOwn(is_array($dark) ? $dark : []),
+            'by_ai' => ($row['source'] ?? '') === 'ai',
         ];
     }
 

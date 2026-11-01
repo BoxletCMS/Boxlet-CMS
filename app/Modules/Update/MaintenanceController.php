@@ -41,11 +41,11 @@ final class MaintenanceController
         Activity::record($this->container->get('db'), 'settings', $on ? 'maintenance_on' : 'maintenance_off', null, '');
         $this->container->get('session')->set('flash', $on ? t('maintenance.turned_on') : t('maintenance.turned_off'));
 
-        // Back where they pressed it: site settings, or the site if they used the bar.
+        // Back where they pressed it: Settings' Maintenance tab (D-294), or the site if they used the bar.
         // The switch moved off the dashboard with D-028.
         $from = $request->input('return');
 
-        return Response::redirect($from === 'site' ? Url::page('') : Url::admin('settings'));
+        return Response::redirect($from === 'site' ? Url::page('') : Url::admin('settings', 'maintenance'));
     }
 
     /**
@@ -58,6 +58,6 @@ final class MaintenanceController
      */
     public function show(Request $request, string $locale, array $params): Response
     {
-        return Response::redirect(Url::admin('settings'));
+        return Response::redirect(Url::admin('settings', 'maintenance'));
     }
 }

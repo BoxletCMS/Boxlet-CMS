@@ -314,6 +314,8 @@ final class MediaVariants
      */
     public function incomplete(int $limit = 10): array
     {
+        // LIMIT is an int parameter. (D-275)
+        // nosemgrep: boxlet-sql-built
         $rows = $this->db->all(
             "SELECT id FROM media WHERE status <> 'complete' ORDER BY id LIMIT {$limit}",
         );

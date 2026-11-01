@@ -29,6 +29,7 @@ return [
     'activity.kind.account' => 'Prijava',
     'activity.kind.redirect' => 'Preusmjeravanje',
     'activity.kind.snippet' => 'Isječak',
+    'activity.kind.script' => 'Skripta',
 
     'activity.page.created' => 'Izrađena stranica „:name“',
     'activity.page.saved' => 'Uređena stranica „:name“',
@@ -71,6 +72,9 @@ return [
     'activity.backup.deleted' => 'Obrisana sigurnosna kopija :name',
     'activity.redirect.created' => 'Dodano preusmjeravanje za :name',
     'activity.redirect.deleted' => 'Obrisano preusmjeravanje za :name',
+    'activity.script.created' => 'Dodana skripta „:name“',
+    'activity.script.saved' => 'Uređena skripta „:name“',
+    'activity.script.deleted' => 'Obrisana skripta „:name“',
     'activity.snippet.created' => 'Dodan isječak „:name“',
     'activity.snippet.saved' => 'Uređen isječak „:name“',
     'activity.snippet.deleted' => 'Obrisan isječak „:name“',
@@ -79,6 +83,11 @@ return [
     'activity.form.saved' => 'Uređen obrazac „:name“',
     'activity.form.deleted' => 'Obrisan obrazac „:name“',
     'activity.message.received' => 'Stigla je poruka putem obrasca „:name“',
+    'activity.page.ai_created' => 'AI klijent izradio je stranicu „:name“',
+    'activity.page.ai_drafted' => 'AI klijent spremio je nacrt stranice „:name“',
+    'activity.media.ai_added' => 'AI klijent dodao je sliku „:name“',
+    'activity.design.ai_added' => 'AI klijent spremio je dizajn „:name“',
+    'activity.message.webhook_failed' => 'Poruka putem obrasca „:name“ nije stigla na web-adresu i čuva se za ponovno slanje',
 
     'activity.design.saved' => 'Objavljen izgled web-stranice',
     'activity.design.header_saved' => 'Spremljeni zaglavlje i podnožje',
@@ -90,6 +99,8 @@ return [
     'activity.design.character_missing' => 'Karakter „:name“ više ne postoji; web-stranica koristi zadani karakter',
 
     'activity.settings.saved' => 'Spremljene postavke web-stranice',
+    'activity.settings.mcp_key_created' => 'Izrađen ključ za AI pristup „:name“',
+    'activity.settings.mcp_key_revoked' => 'Opozvan ključ za AI pristup „:name“',
     'activity.settings.mail_saved' => 'Spremljene postavke slanja e-pošte',
     'activity.settings.ai_saved' => 'Spremljene postavke AI prijevoda',
     'activity.settings.language_added' => 'Dodan jezik :name',

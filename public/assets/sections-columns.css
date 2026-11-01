@@ -69,6 +69,31 @@
   --column-weight: 3;
 }
 
+/* ---- a heading no larger than its column (O-71, the owner: "B, naslov se smanji na širinu
+   stupca: riječi ostaju cijele") ------------------------------------------------------------
+
+   A block's heading is the page's --text-2xl wherever it stands, and in a quarter that was a
+   word wider than the column: Couture's "AFFORDABLE" 493 pixels in 308. Each column measures
+   itself, and a heading in it is at most 11cqi: Couture's 69 pixels are 34 in a quarter at
+   1440, and "PRISTUPAČNO" keeps whole; a heading that already fitted is smaller too
+   (Editorial's 40 is 28), the price of a rule that cannot measure a word, which the owner
+   chose over breaking it. Stacked, a column is the content's width and the cap still holds:
+   Couture 390 pixels wide is 34 rather than the 45 a section of one column has, which is also
+   what keeps "PRISTUPAČNO" (351 pixels at 45) whole in 307. Breaking the word (site.css,
+   D-241) stays the last resort.
+
+   The column becomes the nearest container for cqi inside it. Every cqi a block uses names a
+   nearer one of its own (stats, logos, the split hero's words) or stands in a section of one
+   column, which this leaves alone (the cover hero's band). */
+.section-cols:not(.cols-one) > .section-column {
+  container-type: inline-size;
+}
+
+.section-cols:not(.cols-one) > .section-column :is(.text-heading, .image-text-heading, .cards-heading, .cta-heading, .form-block-heading, .accordion-heading, .stats-heading, .gallery-heading, .logos-heading, .downloads-heading) {
+  --column-heading-size: min(var(--text-2xl), 11cqi);
+  font-size: var(--column-heading-size);
+}
+
 /* ---- inside a block ---------------------------------------------------------------------- */
 
 /* Text in two columns and Image and text keep their 16rem in blocks.css: `columns: 16rem 2`,

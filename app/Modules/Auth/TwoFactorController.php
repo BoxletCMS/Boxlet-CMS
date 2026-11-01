@@ -34,7 +34,7 @@ final class TwoFactorController
         $twoFactor = $this->twoFactor();
         if ($twoFactor->enabled($this->adminId())) {
             // To Your login, which holds two-step login since D-132; #two-step is its heading.
-        return Response::redirect(Url::admin('settings') . '#two-step');
+        return Response::redirect(Url::admin('settings', 'account') . '#two-step');
         }
         $session = $this->container->get('session');
         $secret = $session->get('totp_setup');
@@ -56,7 +56,7 @@ final class TwoFactorController
         $secret = $session->get('totp_setup');
         if (!is_string($secret) || $secret === '' || $twoFactor->enabled($this->adminId())) {
             // To Your login, which holds two-step login since D-132; #two-step is its heading.
-        return Response::redirect(Url::admin('settings') . '#two-step');
+        return Response::redirect(Url::admin('settings', 'account') . '#two-step');
         }
         if (!$twoFactor->valid($secret, $request->input('code'))) {
             return $this->setupScreen($secret, t('twofactor.code_wrong'), 422);
@@ -141,7 +141,7 @@ final class TwoFactorController
         }
 
         // To Your login, which holds two-step login since D-132; #two-step is its heading.
-        return Response::redirect(Url::admin('settings') . '#two-step');
+        return Response::redirect(Url::admin('settings', 'account') . '#two-step');
     }
 
     private function twoFactor(): TwoFactor
